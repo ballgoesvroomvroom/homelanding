@@ -1,0 +1,19 @@
+:root {
+	--background-color: #3f444d;
+}
+
+body, html {
+	height: 100vh;
+
+	word-wrap: break-word;
+	word-break: break-word;
+	background-color: var(--background-color);
+	font-family: 'Alegreya Sans', sans-serif;
+}
+
+.unselectable {
+	-webkit-user-select: none; /* Safari */        
+	-moz-user-select: none; /* Firefox */
+	-ms-user-select: none; /* IE10+/Edge */
+	user-select: none; /* Standard */
+}
