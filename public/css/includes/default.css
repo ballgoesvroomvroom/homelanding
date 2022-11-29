@@ -1,5 +1,7 @@
 :root {
-	--background-color: #3f444d;
+	--background-color: #fff;
+	--accent-color: #ff9cd7;
+	--accent2-color: #ebffb2;
 }
 
 body, html {
@@ -9,6 +11,30 @@ body, html {
 	word-break: break-word;
 	background-color: var(--background-color);
 	font-family: 'Alegreya Sans', sans-serif;
+}
+
+li {
+	margin-bottom: 10px;
+}
+
+a {
+	color: #ff0000;
+
+	padding: 5px;
+	border-radius: .4rem;
+
+	transition-property: background-color;
+	transition-duration: 150ms;
+	transition-timing-function: linear;
+}
+
+a:hover {
+	background-color: var(--accent2-color);
+}
+
+h1 {
+	font-size: 3em;
+	color: var(--accent-color);
 }
 
 .unselectable {

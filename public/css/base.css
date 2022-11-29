@@ -1,10 +1,13 @@
+:root {
+	--folder-bg-color: #3f444d;
+}
+
 #frontpage {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 
 	height: 100vh;
-	background-color: #fff;
 
 	font-size: 2.5rem;
 }
@@ -19,11 +22,34 @@
 
 	font-size: 1.2rem;
 	color: #fff;
+
+	background-color: var(--folder-bg-color);
+}
+
+#meat {
+	display: flex;
+	flex-direction: column;
+	flex-basis: 150px;
+	flex-grow: 1;
+
+	min-height: 0;
+	padding: 20px;
 }
 
 #footer {
-	height: 150px;
+	min-height: 0;
+	padding: 20px;
+
+	line-height: 1.5;
 	background-color: #e3e3e3;
+}
+
+#subdirectories-content {
+	list-style-type: cjk-heavenly-stem;
+}
+
+#subdirectories-content > li {
+	line-height: 1.4;
 }
 
 #filedisplay {
@@ -49,7 +75,7 @@
 	margin-bottom: 20px;
 	font-size: 7em;
 
-	color: #444;
+	color: var(--accent-color);
 }
 
 #subtitlecontainer {
@@ -129,7 +155,7 @@
 	border-radius: 0 .4rem .4rem 0;
 
 	color: #fbfbfb;
-	background-color: var(--background-color);
+	background-color: var(--folder-bg-color);
 
 	transition-property: color, background-color;
 	transition-duration: 100ms;
