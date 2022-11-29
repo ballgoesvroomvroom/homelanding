@@ -236,6 +236,10 @@
 
 #filecontentcontainer {
 	display: flex;
+	flex-shrink: 1;
+
+	min-height: 0;
+	margin-bottom: 20px;
 }
 
 #filecontent {
