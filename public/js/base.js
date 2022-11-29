@@ -217,7 +217,6 @@ $(document).ready(function() {
 				$fileitem.appendTo($selectors["fileview-container"])
 
 				let resourcepointer;
-				console.log(filename, dir[filename], typeof dir[filename])
 				if (typeof dir[filename] == "object") {
 					// target is a folder
 					resourcepointer = subtree +filename +"/" // important to add the trailing slash
@@ -320,6 +319,13 @@ $(document).ready(function() {
 	})
 
 	$selectors["filecard-close"].on("click", closeFileviewing)
+
+	$selectors["filecard-maximise"].on("click", () => {
+		// open a new tab to resourcepointer if currentfileinview is not null
+		if (currentfileinview) {
+			window.open(currentfileinview.replace("root", "cannon"), "_blank")
+		}
+	})
 
 	buildSubtree("root/")
 })
