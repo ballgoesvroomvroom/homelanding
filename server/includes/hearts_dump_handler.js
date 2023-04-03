@@ -32,7 +32,7 @@ class Utils {
 		// use moment instead (as a proxy, sort-of)
 		var t = moment(date.toISOString()) // UTC timezone
 		var localisedT = t.tz(timeZone)
-		var isoFromMoment = localisedT.format() // local iso 8601
+		var isoFromMoment = localisedT.format("YYYY-MM-DDTHH:mm:ss.SSS") // local iso 8601
 
 		// Include the milliseconds from the original timestamp
 		// iso += '.' + date.getMilliseconds().toString().padStart(3, '0');
