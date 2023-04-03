@@ -3,6 +3,7 @@ const fs = require("fs")
 const sharp = require("sharp")
 const crypto = require("crypto")
 const exifr = require("exifr")
+const moment = require('moment-timezone');
 
 const databaseInterface = require("../database/interface.js");
 const images_db = databaseInterface.images_db
@@ -26,13 +27,20 @@ class Utils {
 	// https://stackoverflow.com/a/29268535/12031810
 	static getTimeZoneOffset(date, timeZone) {
 		// Abuse the Intl API to get a local ISO 8601 string for a given time zone.
-		let iso = date.toLocaleString('en-CA', { timeZone, hour12: false }).replace(', ', 'T');
+		// let iso = date.toLocaleString('en-CA', { timeZone, hour12: false }).replace(', ', 'T'); // not reliable on different os
+
+		// use moment instead (as a proxy, sort-of)
+		var t = moment(date.toISOString()) // UTC timezone
+		var localisedT = t.tz(timeZone)
+		var isoFromMoment = localisedT.format() // local iso 8601
 
 		// Include the milliseconds from the original timestamp
-		iso += '.' + date.getMilliseconds().toString().padStart(3, '0');
+		// iso += '.' + date.getMilliseconds().toString().padStart(3, '0');
 
 		// Lie to the Date object constructor that it's a UTC time.
-		const lie = new Date(iso + 'Z');
+		console.log("[DEBUG]: gettzoffset", date, isoFromMoment)
+		const lie = new Date(isoFromMoment + 'Z');
+		console.log("[DEBUG]: processed lie", lie, lie - date, -(lie-date))
 
 		// Return the difference in timestamps, as minutes
 		// Positive values are West of GMT, opposite of ISO 8601
