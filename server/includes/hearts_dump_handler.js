@@ -80,7 +80,7 @@ class Properties {
 	}
 
 	addDateTaken(dateObj, localTimezone, customDateInput) {
-		// dateObj is representative of system time since exifr always return in UTC timezone (caveat)
+		// dateObj is representative of system time since exifr always return in whatever timezone the machine was on (exif doesnt store timezone)
 		// add a field to show the local representative time for user (that uploaded) timezone
 
 		// use moment-timezone to assist
