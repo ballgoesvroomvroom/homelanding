@@ -83,7 +83,12 @@ var interfaceHandler = {
 			// format both dates in 'DD/MM/YYYY, HH:MM:SS {TIMEZONE}'
 			var date = new Date(data.ms_since_epoch)
 			var system_date_repr = `${date.getDate().toString().padStart(2, "0")}/${(date.getMonth() +1).toString().padStart(2, "0")}/${date.getFullYear()}, ${date.toTimeString()}`
-			var upload_fixed_date_repr = date.toLocaleString("en-GB", {timeZone: "Asia/Singapore"}) +' GMT +8'
+
+			// calculate timezone string (gmt offset)
+			var date_sign_prefix = data.localUploadedDate.offset <= 0 ? "+" : "-" // will be a + on 0 offset
+			var date_hour_offset_repr = Math.floor(Math.abs(data.localUploadedDate.offset) /60)
+			var date_min_offset_repr = Math.abs(data.localUploadedDate.offset) -(date_hour_offset_repr *60)
+			var upload_fixed_date_repr = date.toLocaleString("en-GB", {timeZone: data.uploaded_timezone_str}) +` GMT${date_sign_prefix}${date_hour_offset_repr.toString().padStart(2, "0")}${date_min_offset_repr.toString().padStart(2, "0")}`
 
 			// get file size
 			var fileSizeBytes = data.sizeBytes
@@ -1023,7 +1028,7 @@ class CreatePage {
 				parsedMetadata.title = metadata.title
 			}
 
-			formData.append("files", data.fileBlob, "upload.png")
+			formData.append("files", data.fileBlob)
 			formData.append("metadata", JSON.stringify(parsedMetadata))
 		}
 
