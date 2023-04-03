@@ -168,33 +168,32 @@ class Image {
 		qualityRes = qualityRes.map(qualityReduced => {
 			var newFilename = `${this.filename_wo_ext}_${qualityReduced}.webp`
 			var newFileDest = path.join(destination_folder, newFilename)
-			return sharp(this.filepath)
+
+			console.log("[DEBUG]: creating write stream for", this.filepath)
+			// create in/out streams
+			const readableStream = fs.createReadStream(this.filepath)
+			const writableStream = fs.createWriteStream(newFileDest)
+
+			// create sharp pipeline
+			const transform = sharp()
 				.webp({quality: qualityReduced})
-				.toFile(newFileDest)
-				.then(info => {
-					// append new filename & path to it
-					info.filename = newFilename
-					info.filepath = newFileDest
-					info.qualityReduced = qualityReduced
-					return info
-				})
+
+			// funnel pipeline
+			readableStream.pipe(transform).pipe(writableStream)
+			console.log("[DEBUG]: stream funneled")
+
+			// update data
+			writableStream.on("finish", () => {
+				this.compressed[qualityReduced] = {
+					filename: newFilename,
+					filepath: newFileDest,
+					sizeBytes: writableStream.bytesWritten
+				}
+			})
+
+			return newFileDest
 		})
 		console.log("[DEBUG]: post-map:", qualityRes)
-
-		return Promise.all(qualityRes).then(res => {
-			// res contains return values of promises appended in qualityRes array
-			// example: res = [info1, info2]
-			for (let i = 0; i < res.length; i++) {
-				var info = res[i]
-				this.compressed[info.qualityReduced] = {
-					filename: info.filename,
-					filepath: info.filepath,
-					width: info.width,
-					height: info.height,
-					sizeBytes: info.size
-				}
-			}
-		})
 	}
 
 	getUid() {
