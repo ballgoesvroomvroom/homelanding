@@ -12,6 +12,17 @@ router.get("/", (req, res) => {
 	res.sendFile(views.home);
 })
 
+router.get(`/${encodeURIComponent("<3")}`, (req, res) => {
+	res.type("html");
+
+	if (req.session.isAdmin) {
+		res.sendFile(views.upload)
+	} else {
+		// send lock screen
+		res.sendFile(views.upload_lockscreen)
+	}
+})
+
 // SECRET CREATE PATHS
 router.get("/secret-upload-path", (req, res) => {
 	if (req.session.username === "admin") {

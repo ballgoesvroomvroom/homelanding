@@ -1,0 +1,139 @@
+details > summary {
+	list-style: none;
+	display: none;
+}
+
+details > summary::-webkit-details-marker {
+	display: none;
+}
+
+#item-zoom {
+	--primary-color: #f8f8f8;
+}
+
+#item-zoom {
+	display: flex;
+	flex-direction: column;
+
+	position: absolute;
+	top: 42px;
+	left: 0;
+
+	width: 100%;
+	height: calc(100% - 42px);
+
+	transform-origin: 50% 100%;
+	transform: scale(0);
+
+	border-radius: .4rem;/* 10% 10% 0 0;*/
+
+	transition-property: border-radius, transform, left, top;
+	transition-duration: 250ms;
+
+	touch-action: none;
+}
+
+#item-zoom.active {
+	transform: scale(1.0);
+
+	border-radius: 0;
+	background-color: var(--primary-color);
+}
+
+#item-zoom.hidden {
+	left: 100% !important; /* let this override any inline styling set by js */
+}
+
+#item-image-container {
+	width: 100%;
+	flex-basis: 40%;
+	max-height: 60%;
+	min-height: 40%;
+
+	flex-shrink: 0;
+	flex-grow: 1;
+}
+
+#item-image-container > img {
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
+}
+
+#item-details-container {
+	flex-grow: 0;
+	flex-shrink: 1;
+	display: flex;
+	flex-direction: column;
+
+	height: auto;
+	min-height: 0;
+	padding: 10px;
+
+	overflow-y: auto;
+	font-size: .9rem;
+	line-height: 1.5;
+}
+
+#item-detail-title {
+	font-family: 'Alegreya Sans', sans-serif;
+	font-size: 24px; /* h1 font styling */
+	font-weight: 700;
+	color: var(--accent-color);
+
+	--noTitleFontColor: #cbcbcb;
+}
+
+#item-detail-title-inputtext {
+	border: none;
+}
+
+#item-detail-title-inputtext::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+	color: var(--noTitleFontColor);
+	opacity: 1; /* firefox */
+}
+
+#item-detail-title-inputtext:-ms-input-placeholder { /* Internet Explorer 10-11 */
+	color: var(--noTitleFontColor);
+}
+
+#item-detail-title-inputtext::-ms-input-placeholder { /* Microsoft Edge */
+	color: var(--noTitleFontColor);
+}
+
+#item-detail-title.noTitle {
+	color: var(--noTitleFontColor);
+}
+
+.inline-svg {
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+}
+
+.inline-svg > img {
+	width: 16px;
+	height: 16px;
+	padding: 5px;
+	padding-left: 0;
+	object-fit: cover;
+}
+
+#item-detail-date {
+	align-items: flex-start;
+}
+
+#item-detail-fixeddate {
+	padding-left: 21px;
+	font-size: .8rem;
+	color: #6e6e6e;
+}
+
+#item-detail-more-trigger {
+	margin-top: 10px;
+	cursor: pointer;
+}
+
+@media only screen and (min-width: 800px) {
+	/* left bar is present */
+}

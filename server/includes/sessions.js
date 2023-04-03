@@ -66,6 +66,10 @@ class Client {
 		this.id = randomBytes(16)
 		this.isAuthenticated = false;
 		this.isAdmin = false;
+		this.perms = {
+			"upload": false,
+			"delete": false
+		}
 
 		// metadaata
 		this._createdAt = (new Date()).getTime();

@@ -4,6 +4,10 @@ const express = require("express");
 
 const views = require("../includes/views.js");
 const sessions = require("../includes/sessions.js");
+const errmsg = require("../includes/err_msgs.js")
+
+const databaseInterface = require("../database/interface.js");
+const auth_keysDB = databaseInterface.auth_keys
 // const databaseinst = require("../../base/database.js");
 
 // const userDB = databaseinst.user;
@@ -95,9 +99,16 @@ const admin_authenticated = (req, res, next) => { // actual authentication
 	if (sessionobj.isAuthenticated && sessionobj.isAdmin) {
 		next(); // authenticated
 	} else {
-		res.sendFile(views.login); // send login page
+		// deny request
+		res.status(401).end();
+		// res.sendFile(views.login); // send login page
 	}
 }
+
+router.get("/perms", (req, res) => {
+	// return permissions scope user has
+	res.json(req.session.perms);
+})
 
 router.post("/login", (req, res) => {
 	// authenticate based on username and password (plain/text)
@@ -131,29 +142,25 @@ router.post("/login", (req, res) => {
 
 			if (username.length < 5 || username.length > 25) {
 				throw new Error(errmsg.invalid);
-			} else if (password.length < 6 || password.length > 100) {
+			} else if (password.length != 6) {
 				throw new Error(errmsg.invalid);
 			}
 
-			if (username == "1234" && password == "0000") {
-				req.session.username = 'admin';
+			var hashed_password = auth_keysDB.mask.hash(password)
+			if (hashed_password in auth_keysDB.data) {
+				var userData = auth_keysDB.data[hashed_password];
+				req.session.username = userData.username;
+				console.log("[DEBUG]: user logged in as", req.session.username)
+				req.session.isAdmin = true
+
 				authSuccess = true;
 
-				// give admin privileges
-				req.session.isAdmin = true;
+				// set perms
+				req.session.perms = {
+					"upload": userData.perms.upload,
+					"delete": userData.perms.delete
+				};
 			}
-			// if (userDB.doesUserExists(username)) {
-			// 	// validate password
-			// 	if (password == userDB.getUserField(username, "password")) {
-			// 		req.session.username = username; // store username
-			// 		authSuccess = true;
-
-			// 		// check for admin privileges
-			// 		if (username == "admin") {
-			// 			req.session.isAdmin = true
-			// 		}
-			// 	}
-			// }
 		} else {
 			throw new Error(errmsg.missing);
 		}
@@ -164,11 +171,11 @@ router.post("/login", (req, res) => {
 
 	if (authSuccess) {
 		req.session.isAuthenticated = true;
-		res.status(200).end();
+		res.json({"username": req.session.username})
 	} else {
 		// return 401
 		// following spec
-		res.set("WWW-Authenticate", `Basic realm="Site login"`);
+		// res.set("WWW-Authenticate", `Basic realm="Site login"`);
 		res.status(401).json({"error": "Invalid credentials"});
 	}
 })

@@ -1,16 +1,17 @@
 :root {
 	--background-color: #fff;
-	--accent-color: #ff9cd7;
+	--accent-color: #ff6d91;
 	--accent2-color: #ebffb2;
+	--accent3-color: #fbbfce;
 }
 
 body, html {
-	height: 100vh;
+	height: 100%;
 
 	word-wrap: break-word;
 	word-break: break-word;
 	background-color: var(--background-color);
-	font-family: 'Alegreya Sans', sans-serif;
+	font-family: 'Open Sans', sans-serif;
 }
 
 li {
@@ -33,8 +34,25 @@ a:hover {
 }
 
 h1 {
-	font-size: 3em;
+	font-size: 24px;
+	font-weight: 700;
 	color: var(--accent-color);
+}
+
+h2 {
+	font-size: 18px;
+	font-weight: 500;
+}
+
+input {
+	all: unset;
+	border-width: 0 0 2px 0;
+	border-style: solid;
+	border-color: #dbdbdb;
+}
+
+.hidden {
+	display: none;
 }
 
 .unselectable {
@@ -42,4 +60,21 @@ h1 {
 	-moz-user-select: none; /* Firefox */
 	-ms-user-select: none; /* IE10+/Edge */
 	user-select: none; /* Standard */
+}
+
+.skeleton {
+	background: linear-gradient(85deg, #efefef 20%, rgb(255, 255, 255) 50%, #efefef 80%);
+	background-repeat: repeat-x;
+	background-size: 150% 100%;
+	background-position: 0 0;
+	animation: skeleton-loading 1s linear infinite;
+}
+
+@keyframes skeleton-loading {
+	from {
+		background-position: 300% 0;
+	}
+	to {
+		background-position: 0 0;
+	}
 }

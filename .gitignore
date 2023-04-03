@@ -1,1 +1,6 @@
 node_modules/*
+.env
+public/hearts/*
+!public/hearts/*/
+public/hearts/background/*
+public/hearts/compressed/*
