@@ -80,8 +80,17 @@ class Properties {
 	}
 
 	addDateTaken(dateObj, localTimezone, customDateInput) {
-		// dateObj is representative in UTC time
+		// dateObj is representative of system time since exifr always return in UTC timezone (caveat)
 		// add a field to show the local representative time for user (that uploaded) timezone
+
+		// use moment-timezone to assist
+		var systemTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+		console.log("[DEBUG]: fetched system timezone", systemTimezone)
+		var localDate = moment.tz(dateObj.valueOf(), systemTimezone) // moment object with respect to system timezone
+
+		// generate actual utc date from moment object
+		dateObj = new Date(localDate.utc().valueOf())
+
 		console.log("[DEBUG]: dateObj:", dateObj, dateObj.valueOf())
 		console.log("[DEBUG]: .getTimezoneOffset()", dateObj.getTimezoneOffset())
 		this.date = {
