@@ -26,7 +26,7 @@
 				<h1>Enter<br>key</h1>
 				<div id="form-container">
 					<form id="keyinputform" onsubmit="return false">
-						<input id="authkeyinput" name="authenticationkey" type="password" placeholder="•••" onfocus="this.value=''">
+						<input id="authkeyinput" name="authenticationkey" type="password" pattern="\d{6}" inputmode="numeric" placeholder="•••" onfocus="this.value=''">
 						<button id="keyenterbutton" type="submit">G</button>
 					</form>
 				</div>
