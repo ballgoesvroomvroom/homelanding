@@ -1150,7 +1150,7 @@ $(document).ready(() => {
 	$selectors["task-save-path circle"].css("stroke-dasharray", circle_dasharray_length)
 	$selectors["task-save-path circle"].css("stroke-dashoffset", circle_dasharray_length)
 
-	// create page interface handler
+	// create page upload interface handler
 	$selectors["create-upload-btn"].on("click", e => {
 		e.preventDefault()
 		$selectors["create-file-input"].trigger("click")
@@ -1249,6 +1249,9 @@ $(document).ready(() => {
 		// retrieve create page container
 		var createPageContainer = interfaceHandler.getCreatePageContainer()
 
+		// save whatever was written
+		createPageContainer.saveCurrentFormToEntry()
+
 		if (createPageContainer.entry.length >= 1) {
 			// theres uploaded data
 			var fd = createPageContainer.parseToFormData()
@@ -1288,5 +1291,5 @@ $(document).ready(() => {
 	interfaceHandler.registerGestures()
 
 	// testing
-	interfaceHandler.switchPage(2)
+	// interfaceHandler.switchPage(2)
 })
