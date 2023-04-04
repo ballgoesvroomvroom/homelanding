@@ -214,17 +214,22 @@ class Image {
 			console.log("[DEBUG]: stream funneled")
 
 			// update data
-			writableStream.on("finish", () => {
-				this.compressed[qualityReduced] = {
-					filename: newFilename,
-					filepath: newFileDest,
-					sizeBytes: writableStream.bytesWritten
-				}
-			})
+			return new Promise(res => {
+				writableStream.on("finish", () => {
+					this.compressed[qualityReduced] = {
+						filename: newFilename,
+						filepath: newFileDest,
+						sizeBytes: writableStream.bytesWritten
+					}
 
-			return newFileDest
+					// resolve call
+					res()
+				})
+			})
 		})
+
 		console.log("[DEBUG]: post-map:", qualityRes)
+		return Promise.all(qualityRes)
 	}
 
 	getUid() {
@@ -358,7 +363,7 @@ class Image {
 			if (err) {
 				console.warn("[DEBUG]: unable to delete file", this.filepath, "with error:", err)
 			} else {
-				console.log("[DEBUG]: deleted file successfully")
+				console.log("[DEBUG]: deleted file,", this.filepath, ", successfully")
 			}
 		})
 
@@ -399,12 +404,12 @@ class Scheduler {
 				)
 
 				// execute main process
-				await handleFileObject.process()
-					.then(() => handleFileObject.createLowerRes([20, 50]))
-					.then(() => {
-						console.log("[DEBUG]: done processing image", handleFileObject.imageProperties)
-						handleFileObject.addToDatabase()
-				}).catch(errCode => {
+					await handleFileObject.process()
+						.then(() => handleFileObject.createLowerRes([20, 50]))
+						.then(() => {
+							console.log("[DEBUG]: done processing image", handleFileObject.imageProperties)
+							handleFileObject.addToDatabase()
+					}).catch(errCode => {
 					// error handling
 					if (typeof errCode == "number") {
 						console.warn("[DEBUG]: handleFileObject returned error code:", errCode, "when .process() method was called")
@@ -415,7 +420,7 @@ class Scheduler {
 					// delete file
 					handleFileObject.destroy()
 
-					// add it to this.unsuccessful references
+					// add it to this.unsuccessful references (use index so original file can be identified)
 					this.unsuccessful.push(i)
 				})
 			}

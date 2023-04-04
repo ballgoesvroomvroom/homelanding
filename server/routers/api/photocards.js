@@ -146,7 +146,7 @@ router.post("/upload", auth_router.admin_authenticated, upload.array("files"), (
 			return res.json({status: 3})
 		} else if (handleFileScheduler.unsuccessful.length > 0) {
 			// semi-okay (returns the array containing the original names of the files that have failed)
-			return res.json({status: 2, unsuccessful: handleFileScheduler.queue.map(obj => obj[2])})
+			return res.json({status: 2, unsuccessful: handleFileScheduler.unsuccessful})
 		} else if (handleFileScheduler.unsuccessful.length == 0) {
 			// all okay
 			return res.json({status: 1})

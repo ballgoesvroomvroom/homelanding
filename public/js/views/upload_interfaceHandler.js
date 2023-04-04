@@ -308,13 +308,27 @@ var interfaceHandler = {
 		}, 3000)
 	},
 
-	newCreatePageContainer() {
+	newCreatePageContainer(savedEntry) {
 		// trash the current object and creates a new one
 		if (this.createPageContainer) {
 			this.createPageContainer.destroy()
 		}
 
 		this.createPageContainer = new CreatePage(this.$selectors)
+
+		// check if savedEntry is not null (entries re-used from the previous createPageContainer)
+		if (savedEntry && savedEntry.length >= 1) {
+			savedEntry.forEach(entry => {
+				this.createPageContainer.entry.push(entry)
+			})
+
+			savedEntry = null // remove reference for GC (not needed?)
+
+			// set current selection to 0 (and call .handleImageClickSelection() so that image & overlay display stats are accurate)
+			// can safely set since there is gauranteed to be something in this.entry (since saveEntry.length >= 1)
+			this.createPageContainer.handleImageClickSelection(0, false)
+		}
+
 		return this.createPageContainer
 	},
 	getCreatePageContainer() {
@@ -326,7 +340,7 @@ var interfaceHandler = {
 		return this.createPageContainer
 	},
 	handleCreatePageWorker() {
-		// handles reply from create page worke
+		// handles reply from create page worker (hooked on .ready())
 		if (CreatePage.worker) {
 			// worker exists
 			console.log("[DEBUG]: worker received")
@@ -787,6 +801,9 @@ class CreatePage {
 		// update counter
 		this.$selectors["create-upload-counter"].text(`${selectionIdx +1}/${this.entry.length}`)
 
+		// show hidden proceed button
+		this.$selectors["create-page-topbar-right"].removeClass("hidden")
+
 		// show navigation arrows (if there is any previous/next images to be shown)
 		if (this.entry.length -1 > selectionIdx) {
 			// there is more (show next button)
@@ -874,7 +891,7 @@ class CreatePage {
 		if (selectionIdx >= 1) {
 			// previous item (selectionIdx of 0 can be shown)
 			this.$selectors["create-upload-prev-btn"].removeClass("hidden")
-		}else {
+		} else {
 			this.$selectors["create-upload-prev-btn"].addClass("hidden")
 		}
 
@@ -1045,12 +1062,39 @@ class CreatePage {
 			// theres uploaded data
 			var fd = this.parseToFormData()
 
-			interfaceHandler.uploadImages(fd).then(success => {
+			interfaceHandler.uploadImages(fd).then((returnedPayload) => {
 				// success: boolean (whether upload post was successful or not)
+				var [success, failedUploads] = returnedPayload
+				console.log("[DEBUG]: received data server", success, failedUploads)
 				if (success) {
 					// create a new container for the next upload (if any)
 					interfaceHandler.newCreatePageContainer();
+				} else if (failedUploads) {
+					// some images still salvageable
+
+					// save entry data (for images that failed)
+					var cached = []
+					for (let i = 0; i < failedUploads.length; i++) {
+						var fileIdx = failedUploads[i]
+						if (fileIdx >= this.entry.length) {
+							// file index out of range (not possible??)
+							console.warn("[WARN]: fileIdx", fileIdx, "out of range for entries", this.entry)
+
+							// skip this file index
+							continue
+						}
+
+						cached.push(this.entry[fileIdx])
+					}
+
+					// create a new container with re-used data for those files that have failed
+					interfaceHandler.newCreatePageContainer(cached)
+
+					// show notification
+					interfaceHandler.notification("Failed to upload these files", "#ff0000")
 				} else {
+					// totally failed
+					// re-use the same current createPageContainer
 					interfaceHandler.notification("Failed to upload", "#ff0000")
 				}
 			})
