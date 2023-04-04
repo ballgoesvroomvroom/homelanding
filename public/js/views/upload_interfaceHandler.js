@@ -1035,6 +1035,28 @@ class CreatePage {
 		return formData
 	}
 
+	submitData() {
+		// submit images to server
+
+		// save whatever was written
+		this.saveCurrentFormToEntry()
+
+		if (this.entry.length >= 1) {
+			// theres uploaded data
+			var fd = this.parseToFormData()
+
+			interfaceHandler.uploadImages(fd).then(success => {
+				// success: boolean (whether upload post was successful or not)
+				if (success) {
+					// create a new container for the next upload (if any)
+					interfaceHandler.newCreatePageContainer();
+				} else {
+					interfaceHandler.notification("Failed to upload", "#ff0000")
+				}
+			})
+		}
+	}
+
 	destroy() {
 		this.hideContent() // show default empty page
 
@@ -1249,23 +1271,16 @@ $(document).ready(() => {
 		// retrieve create page container
 		var createPageContainer = interfaceHandler.getCreatePageContainer()
 
-		// save whatever was written
-		createPageContainer.saveCurrentFormToEntry()
+		// delegate it to create page object
+		createPageContainer.submitData()
+	})
 
-		if (createPageContainer.entry.length >= 1) {
-			// theres uploaded data
-			var fd = createPageContainer.parseToFormData()
+	// disable submit function on edit details form (title, date)
+	// instead, forward request to $selectors["create-page-proceed-btn"]
+	$selectors["create-edit-form"].on("submit", e => {
+		e.preventDefault()
 
-			interfaceHandler.uploadImages(fd).then(success => {
-				// success: boolean (whether upload post was successful or not)
-				if (success) {
-					// create a new container for the next upload (if any)
-					interfaceHandler.newCreatePageContainer();
-				} else {
-					interfaceHandler.notification("Failed to upload", "#ff0000")
-				}
-			})
-		}
+		$selectors["create-page-proceed-btn"].trigger("click")
 	})
 
 	// proxy trigger for summary tab on close up view page
