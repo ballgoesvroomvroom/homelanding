@@ -109,18 +109,33 @@ class APIActions {
 		}
 
 		// send fetch POST request
-		return fetch(`${this.base}/upload`, {
+		var path = `${this.base}/upload`
+		return fetch(path, {
 			method: "POST",
 			body: formData
 		}).then(r => {
 			if (r.status == 200) {
-				return true
+				return r.json()
 			} else {
 				return Promise.reject(r.status)
 			}
+		}).then(data => {
+			// data: {status: number, unsuccessful: {number}}
+			switch (data.status) {
+				case 1:
+					// all images uploaded fine
+					return [true]
+				case 2:
+					// only some images uploaded fine
+					// images that failed to upload, its index would be contained within data.unsuccessful
+					return [false, data.unsuccessful]
+				case 3:
+					// all images failed to upload
+					return [false]
+			}
 		}).catch(errcode => {
 			console.warn("[WARN]: failed to upload to route " +path +" with HTTP status code", errcode)
-			return false
+			return [false]
 		})
 	}
 }
