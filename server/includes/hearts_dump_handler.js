@@ -80,17 +80,7 @@ class Properties {
 	}
 
 	addDateTaken(dateObj, localTimezone, customDateInput) {
-		// dateObj is representative of system time since exifr always return in whatever timezone the machine was on (exif doesnt store timezone)
-		// add a field to show the local representative time for user (that uploaded) timezone
-
-		// use moment-timezone to assist
-		var systemTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
-		console.log("[DEBUG]: fetched system timezone", systemTimezone)
-		var localDate = moment.tz(dateObj.valueOf(), systemTimezone) // moment object with respect to system timezone
-
-		// generate actual utc date from moment object
-		dateObj = new Date(localDate.utc().valueOf())
-
+		// dateObj.valueOf() should return the representive second in time (respective to localTimezone) for the image date (be it custom input or not)
 		console.log("[DEBUG]: dateObj:", dateObj, dateObj.valueOf())
 		console.log("[DEBUG]: .getTimezoneOffset()", dateObj.getTimezoneOffset())
 		this.date = {
@@ -149,7 +139,31 @@ class Image {
 				customDateInput = true; // set this to true so imageProperties know that date was NOT extracted from the image itself
 				console.log("[DEBUG]: custom date used with", this.uploadedMetadata.date, date)
 			} else {
-				date = r.DateTimeOriginal
+				date = r.DateTimeOriginal // should be in UTC
+				console.log("[DEBUG]: original date", date)
+
+				// date returned by exifr.parse() is built using Date object, hence it will take it as the local date & time (in perspective of the systems time)
+				// hence we extract the individual components and work off there, instead of relying on the UTC components
+				// using extracted components to create the same exact date with moment.js just that with the uploaded timezone set provided (spoofing the timezone)
+				var day = date.getDate().toString().padStart(2, "0")
+				var month = (date.getMonth() +1).toString().padStart(2, "0")
+				var year = date.getFullYear().toString().padStart(4, "0")
+
+				var hour = date.getHours().toString().padStart(2, "0")
+				var min = date.getMinutes().toString().padStart(2, "0")
+				var sec = date.getSeconds().toString().padStart(2, "0")
+				var ms = date.getMilliseconds().toString().padStart(3, "0")
+
+				// in the format YYYY-MM-DD HH:mm:ss.SSS (for moment object)
+				var format_date_string = `${year}-${month}-${day} ${hour}:${min}:${sec}.${ms}`
+				console.log("[DEBUG]: formatted string", format_date_string)
+
+				// create moment object and force the extracted date info to be in the uploaded user's timezone
+				var momentObj = moment.tz(format_date_string, this.uploadedMetadata.timezonePref)
+				console.log("[DEBUG]: moment object", momentObj)
+
+				// convert it back to utc
+				date = new Date(momentObj.utc().valueOf())
 			}
 
 			console.log("[DEBUG]: parsed date", date)
