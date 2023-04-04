@@ -689,6 +689,8 @@ class CreatePage {
 		this.entry = []
 
 		this.currentSelectionIdx = -1 // zero index based
+
+		this.submitLocked = false // toggled true when .submitData() is called to prevent double submits (debounce)
 	}
 
 	createEmptyImageContainer(fileBlob) {
@@ -928,6 +930,12 @@ class CreatePage {
 		}
 	}
 
+	clearEditForm() {
+		// empty out form (so .saveCurrentFormToEntry() does not save any data)
+		this.$selectors["create-form-title-input"].val()
+		this.$selectors["create-form-date-input"].val()
+	}
+
 	deleteCurrentSelected() {
 		// references this.currentSelectionIdx
 		if (this.currentSelectionIdx !== -1 && this.currentSelectionIdx <= this.entry.length -1) {
@@ -959,6 +967,7 @@ class CreatePage {
 
 		// hide edit form
 		this.$selectors["create-edit-form"].addClass("hidden")
+		this.clearEditForm()
 
 		// show empty placeholder
 		this.$selectors["create-edit-emptyplaceholder"].removeClass("hidden")
@@ -1056,6 +1065,12 @@ class CreatePage {
 	submitData() {
 		// submit images to server
 
+		// check debounce
+		if (this.submitLocked) {
+			return
+		}
+		this.submitLocked = true
+
 		// save whatever was written
 		this.saveCurrentFormToEntry()
 
@@ -1069,6 +1084,12 @@ class CreatePage {
 				console.log("[DEBUG]: received data server", success, failedUploads)
 				if (success) {
 					// create a new container for the next upload (if any)
+
+					// clear form so in case new create page container gets created and proceed btn gets triggered immediately after, no old data is being brough forward
+					// since debounce is not global, only localised to THIS object only
+					this.clearEditForm()
+
+					// create new container
 					interfaceHandler.newCreatePageContainer();
 				} else if (failedUploads) {
 					// some images still salvageable
@@ -1088,6 +1109,10 @@ class CreatePage {
 						cached.push(this.entry[fileIdx])
 					}
 
+					// clear form so in case new create page container gets created and proceed btn gets triggered immediately after, no old data is being brought forward
+					// since debounce is not global, only localised to THIS object only
+					this.clearEditForm()
+
 					// create a new container with re-used data for those files that have failed
 					interfaceHandler.newCreatePageContainer(cached)
 
@@ -1098,7 +1123,7 @@ class CreatePage {
 					// re-use the same current createPageContainer
 					interfaceHandler.notification("Failed to upload", "#ff0000")
 				}
-			})
+			}).then(() => this.submitLocked = false)
 		}
 	}
 
