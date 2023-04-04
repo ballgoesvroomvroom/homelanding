@@ -452,9 +452,18 @@
 	background-color: #ffb4c696;
 }
 
-.page-window-navig-button.right {
-	margin-right: 0;
+.page-window-navig-button-right { /* independent class so .closePage() doesnt trigger on this class */
+	width: 32px;
+	height: 32px;
+
+	font-size: 24px;
+	font-weight: 700;
+	color: #fff;
+
 	margin-left: 20px;
+
+	border-radius: .4rem;
+	background-color: #ffb4c696;
 }
 
 .page-window-navig-button-float {
