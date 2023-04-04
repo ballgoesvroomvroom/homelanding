@@ -826,7 +826,7 @@ class CreatePage {
 		// references this.currentSelectionIdx
 		var selectionIdx = this.currentSelectionIdx
 
-		var title = this.$selectors["create-form-title-input"].val()
+		var title = this.$selectors["create-form-title-input"].val().trim()
 		var date = this.$selectors["create-form-date-input"].val() // in format of YYYY-MM-DDThh:mm
 
 		this.entry[selectionIdx].metadata.title = title
@@ -1041,6 +1041,7 @@ class CreatePage {
 			}
 
 			// include title if any
+			// note: metadata.title value has already been trimmed (string.proto.trim()) on SINGLE entry point - .saveCurrentFormToEntry()
 			if (metadata.title.length >= 1) {
 				parsedMetadata.title = metadata.title
 			}

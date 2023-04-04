@@ -247,7 +247,7 @@ class Image {
 
 	pack() {
 		return {
-			title: this.uploadedMetadata.title,
+			title: this.uploadedMetadata.title.trim(),
 			note: "",
 			collection: "",
 			filename: this.filename,
