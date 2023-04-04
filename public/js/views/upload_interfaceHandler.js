@@ -826,6 +826,11 @@ class CreatePage {
 	saveCurrentFormToEntry() {
 		// saves form details to entry before moving on
 		// references this.currentSelectionIdx
+		if (this.currentSelectionIdx === -1) {
+			// nothing loaded yet
+			return
+		}
+
 		var selectionIdx = this.currentSelectionIdx
 
 		var title = this.$selectors["create-form-title-input"].val().trim()
@@ -1071,11 +1076,13 @@ class CreatePage {
 		}
 		this.submitLocked = true
 
-		// save whatever was written
-		this.saveCurrentFormToEntry()
-
 		if (this.entry.length >= 1) {
 			// theres uploaded data
+
+			// save whatever was written
+			this.saveCurrentFormToEntry()
+
+			// parse this.entry
 			var fd = this.parseToFormData()
 
 			interfaceHandler.uploadImages(fd).then((returnedPayload) => {
