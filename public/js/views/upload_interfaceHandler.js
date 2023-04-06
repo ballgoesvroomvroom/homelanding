@@ -112,15 +112,30 @@ var interfaceHandler = {
 			this.$selectors["item-detail-fixeddate-text"].text(upload_fixed_date_repr)
 
 			// collection
-			this.$selectors["item-detail-collection-text"].html("collection: <a>add collection</a>")
+			this.$selectors["item-detail-collection-text"].html("Collection: <a>add collection</a>")
 
 			// check if location data is present
-			if (data.lat && data.long) {
-				this.$selectors["item-detail-location-text"].text(`${data.lat} ${data.long}`)
+			if (data.ext_data.lat && data.ext_data.long) {
+				this.$selectors["item-detail-location-text"].text(`${data.ext_data.lat} ${data.ext_data.long}`)
 			}
 
+			// make and model
+			// display in format: "MAKE, MODEL"
+			var make_model_string = ""
+			if (data.ext_data.make) {
+				make_model_string = data.ext_data.make
+			}
+			if (data.ext_data.model) {
+				if (make_model_string.length > 0) {
+					// theres content
+					make_model_string += ", "
+				}
+
+				make_model_string += data.ext_data.model
+			}
+			this.$selectors["item-detail-camera-text"].text(make_model_string.length > 0 ? make_model_string : "No data")
+
 			this.$selectors["item-detail-cameraman-text"].html("<a>set person</a>")
-			this.$selectors["item-detail-camera-text"].text("No data")
 			this.$selectors["item-detail-filesize-text"].text(`${Math.floor(fileSizeMB *100) /100}MB or ${fileSizeBytes} bytes`)
 			this.$selectors["item-detail-filedimen-text"].text(`${data.ext_data.width}x${data.ext_data.height} (px)`)
 		})
@@ -1097,7 +1112,7 @@ class CreatePage {
 					this.clearEditForm()
 
 					// create new container
-					interfaceHandler.newCreatePageContainer();
+					interfaceHandler.newCreatePageContainer(); // this.destroy() gets called too
 				} else if (failedUploads) {
 					// some images still salvageable
 

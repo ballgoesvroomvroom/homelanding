@@ -56,6 +56,7 @@ class Properties {
 		this.date = {}
 		this.dimensions = {}
 		this.location = {}
+		this.model = {}
 		this.metadata = {
 			hasDateInfo: false,
 			hasLocInfo: false,
@@ -102,6 +103,14 @@ class Properties {
 		this.metadata.hasDateInfo = true
 		this.metadata.isCustomDateInput = customDateInput // determine whether date was extracted from image or user-inputted
 	}
+
+	addMake(make) {
+		this.model.make = make // "OPPO"
+	}
+
+	addModel(model) {
+		this.model.model = model // "OPPO Reno5"
+	}
 }
 
 class Image {
@@ -138,7 +147,7 @@ class Image {
 				date = new Date(this.uploadedMetadata.date)
 				customDateInput = true; // set this to true so imageProperties know that date was NOT extracted from the image itself
 				console.log("[DEBUG]: custom date used with", this.uploadedMetadata.date, date)
-			} else {
+			} else if ('DateTimeOriginal' in r) {
 				date = r.DateTimeOriginal // should be in UTC
 				console.log("[DEBUG]: original date", date)
 
@@ -183,12 +192,21 @@ class Image {
 			if (height && width) {
 				this.imageProperties.addDimensions(height, width)
 			} else {
-				return Promise.reject(UploadError.noDimensions)
+				this.imageProperties.addDimensions(0, 0)
+				// return Promise.reject(UploadError.noDimensions)
 			}
 
 			// location
 			if (r.latitude && r.longitude) {
 				this.imageProperties.addLocation(r.latitude, r.longitude)
+			}
+
+			// model & make
+			if (r.Make) {
+				this.imageProperties.addMake(r.Make)
+			}
+			if (r.Model) {
+				this.imageProperties.addModel(r.Model)
 			}
 		})
 	}
@@ -261,6 +279,8 @@ class Image {
 				width: this.imageProperties.dimensions.width,
 				height: this.imageProperties.dimensions.height,
 				repr_date: this.imageProperties.date.repr_date,
+				make: this.imageProperties.model.make,
+				model: this.imageProperties.model.model,
 				is_custom_date_input: this.imageProperties.metadata.isCustomDateInput
 			},
 			localUploadedDate: this.imageProperties.localUploadedDate, // array in itself
