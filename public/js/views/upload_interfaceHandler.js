@@ -135,6 +135,17 @@ var interfaceHandler = {
 			}
 			this.$selectors["item-detail-camera-text"].text(make_model_string.length > 0 ? make_model_string : "No data")
 
+			// date lock icon
+			if (data.ext_data.is_custom_date_input) {
+				// user uploaded own date
+				this.$selectors["item-detail-date-lock-tooltip"].text("Date was customised")
+				this.$selectors["item-detail-date-lock-img"].attr("src", "/navig_icons/lock_open_icon.svg")
+			} else {
+				// date is locked (extracted from image)
+				this.$selectors["item-detail-date-lock-tooltip"].text("Date was extracted from image")
+				this.$selectors["item-detail-date-lock-img"].attr("src", "/navig_icons/lock_icon.svg")
+			}
+
 			this.$selectors["item-detail-cameraman-text"].html("<a>set person</a>")
 			this.$selectors["item-detail-filesize-text"].text(`${Math.floor(fileSizeMB *100) /100}MB or ${fileSizeBytes} bytes`)
 			this.$selectors["item-detail-filedimen-text"].text(`${data.ext_data.width}x${data.ext_data.height} (px)`)
@@ -1172,6 +1183,8 @@ $(document).ready(() => {
 		"item-detail-title": $("#item-detail-title"),
 		"item-detail-title-inputtext": $("#item-detail-title-inputtext"),
 		"item-detail-date-text": $("#item-detail-date-text"),
+		"item-detail-date-lock-img": $("#item-detail-date-lock-img"),
+		"item-detail-date-lock-tooltip": $("#item-detail-date-lock-tooltip"),
 		"item-detail-fixeddate-text": $("#item-detail-fixeddate-text"), // fixed date (uploaded date)
 		"item-detail-collection-text": $("#item-detail-collection-text"),
 		"item-detail-location-text": $("#item-detail-location-text"),
