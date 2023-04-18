@@ -1,13 +1,15 @@
 {
-	"de014cc385f4ef47088424cd5e3551ff41e19ca637cdb9e205a53fded41bc4449119bd57faf52eccbe494d91a37b552ca7658b49e65e2db2d2a8fecb2dfd8ad1": {
+	"941c8d598ff8fde5f217004acde75a3f594ddd72ad9a8a60d8b836d3a9e024ec557a459cd6fa05fb260746a3bbeb80ace4ca5a0636b9b1dd5507e8700353456a": {
 		"username": "j",
+		"uid": 2,
 		"perms": {
 			"upload": true,
 			"delete": true
 		}
 	},
-	"10fe246e43ebc31af192e21c9c81774c03d026e3e559dfefcb0a847d28d0e0f67095c22e67f6d8144dc9e7a5ad5bc26d61a35c09204fc3027bcda91b6fd3880b": {
+	"2c97b865b0aedeb9cc7e26076254f1bf8a994a51f3c1c079a136cbcf2026aa4bc3ccc0d6d7210910f2c503a071f9b0027643ca76fc9a88dd633aff5911ee4091": {
 		"username": "lh",
+		"uid": 1,
 		"perms": {
 			"upload": true,
 			"delete": true
