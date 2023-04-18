@@ -190,6 +190,7 @@ class Database {
 module.exports = {
 	auth_keys: new Database("auth_keys", {
 		keysEncrypted: true,
+		salt: "pepperandcorn",
 		// fieldsEncrypted: ["/username"],
 		passphrase: process.env.ENCRYPT_PASSPHRASE
 	}),
