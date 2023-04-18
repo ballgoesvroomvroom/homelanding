@@ -146,7 +146,7 @@ router.post("/login", (req, res) => {
 				throw new Error(errmsg.invalid);
 			}
 
-			var hashed_password = auth_keysDB.mask.hash(password)
+			var hashed_password = auth_keysDB.mask.hash(password +auth_keysDB.salt)
 			if (hashed_password in auth_keysDB.data) {
 				var userData = auth_keysDB.data[hashed_password];
 				req.session.username = userData.username;
