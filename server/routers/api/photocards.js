@@ -154,6 +154,39 @@ router.post("/upload", auth_router.admin_authenticated, upload.array("files"), (
 	})
 })
 
+// add reactions
+router.post("/reactions/add", auth_router.admin_authenticated, (req, res) => {
+	// add reactions in the form of unicode string
+	var unicodeHexString = parseInt(req.body.unicodeHexString)
+	var imgUid = req.body.uid
+	if (!unicodeHexString || !imgUid) {
+		// not valid input
+	}
+
+	var success = backend_handler.addReaction(imgUid, req.session.uid, unicodeHexString)
+	if (success) {
+		return res.status(200).end()
+	} else {
+		return res.status(403).end()
+	}
+})
+
+// remove reactions
+router.post("/reactions/remove", auth_router.admin_authenticated, (req, res) => {
+	// add reactions in the form of unicode string
+	var imgUid = req.body.uid
+	if (!imgUid) {
+		// not valid input
+	}
+
+	var success = backend_handler.addReaction(imgUid, req.session.uid)
+	if (success) {
+		return res.status(200).end()
+	} else {
+		return res.status(403).end()
+	}
+})
+
 
 module.exports = { // export router object and authenticated middleware
 	baseURL, router

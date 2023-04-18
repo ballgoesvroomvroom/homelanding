@@ -284,7 +284,12 @@ class Image {
 				is_custom_date_input: this.imageProperties.metadata.isCustomDateInput
 			},
 			localUploadedDate: this.imageProperties.localUploadedDate, // array in itself
-			compressed: this.compressed
+			compressed: this.compressed,
+
+			reactions: {
+				actors: {},
+				tally: {}
+			}
 		}
 	}
 
@@ -525,6 +530,77 @@ function modifyImageDetails(uid, body) {
 	return true
 }
 
+function addReaction(uid, actorId, unicodeHexString) {
+	// uid: unique string that identifies the image to add reactions to
+	// actorId: numner (user id that reacted)
+	// unicodeHexString: hex string that represents the emoji in unicode
+	// returns BOOLEAN (denotes whether addition was successful or not)
+
+	// pull up image data
+	var imageData = images_db.data.images[uid]
+
+	// verify if user has already reacted
+	if (actorId in imageData.reactions.actors) {
+		// already acted, find out which unicode was applied
+		var reactedUnicode = imageData.reactions.actors[actorId]
+
+		// modify content field (SHOULD EXIST)
+		if (reactedUnicode in imageData.reactions.tally) {
+			// remove logged reaction (immediately, prevent race condition)
+			delete imageData.reactions.actors[actorId]
+
+			imageData.reactions.tally[reactedUnicode]--
+
+		} else {
+			// user already added this reaction but entry is missing in tally field
+			return false
+		}
+	}
+
+	// modify reactions field
+	if (unicodeHexString in imageData.reactions.tally) {
+		imageData.reactions.tally[unicodeHexString]++
+	} else {
+		// no reaction corresponding to this unicode
+		imageData.reactions.tally[unicodeHexString] = 1
+	}
+
+	// add in to imageData.reactions.actors list
+	imageData.reactions.actors[actorId] = unicodeHexString
+
+	return true
+}
+
+function removeReaction(uid, actorId) {
+	// uid: string (unique string that identifies the image to remove reactions from)
+	// actorId: number (user id that acted on this request)
+	// returns BOOLEAN (denotes whether addition was successful or not)
+
+	// pull up image data
+	var imageData = images_db.data.images[uid]
+
+		// verify if user has already reacted
+	if (actorId in imageData.reactions.actors) {
+		// already acted, find out which unicode was applied
+		var reactedUnicode = imageData.reactions.actors[actorId]
+
+		// modify content field (SHOULD EXIST)
+		if (reactedUnicode in imageData.reactions.tally) {
+			// remove logged reaction (immediately, prevent race condition)
+			delete imageData.reactions.actors[actorId]
+
+			imageData.reactions.tally[reactedUnicode]--
+
+			return true
+		} else {
+			// user already added this reaction but entry is missing in tally field
+			return false
+		}
+	} else {
+		return false
+	}
+}
+
 module.exports = {
-	Image, Scheduler, fetchImages, queryImageDetails, modifyImageDetails
+	Image, Scheduler, fetchImages, queryImageDetails, modifyImageDetails, addReaction, removeReaction
 }
