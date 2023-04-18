@@ -152,6 +152,7 @@ router.post("/login", (req, res) => {
 				req.session.username = userData.username;
 				console.log("[DEBUG]: user logged in as", req.session.username)
 				req.session.isAdmin = true
+				req.sesison.uid = userData.uid
 
 				authSuccess = true;
 
