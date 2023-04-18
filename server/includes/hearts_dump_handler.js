@@ -476,6 +476,9 @@ function fetchImages(compressed=true) {
 				// reset
 				filename = data.filename
 			}
+		} else {
+			// request for non-compressed
+			filename = data.filename
 		}
 
 		payload.push([image_uid, filename, data.ms_since_epoch])
