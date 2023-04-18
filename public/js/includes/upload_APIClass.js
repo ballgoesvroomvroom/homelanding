@@ -138,6 +138,47 @@ class APIActions {
 			return [false]
 		})
 	}
+
+	addReaction(imgUid, reactionUnicode) {
+		// imgUid represents the unqiue string of characters identifying the image
+		// reactionUnicode represents the hex string of the emoji
+
+		var path = `${base}/reactions/add`
+		return fetch(path, {
+			method: "POST",
+			body: JSON.stringify({
+				uid: imgUid,
+				unicodeHexString: reactionUnicode
+			})
+		}).then(r => {
+			if (r.status == 200) {
+				return true
+			} else {
+				// 403
+				return false
+			}
+		})
+	}
+
+	removeReaction(imgUid) {
+		// imgUid represents the unqiue string of characters identifying the image
+		// emoji reacted is stored server-side
+
+		var path = `${base}/reactions/remove`
+		return fetch(path, {
+			method: "POST",
+			body: JSON.stringify({
+				uid: imgUid
+			})
+		}).then(r => {
+			if (r.status == 200) {
+				return true
+			} else {
+				// 403
+				return false
+			}
+		})
+	}
 }
 
 class APIView {
