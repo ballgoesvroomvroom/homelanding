@@ -172,7 +172,7 @@ router.post("/login", (req, res) => {
 
 	if (authSuccess) {
 		req.session.isAuthenticated = true;
-		res.json({"username": req.session.username})
+		res.json({"username": req.session.username, "uid": req.session.uid})
 	} else {
 		// return 401
 		// following spec
