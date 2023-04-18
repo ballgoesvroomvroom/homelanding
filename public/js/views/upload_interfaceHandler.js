@@ -15,6 +15,7 @@ var interfaceHandler = {
 	notificationTimeoutEventId: null, // to be set by .notification(); stores the id returned by setTimeout to be cancelled if needed
 
 	createPageContainer: null, // will be set by switchPages (property acts like a cache reference; will be created if none exists)
+	reactionHandler: null, // to be instantiated by .ready()
 
 	isReady: false, // to be set by .ready()
 
@@ -23,6 +24,9 @@ var interfaceHandler = {
 		this.$container = $selectors["item-zoom"]
 		this.$selectors = $selectors
 		this.isReady = true
+
+		// create new reactions handler
+		this.reactionHandler = new Reactions($selectors)
 
 		// register pages
 		this.registerPages()
@@ -78,6 +82,9 @@ var interfaceHandler = {
 				this.$container.removeClass("hidden")
 				this.$container.addClass("active")
 			})
+
+			// load up reactios hadler
+			this.reactionHandler.enterView(uid)
 
 			// get both dates (one is local system time and another is restricted to the timezone the image was uploaded in)
 			// format both dates in 'DD/MM/YYYY, HH:MM:SS {TIMEZONE}'
@@ -160,6 +167,9 @@ var interfaceHandler = {
 
 		// re-enable sideBarGestureController
 		this.sideBarGestureController.enableGestures();
+
+		// un-hook reactions handler
+		this.reactionHandler.exitView()
 	},
 	registerGestures() {
 		// registers gestures for $container
@@ -907,7 +917,7 @@ class CreatePage {
 		this.$selectors["create-upload-tray-empty"].addClass("hidden")
 
 		// show image
-		this.$selectors["create-upload-img-display"].attr("srC", URL.createObjectURL(this.entry[selectionIdx].fileBlob))
+		this.$selectors["create-upload-img-display"].attr("src", URL.createObjectURL(this.entry[selectionIdx].fileBlob))
 
 		// fill up edit form
 		this.populateEditForm(selectionIdx)
@@ -1168,6 +1178,72 @@ class CreatePage {
 	}
 }
 
+class Reactions {
+	constructor($selectors) {
+		this.$selectors = $selectors
+
+		this.inView = false // boolean value depicting whether there is a view or not
+		this.currentView = {
+			imageUid: "",
+			liked: false,
+			reactions: [],
+			likeCount: 0
+		}
+
+		// initial set up
+		this.setupEvents()
+	}
+
+	enterView(imageUid) {
+		this.inView = true
+		this.currentView.imageUid = imageUid
+	}
+
+	exitView() {
+		this.inView = false
+	}
+
+	setupEvents() {
+		// set up events such as mouse hover on heart to fill
+
+		// change heart icon to red on hover
+		this.$selectors["item-image-stats-hearts-container"].hover(() => {
+			// hover in
+			if (this.currentView.liked) {return} // since it was liked, do nothing
+			this.$selectors["item-image-stats-hearts-svg-path"].attr("fill", "#ff3650")
+			this.$selectors["item-image-stats-hearts-svg-path"].attr("stroke", "#ff3650")
+		}, () => {
+			// hover out
+			if (this.currentView.liked) {return} // since it was liked, do nothing
+			this.$selectors["item-image-stats-hearts-svg-path"].attr("fill", "none")
+			this.$selectors["item-image-stats-hearts-svg-path"].attr("stroke", "#d3d3d3")
+		})
+
+		// like event
+		this.$selectors["item-image-stats-hearts-container"].on("click", e => {
+			this.currentView.liked = !this.currentView.liked
+
+			if (this.currentView.liked) {
+				// show red fill
+				this.$selectors["item-image-stats-hearts-svg-path"].attr("fill", "#ff3650")
+				this.$selectors["item-image-stats-hearts-svg-path"].attr("stroke", "#ff3650")
+
+				// update like count
+				this.$selectors["item-image-stats-hearts-count"].text(++this.currentView.likeCount)
+			} else {
+				// show no fill
+				this.$selectors["item-image-stats-hearts-svg-path"].attr("fill", "none")
+				this.$selectors["item-image-stats-hearts-svg-path"].attr("stroke", "#d3d3d3")
+
+				// update like count
+				this.$selectors["item-image-stats-hearts-count"].text(--this.currentView.likeCount)
+			}
+
+			// save like action to backend
+		})
+	}
+}
+
 $(document).ready(() => {
 	console.log("[DEBUG]: alive")
 	const $selectors = {
@@ -1179,6 +1255,14 @@ $(document).ready(() => {
 
 		"item-zoom": $("#item-zoom"),
 		"item-image-element": $("#item-image-element"),
+
+		"item-image-stats-overlay-more-btn": $("#item-image-stats-overlay-more-btn"),
+
+		"item-image-stats-overlay-bottom": $("#item-image-stats-overlay-bottom"),
+		"item-image-stats-hearts-container": $("#item-image-stats-hearts-container"),
+		"item-image-stats-hearts-svg": $("#item-image-stats-hearts-svg"),
+		"item-image-stats-hearts-svg-path": $("#item-image-stats-hearts-svg-path"),
+		"item-image-stats-hearts-count": $("#item-image-stats-hearts-count"),
 
 		"item-detail-title": $("#item-detail-title"),
 		"item-detail-title-inputtext": $("#item-detail-title-inputtext"),
