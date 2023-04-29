@@ -10,7 +10,7 @@ const router = express.Router();
 
 // article domain
 const articleViewRouter = require(path.join(viewsRouteHandler, "docs.js"))
-console.log("[DEBUG]: REQUIRED", path.join(viewsRouteHandler, "docs.js"))
+const hotelViewRouter = require(path.join(viewsRouteHandler, "hotel.js"))
 
 // HOME PAGE
 router.get("/", (req, res) => {
@@ -61,6 +61,7 @@ router.get("/secret-get-path", (req, res) => {
 })
 
 router.use(articleViewRouter.baseURL, articleViewRouter.router)
+router.use(hotelViewRouter.baseURL, hotelViewRouter.router)
 
 module.exports = {
 	baseURL, router

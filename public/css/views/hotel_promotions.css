@@ -1,0 +1,174 @@
+:root {
+	--primary-color: #f1e2ad; /* golden yellow */
+	--primary-compl-color: #bd9526; /* darker yellow, slightly more gold */
+	--secondary-color: #e0d7c7; /* khaki */
+	--secondary-compl-color: #f5f3ef; /* peach white */
+	--tertiary-color: #56453e; /* pruce */
+
+	--black-color: #211c1d;
+
+
+	--page-horizontal-whitespace: 120px;
+}
+
+/* DEFAULT STYLES */
+body {
+	font-family: 'Playfair Display', serif;
+
+	word-wrap: break-word;
+}
+
+h1 {
+	font-size: 46px;
+	font-weight: 900;
+	color: var(--primary-compl-color);
+}
+
+p {
+	color: var(--black-color);
+}
+
+/* TOPBAR STYLING */
+#topbar-container {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+
+	position: sticky;
+
+	width: calc(100% - var(--page-horizontal-whitespace) * 2);
+	height: 82px;
+
+	padding: 0 var(--page-horizontal-whitespace);
+
+	border-bottom-style: solid;
+	border-bottom-width: 2px;
+	border-bottom-color: var(--primary-color);
+
+	color: var(--tertiary-color);
+	background-color: var(--secondary-compl-color);
+}
+
+#comp-logo {
+	width: auto;
+	height: 100%;
+
+	object-fit: cover;
+}
+
+#topbar-right-container {
+	display: flex;
+	flex-direction: row;
+}
+
+#topbar-member-login-btn {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+
+	padding-right: 8px;
+	margin-left: 20px;
+	margin-right: 35px;
+
+	transition-property: background-color;
+	transition-duration: 150ms;
+	transition-timing-function: linear;
+}
+
+#topbar-member-login-btn > img {
+	width: 24px;
+	height: 24px;
+	padding: 8px;
+}
+
+#topbar-member-login-btn:hover,
+#topbar-member-login-btn:focus {
+	background-color: #fff;
+}
+
+#topbar-booknow-btn {
+	padding: 10px;
+
+	color: #fff;
+
+	background-color: var(--primary-compl-color);
+
+	transition-property: background-color;
+	transition-duration: 150ms;
+	transition-timing-function: linear;
+}
+
+#topbar-booknow-btn:hover,
+#topbar-booknow-btn:focus {
+	background-color: var(--primary-color);
+}
+
+/* CAROUSEL STYLING */
+#carousel-container {
+	--current-active-image: url(https://www.panpacific.com/content/dam/pphg-revamp/en/global/offers/parents-day/parentsday-masthead2.png);
+	width: 100%;
+	height: calc(100vh - 84px - 300px);
+
+	background-image: var(--current-active-image);
+	background-repeat: no-repeat;
+	background-size: cover;
+}
+
+#carousel-container > img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+/* CONTENT STYLING */
+#content-container {
+	height: 300px;
+}
+
+#page-header {
+	padding: 30px var(--page-horizontal-whitespace) 15px;
+}
+
+#page-caption {
+	padding: 15px var(--page-horizontal-whitespace);
+}
+
+
+/* MEDIA QUERY */
+@media only screen and (max-width: 900px) {
+	:root {
+		--page-horizontal-whitespace: 40px;
+	}
+
+	/* reduce whitespace between member sign in button and login button */
+	/* add whitespace between company logo and member sign in button */
+	#topbar-member-login-btn {
+		margin-left: 15px;
+		margin-right: 20px;
+	}
+}
+
+@media only screen and (max-width: 620px) {
+	:root {
+		--page-horizontal-whitespace: 20px;
+	}
+
+	/* reduce whitespace between member sign in button and login button */
+	/* add whitespace between company logo and member sign in button */
+	#topbar-member-login-btn {
+		margin-left: 15px;
+		margin-right: 15px;
+	}
+}
+
+@media only screen and (max-width: 400px) {
+	:root {
+		--page-horizontal-whitespace: 15px;
+	}
+
+	/* hide member sign in button completely */
+	#topbar-member-login-btn {
+		display: none;
+	}
+}

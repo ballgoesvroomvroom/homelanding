@@ -11,6 +11,11 @@ class Docs {
 	static articleSkeleton = path.join(html, "views/docs/articleSkeleton.html")
 }
 
+class Hotel {
+	static promotions = path.join(html, "views/hotel/promotions.html")
+	static reservations = path.join(html, "views/hotel/reservations.html")
+}
+
 class Views {
 	static home = path.join(html, "base.html")
 	static upload_lockscreen = path.join(html, "views/upload_lock.html")
@@ -19,6 +24,7 @@ class Views {
 	static notFound = path.join(html, "includes/404.html")
 
 	static docs = Docs
+	static hotel = Hotel
 }
 
 module.exports = Views;
