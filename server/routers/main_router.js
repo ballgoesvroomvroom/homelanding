@@ -1,10 +1,16 @@
 const baseURL = "/";
 
+const path = require("path")
 const express = require("express");
 
 const views = require("../includes/views.js");
+const viewsRouteHandler = path.join(__dirname, "views")
 
 const router = express.Router();
+
+// article domain
+const articleViewRouter = require(path.join(viewsRouteHandler, "docs.js"))
+console.log("[DEBUG]: REQUIRED", path.join(viewsRouteHandler, "docs.js"))
 
 // HOME PAGE
 router.get("/", (req, res) => {
@@ -53,6 +59,8 @@ router.get("/secret-get-path", (req, res) => {
 		res.status(403).end();
 	}
 })
+
+router.use(articleViewRouter.baseURL, articleViewRouter.router)
 
 module.exports = {
 	baseURL, router

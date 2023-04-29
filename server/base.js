@@ -52,6 +52,7 @@ app.use(main_router.baseURL, main_router.router);
 
 app.use((req, res, next) => {
 	// end of stack
+	console.log("#END OF STACK")
 	console.log("end of stack: " + req.session.id)
 	res.status(404).sendFile(views.notFound);
 })
