@@ -146,13 +146,13 @@ router.post("/login", (req, res) => {
 				throw new Error(errmsg.invalid);
 			}
 
-			var hashed_password = auth_keysDB.mask.hash(password +auth_keysDB.salt)
+			var hashed_password = auth_keysDB.mask.hash(password +auth_keysDB.properties.salt)
 			if (hashed_password in auth_keysDB.data) {
 				var userData = auth_keysDB.data[hashed_password];
 				req.session.username = userData.username;
 				console.log("[DEBUG]: user logged in as", req.session.username)
-				req.session.isAdmin = true
-				req.sesison.uid = userData.uid
+				req.session.uid = userData.uid
+				req.session.isAdmin = true // set privileges last (AFTER setting profiling details)
 
 				authSuccess = true;
 

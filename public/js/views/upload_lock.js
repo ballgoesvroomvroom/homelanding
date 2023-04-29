@@ -18,7 +18,7 @@ $(document).ready(() => {
 				return r.json(); // contains the user details (e.g. username)
 			} else {
 				console.log("BAD")
-				return Promise.reject(r.status)
+				return Promise.reject(r.json())
 			}
 		}).then(userDetails => {
 			// store it in localStorage
