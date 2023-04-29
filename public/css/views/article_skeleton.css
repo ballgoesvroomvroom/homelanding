@@ -27,6 +27,7 @@
 
 #sidebar-document-navig-container {
 	padding: 20px;
+	padding-right: 0;
 }
 
 #sidebar-document-navig-container > h2 {
@@ -40,12 +41,28 @@
 	padding-left: 5px;
 }
 
-#sidebar-document-navig-container li {
+#sidebar-document-list-container li {
 	display: flex;
 	align-items: center;
+
+	padding: 5px;
+
+	border-radius: .4rem;
+
+	cursor: pointer;
+
+	transition-property: background-color;
+	transition-duration: 150ms;
+	transition-timing-function: linear;
 }
 
-#sidebar-document-navig-container li::before {
+#sidebar-document-list-container li:hover,
+#sidebar-document-list-container li:focus {
+	box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+	background-color: #fff;
+}
+
+#sidebar-document-list-container li::before {
 	content: "";
 	display: inline-block;
 	height: 16px;
@@ -56,6 +73,10 @@
 
 	background-size: contain;
 	background-image: url("/navig_icons/folderopen_black_closeupview.svg");
+}
+
+#sidebar-document-list-container > ul > li::before {
+	background-image: url("/navig_icons/article_icon.svg");
 }
 
 #reading-area {

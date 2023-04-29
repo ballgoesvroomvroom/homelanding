@@ -16,6 +16,11 @@ class Skeleton {
 	static article  = fs.readFileSync(views.docs.articleSkeleton, {encoding: "utf8", flag: "r"})
 }
 
+// template engine (for hydrating pages)
+class Template {
+	static loopMatch = /{{%LOOP (?<loopid>[A-Z]*)\s*?(?<element>.*?)\s*?%ENDLOOP}}/m
+}
+
 console.log(Skeleton.article)
 
 // home page
@@ -26,22 +31,67 @@ router.get("/", (req, res) => {
 
 // document home domain
 router.get("/:documentId", (req, res) => {
-	// no hydration
+	// hydrate content
 
-	var isExists = docHandler.documentExists(req.params.documentId)
+	// documentId is always lowercase
+	var docId = req.params.documentId.toLowerCase()
+
+	var isExists = docHandler.documentExists(docId)
 	if (!isExists) {
 		return res.status(404).end()
 	}
 
-	res.type("html")
+	// get list of articles in this document (sorted according to creation date)
+	var getArticleList = docHandler.getArticleList(docId)
 
-	return res.sendFile(views.docs.documentSkeleton)
+	// set type
+	res.type("html");
+
+	// hydrate html page
+	getArticleList.then(sortedArticleList => {
+		Skeleton.document = fs.readFileSync(views.docs.documentSkeleton, {encoding: "utf8", flag: "r"})
+		var hydrated = Skeleton.document.replaceAll("%DOCUMENT-NAME%", docId.toUpperCase())
+
+		// loops
+		var loopMatch = hydrated.match(Template.loopMatch)
+		while (loopMatch != null) {
+			var groups = loopMatch.groups
+
+			// handling logic
+			var newContent = "";
+			if (groups.loopid === "ARTICLEITEM") {
+				const element = groups.element
+
+				for (let fileIdx = 0; fileIdx < sortedArticleList.length; fileIdx++) {
+					var fileNameWoExt = sortedArticleList[fileIdx].split(".")
+					fileNameWoExt.pop()
+					fileNameWoExt = fileNameWoExt.join(".")
+
+					newContent += element
+						.replace("%ARTICLE-PATH%", `/docs/${docId}/${fileNameWoExt}`)
+						.replace("%ARTICLE-NAME%", fileNameWoExt)
+				}
+			}
+
+			// remove loop statement
+			hydrated = hydrated.replace(Template.loopMatch, newContent)
+
+			// find next loop
+			Template.loopMatch.lastIndex = 0 // reset index
+			loopMatch = hydrated.match(Template.loopMatch)
+		}
+
+		res.write(hydrated)
+		res.status(200).end()
+	})
 })
 
 // article page
 router.get("/:documentId/:articleId", (req, res) => {
 	// hydrate content
-	var isExists = docHandler.articleExists(req.params.documentId, req.params.articleId)
+	var docId = req.params.documentId.toLowerCase()
+	var artId = req.params.articleId.toLowerCase()
+	var isExists = docHandler.articleExists(docId, artId)
 	if (!isExists) {
 		return res.status(404).end()
 	}
@@ -50,16 +100,17 @@ router.get("/:documentId/:articleId", (req, res) => {
 	res.type("html")
 
 	// hydrate skeleton
-	docHandler.readArticle(req.params.documentId, req.params.articleId).then(data => {
+	docHandler.readArticle(docId, artId).then(data => {
 		// parse data
 		return parser(data)
 	}).then(parsedHtml => {
 		// read Skeleton.article
 		Skeleton.article = fs.readFileSync(views.docs.articleSkeleton, {encoding: "utf8", flag: "r"})
 		var hydrated = Skeleton.article.replace("%ARTICLE-CONTENT%", parsedHtml)
-		hydrated = hydrated.replace("%ARTICLE-HEADER%", req.params.articleId)
-		hydrated = hydrated.replace("%ARTICLE-PARENT%", req.params.documentId)
+		hydrated = hydrated.replaceAll("%ARTICLE-HEADER%", artId)
+		hydrated = hydrated.replaceAll("%ARTICLE-PARENT%", docId)
 		res.write(hydrated)
+		res.status(200).end()
 	}).catch(err => {
 		// catch error
 		console.warn(err)
