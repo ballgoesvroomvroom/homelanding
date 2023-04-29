@@ -1,0 +1,15 @@
+h1 {
+	padding: 20px 0;
+}
+
+h2, h3, h4, h5, h6 {
+	padding: 15px 0;
+}
+
+p {
+	line-height: 1.5;
+}
+
+a {
+	color: #7a5aba;
+}
