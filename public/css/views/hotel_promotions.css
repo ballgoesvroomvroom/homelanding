@@ -8,7 +8,7 @@
 	--black-color: #211c1d;
 
 
-	--page-horizontal-whitespace: 120px;
+	--page-horizontal-whitespace: 150px;
 }
 
 /* DEFAULT STYLES */
@@ -161,6 +161,15 @@ p {
 @media only screen and (max-width: 620px) {
 	:root {
 		--page-horizontal-whitespace: 20px;
+	}
+
+	/* change topbar height */
+	#topbar-container {
+		height: 64px;
+	}
+
+	#carousel-container {
+		height: calc(100vh - 66px - 300px);
 	}
 
 	/* reduce whitespace between member sign in button and login button */
