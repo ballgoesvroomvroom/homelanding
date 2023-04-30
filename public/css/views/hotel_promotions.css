@@ -306,6 +306,8 @@ p {
 	font-weight: 800;
 	font-style: italic;
 	color: #fff;
+
+	user-select: none;
 }
 
 .section-content-container {
@@ -345,9 +347,12 @@ p {
 
 	margin: 2px;
 
-	object-fit: cover;
-
 	border-radius: .4rem .4rem 0 0;
+
+	background-image: url("https://www.panpacific.com/content/dam/pphg-revamp/en/global/countries/singapore/teacation-relaxation/tea-cation-prsmb.jpg");
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-position: 50% 50%;
 }
 
 .promo-card-details {
