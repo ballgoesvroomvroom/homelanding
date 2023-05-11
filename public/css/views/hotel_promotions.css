@@ -3,6 +3,7 @@
 	--primary-compl-color: #bd9526; /* darker yellow, slightly more gold */
 	--secondary-color: #e0d7c7; /* khaki */
 	--secondary-compl-color: #f5f3ef; /* peach white */
+	--secondary-trans-color: #e0d7c700;
 	--tertiary-color: #56453e; /* pruce */
 
 	--black-color: #211c1d;
@@ -17,7 +18,7 @@ html {
 }
 
 body {
-	font-family: 'Playfair Display', serif;
+	font-family: serif;
 
 	word-wrap: break-word;
 }
@@ -37,6 +38,8 @@ h2 {
 
 p {
 	font-family: serif;
+	font-weight: 300;
+	letter-spacing: normal;
 	line-height: 1.5;
 
 	color: var(--black-color);
@@ -123,11 +126,22 @@ p {
 	background-color: var(--primary-color);
 }
 
+/* FRONT PAGE CONTAINER (to contain carousel and searchbar in a flex container) */
+#frontpage-container {
+	display: flex;
+	flex-direction: column;
+
+	height: calc(100svh - var(--topbar-height));
+}
+
 /* CAROUSEL STYLING */
 #carousel-container {
 	--current-active-image: url("https://www.panpacific.com/content/dam/pphg-revamp/en/global/offers/parents-day/parentsday-masthead2.png");
+	flex-grow: 1;
+	flex-shrink: 1;
+
 	width: 100%;
-	height: calc(100svh - var(--topbar-height) - 352px);
+	min-height: 0;
 
 	background-image: var(--current-active-image);
 	background-repeat: no-repeat;
@@ -151,9 +165,14 @@ p {
 
 /* GREETER STYLING */
 #greeter-container {
-	position: relative;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
 
-	height: 350px;
+	flex-grow: 0;
+	flex-shrink: 1;
+
+	min-height: 0;
 }
 
 #page-header {
@@ -162,6 +181,7 @@ p {
 
 #page-caption {
 	padding: 15px var(--page-horizontal-whitespace);
+	margin-bottom: 20px;
 }
 
 /* CONTENT SEARCH BAR STYLING */
@@ -169,7 +189,7 @@ p {
 	display: flex;
 	flex-direction: column;
 
-	position: absolute;
+	position: relative;
 	bottom: 0px;
 
 	width: calc(100% - var(--page-horizontal-whitespace) * 2);
@@ -347,15 +367,27 @@ p {
 	overflow-y: hidden;
 }
 
-.promo-card-thumbnail {
+.promo-card-top-container {
+	position: relative;
 	flex-grow: 1;
-	flex-shrink: 0;
+	flex-shrink: 1;
 
 	width: calc(100% - 4px);
 	min-height: 0;
 	aspect-ratio: 1;
 
-	margin: 2px;
+	padding: 2px;
+
+	cursor: help;
+}
+
+.promo-card-top-container:hover .promo-card-specs-container {
+	opacity: 1;
+}
+
+.promo-card-thumbnail {
+	width: 100%;
+	height: 100%;
 
 	background-image: url("https://www.panpacific.com/content/dam/pphg-revamp/en/global/countries/singapore/teacation-relaxation/tea-cation-prsmb.jpg");
 	background-repeat: no-repeat;
@@ -363,31 +395,78 @@ p {
 	background-position: 50% 50%;
 }
 
-.promo-card-thumbnail-flip-btn {
-	position: relative;
-	right: 0;
-	top: 0;
+.promo-card-specs-container {
+	display: flex;
+	flex-direction: column;
 
-	width: 32px;
-	height: 32px;
+	position: absolute;
+	top: 2px;
 
-	padding: 5px;
-	margin: 5px;
+	width: calc(100% - 24px);
+	height: calc(100% - 14px);
 
+	padding: 5px 10px;
+
+	opacity: 0;
+
+	font-size: .9rem;
 	background-color: var(--secondary-compl-color);
 
-	background-image: url("/hotel_assets/fliptoback_icon.svg");
+	border-bottom-style: solid;
+	border-bottom-width: 1px;
+	border-bottom-color: var(--tertiary-color);
+
+	transition-property: opacity;
+	transition-duration: 150ms;
+	transition-timing-function: linear;
+}
+
+.promo-card-specs-container > p {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+
+	margin-bottom: 4px;
+}
+
+.promo-card-specs-container > p:before {
+	display: block;
+
+	content: "";
+
+	width: 16px;
+	height: 16px;
+
+	margin-right: 6px;
+
 	background-repeat: no-repeat;
 	background-size: cover;
+}
+
+.promo-card-specs-date {
+	font-size: 1.5em;
+}
+
+.promo-card-specs-date:before {
+	background-image: url("/hotel_assets/date_icon.svg");
+}
+
+.promo-card-specs-tc:before {
+	background-image: url("/hotel_assets/exclamation_icon.svg");
+}
+
+.promo-card-specs-fm:before {
+	background-image: url("/hotel_assets/account_icon.svg");
 }
 
 .promo-card-details {
 	display: flex;
 	flex-direction: column;
+	justify-content: space-between;
 	align-items: center;
 
-	flex-grow: 0;
-	flex-shrink: 1;
+	flex-grow: 1;
+	flex-shrink: 0;
 
 	min-height: 0;
 
@@ -418,49 +497,6 @@ p {
 	white-space: nowrap;
 }
 
-.promo-card-specs-container {
-	display: flex;
-	flex-direction: column;
-
-	display: none;
-
-	padding: 5px 0 20px;
-
-	font-size: .9rem;
-}
-
-.promo-card-specs-container > p {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-}
-
-.promo-card-specs-container > p:before {
-	display: block;
-
-	content: "";
-
-	width: 16px;
-	height: 16px;
-
-	margin-right: 6px;
-
-	background-repeat: no-repeat;
-	background-size: cover;
-}
-
-.promo-card-specs-date:before {
-	background-image: url("/hotel_assets/date_icon.svg");
-}
-
-.promo-card-specs-tc:before {
-	background-image: url("/hotel_assets/exclamation_icon.svg");
-}
-
-.promo-card-specs-fm:before {
-	background-image: url("/hotel_assets/account_icon.svg");
-}
-
 
 /* DINING CONTENT STYLING */
 #content-container {
@@ -483,6 +519,11 @@ p {
 	#topbar-member-login-btn {
 		margin-left: 15px;
 		margin-right: 20px;
+	}
+
+	/* reduce amount of columns for promotions-card */
+	.promo-card-grid-container {
+		grid-template-columns: repeat(3, 1fr);
 	}
 }
 
