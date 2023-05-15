@@ -430,12 +430,16 @@ p {
 }
 
 .promo-card-specs-container > p:before {
-	display: block;
+	flex-grow: 0;
+	flex-shrink: 0;
+	flex-basis: 16px;
 
+	display: block;
 	content: "";
 
 	width: 16px;
 	height: 16px;
+	min-height: 16px;
 
 	margin-right: 6px;
 
