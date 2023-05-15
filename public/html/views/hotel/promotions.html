@@ -115,6 +115,87 @@
 					</div>
 				</div>
 			</section>
+			<section class="section-container" id="accommodation">
+				<div class="section-header-container">
+					<h2>Accommodation</h2>
+				</div>
+				<div class="section-content-container">
+					<p>Cozy yet luxurious room stays.</p>
+					<div class="promo-card-grid-container">
+						<div class="promo-card">
+							<div class="promo-card-top-container">
+								<div class="promo-card-thumbnail"></div>
+								<div class="promo-card-specs-container">
+									<p class="promo-card-specs-date">19/2/23 - 24/2/23</p>
+									<p class="promo-card-specs-tc">While stock lasts</p>
+									<p class="promo-card-specs-tc">Terms & conditions apply</p>
+								</div>
+							</div>
+							<div class="promo-card-details">
+								<h3>20% High Tea for 2nd Pax</h3>
+								<button class="promo-card-view-more-btn">
+									VIEW MORE
+								</button>
+							</div>
+						</div>
+						<div class="promo-card">
+							<div class="promo-card-top-container">
+								<div class="promo-card-thumbnail"></div>
+								<div class="promo-card-specs-container">
+									<p class="promo-card-specs-date">19/2/23 - 24/2/23</p>
+									<p class="promo-card-specs-tc">While stock lasts</p>
+									<p class="promo-card-specs-tc">Terms & conditions apply</p>
+								</div>
+							</div>
+							<div class="promo-card-details">
+								<h3>20% High Tea for 2nd Pax</h3>
+								<button class="promo-card-view-more-btn">
+									VIEW MORE
+								</button>
+							</div>
+						</div>
+						<div class="promo-card">
+							<div class="promo-card-top-container">
+								<div class="promo-card-thumbnail"></div>
+								<div class="promo-card-specs-container">
+									<p class="promo-card-specs-date">19/2/23 - 24/2/23</p>
+									<p class="promo-card-specs-tc">While stock lasts</p>
+									<p class="promo-card-specs-tc">Terms & conditions apply</p>
+								</div>
+							</div>
+							<div class="promo-card-details">
+								<h3>20% High Tea for 2nd Pax</h3>
+								<button class="promo-card-view-more-btn">
+									VIEW MORE
+								</button>
+							</div>
+						</div>
+						<div class="promo-card">
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+
+		<div id="modal-window">
+			<div id="modal-container">
+				<div id="modal-content-thumbnail">
+				</div>
+				<div id="modal-content">
+					<h2 id="modal-content-header">20% High Tea 2nd Pax</h2>
+					<div id="modal-content-wrapper">
+						<div id="modal-content-description">
+							<p>Desc...</p>
+						</div>
+						<div id="modal-content-details">
+							<p>Time slot</p>
+						</div>
+						<div id="modal-content-close">
+							<button id="modal-content-close-btn">Close</button>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 
 		<!-- CREDITS
@@ -124,5 +205,10 @@
 	<script>
 		/* set min-date for date input (content-searchbar) */
 		document.getElementById("content-searchbar-filter-date").setAttribute("min", new Date().toISOString().split("T")[0])
+
+		/* promo card view more */
+		document.getElementsByClass("promo-card-view-more-btn").addEventListener("click", e => {
+			document.getElementById("modal-content-container").classList.add("open-animation")
+		})
 	</script>
 </html>

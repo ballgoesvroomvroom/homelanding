@@ -18,6 +18,7 @@ html {
 }
 
 body {
+	position: relative;
 	font-family: serif;
 
 	word-wrap: break-word;
@@ -114,6 +115,10 @@ p {
 	color: #fff;
 
 	background-color: var(--primary-compl-color);
+
+	border-style: solid;
+	border-width: 1px;
+	border-color: var(--secondary-color);
 
 	transition-property: color, background-color;
 	transition-duration: 150ms;
@@ -299,8 +304,14 @@ p {
 }
 
 /* SECTION STYLING */
+#content-container {
+	width: 100%;
+}
+
 .section-container {
 	width: 100%;
+
+	padding-bottom: 100px;
 }
 
 .section-header-container {
@@ -331,7 +342,7 @@ p {
 }
 
 .section-content-container {
-	padding: 10px var(--page-horizontal-whitespace) 400px;
+	padding: 10px var(--page-horizontal-whitespace);
 }
 
 /* PROMO CARDS */
@@ -490,6 +501,20 @@ p {
 
 	color: #fff;
 	background-color: var(--primary-compl-color);
+
+	border-style: solid;
+	border-width: 1px;
+	border-color: var(--secondary-color);
+
+	transition-property: color, background-color;
+	transition-duration: 150ms;
+	transition-timing-function: linear;
+}
+
+.promo-card-view-more-btn:focus,
+.promo-card-view-more-btn:hover {
+	color: #000;
+	background-color: var(--primary-color);
 }
 
 .promo-card-details > p {
@@ -503,14 +528,134 @@ p {
 
 
 /* DINING CONTENT STYLING */
-#content-container {
-	width: 100%;
-}
-
 #dining > .section-header-container {
 	background-image: url("https://www.panpacific.com/content/dam/pphg-revamp/en/global/countries/singapore/teacation-relaxation/tea-cation-ppsin.jpg");
 }
 
+/* ACCOMMODATION CONTENT STYLING */
+#accommodation > .section-header-container {
+	background-image: url("https://images.pexels.com/photos/164595/pexels-photo-164595.jpeg?cs=srgb&dl=pexels-pixabay-164595.jpg&fm=jpg");
+}
+
+
+/* MODAL STYLING */
+#modal-window {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+
+	position: fixed;
+
+	top: 0;
+	left: 0;
+
+	width: calc(100% - 30px);
+	height: calc(100svh - 20px);
+
+	padding: 15px;
+
+	backdrop-filter: blur(4px);
+
+	z-index: 10;
+}
+
+#modal-container {
+	display: flex;
+	flex-direction: row;
+
+	flex-grow: 1;
+	flex-shrink: 1;
+	flex-basis: 200px;
+
+	width: 100%;
+	min-height: 0;
+
+	border-radius: .2rem;
+	border-style: solid;
+	border-width: 1px;
+	border-color: var(--secondary-color);
+	background-color: #fff;
+}
+
+#modal-content-thumbnail {
+	flex-grow: .3;
+
+	min-height: 250px;
+
+	border-radius: .2rem 0 0 .2rem;
+
+	background-image: url("https://www.panpacific.com/content/dam/pphg-revamp/en/global/countries/singapore/teacation-relaxation/tea-cation-prsmb.jpg");
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-position: 50% 50%;
+}
+
+#modal-content {
+	display: flex;
+	flex-direction: column;
+
+	flex-grow: .7;
+
+	padding: 15px;
+}
+
+#modal-container.open-animation {
+	animation-name: open-animation;
+}
+
+@keyframes open-animation {
+	from {
+
+	}
+}
+
+#modal-content-wrapper {
+	display: flex;
+	flex-direction: row;
+
+	flex-grow: 1;
+
+	min-height: 0;
+}
+
+#modal-content-description {
+	flex-grow: .6;
+	flex-shrink: 1;
+
+	min-width: 0;
+}
+
+#modal-content-details {
+	flex-grow: .3;
+
+	margin: 5px;
+
+	background-color: var(--secondary-compl-color);
+}
+
+#modal-content-close {
+	position: relative;
+
+	flex-grow: 1;
+	flex-shrink: 1;
+	min-width: 0;
+}
+
+#modal-content-close-btn {
+	position: absolute;
+	bottom: 0;
+
+	padding: 10px;
+
+	color: #fff;
+
+	background-color: var(--primary-compl-color);
+
+	border-style: solid;
+	border-width: 1px;
+	border-color: var(--secondary-color);
+}
 
 /* MEDIA QUERY */
 @media only screen and (max-width: 900px) {
