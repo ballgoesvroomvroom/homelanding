@@ -46,6 +46,11 @@ p {
 	color: var(--black-color);
 }
 
+/* STANDARD UTIL CLASSES */
+.hidden {
+	display: none;
+}
+
 /* TOPBAR STYLING */
 #topbar-container {
 	display: flex;
@@ -326,6 +331,7 @@ p {
 	padding: 0 var(--page-horizontal-whitespace);
 	margin-bottom: 50px;
 
+	background-color: var(--tertiary-color);
 	background-repeat: no-repeat;
 	background-size: cover;
 }
@@ -349,7 +355,7 @@ p {
 .promo-card-grid-container {
 	display: grid;
 
-	grid-template-columns: repeat(4, 1fr);
+	grid-template-columns: repeat(5, 1fr);
 	grid-template-rows: repeat(auto-fill, minmax(min-content, 0));
 	column-gap: 20px;
 	row-gap: 20px;
@@ -555,9 +561,13 @@ p {
 
 	padding: 15px;
 
-	backdrop-filter: blur(4px);
+	backdrop-filter: blur(8px);
 
 	z-index: 10;
+}
+
+#modal-window.hidden {
+	display: none;
 }
 
 #modal-container {
@@ -566,7 +576,7 @@ p {
 
 	flex-grow: .5;
 	flex-shrink: 1;
-	flex-basis: min(100vw, 10px);
+	flex-basis: auto;
 
 	min-width: 0;
 
@@ -626,18 +636,36 @@ p {
 
 	flex-grow: .2;
 	flex-shrink: 1;
+	flex-basis: 150px;
 
 	min-width: 0;
 }
 
-#modal-container.open-animation {
-	animation-name: open-animation;
+#modal-content-details-promo-date {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+
+	font-size: .8rem;
+
+	word-break: break-all;	
 }
 
-@keyframes open-animation {
-	from {
+#modal-content-details-promo-date::before {
+	display: block;
+	content: "";
 
-	}
+	flex-grow: 0;
+	flex-shrink: 0;
+	flex-basis: 16px;
+
+	height: 16px;
+
+	margin-right: 6px;
+
+	background-image: url("/hotel_assets/date_icon.svg");
+	background-repeat: no-repeat;
+	background-size: cover;
 }
 
 #modal-content-close-btn {
@@ -665,6 +693,20 @@ p {
 
 
 /* MEDIA QUERY */
+@media only screen and (min-width: 2000px) {
+	/* increase column row */
+	.promo-card-grid-container {
+		grid-template-columns: repeat(8, 1fr);
+	}
+}
+
+@media only screen and (max-width: 1200px) {
+	/* decrease column row */
+	.promo-card-grid-container {
+		grid-template-columns: repeat(4, 1fr);
+	}
+}
+
 @media only screen and (max-width: 900px) {
 	:root {
 		--page-horizontal-whitespace: 40px;
@@ -680,6 +722,27 @@ p {
 	/* reduce amount of columns for promotions-card */
 	.promo-card-grid-container {
 		grid-template-columns: repeat(3, 1fr);
+	}
+
+	/* change modal to a top to bottom layout */
+	#modal-container {
+		flex-direction: column;
+	}
+
+	#modal-content {
+		flex-direction: column;
+	}
+
+	#modal-content-thumbnail {
+		border-radius: .2rem .2rem 0 0;
+	}
+
+	#modal-content-right {
+		padding-top: 15px;
+	}
+
+	#modal-content-close-btn {
+		margin-top: 10px;
 	}
 }
 
@@ -707,8 +770,11 @@ p {
 	}
 
 	/* shorten whitespace between header and p tag */
+	/* reduce font size too */
 	.section-header-container h2 {
 		padding-bottom: 10px;
+
+		font-size: 40px;
 	}
 
 	/* change grid container to 2 columns only */
