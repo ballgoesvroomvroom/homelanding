@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=10.0, minimum-scale=1, user-scalable=yes"/>
+		<meta name="description" content=":)"/>
+
+		<link rel="icon" type="image/x-icon" href="">
+		<link rel="stylesheet" href="/css/includes/reset.css">
+		<link rel="stylesheet" href="/css/views/hotel_topbar.css">
+		<link rel="stylesheet" href="/css/views/hotel_reservations.css">
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+		<title>Dusk | Promotions</title>
+	</head>
+	<body>
+		<div id="topbar-container">
+			<img id="comp-logo" src="/hotel_assets/icon.svg">
+			<div id="topbar-right-container">
+				<button id="topbar-member-login-btn">
+					<img src="/hotel_assets/account_icon.svg">
+					Member sign in
+				</button>
+				<button id="topbar-booknow-btn">
+					BOOK NOW
+				</button>
+			</div>
+		</div>
+		<div id="window-image-container">
+		</div>
+		<div id="navmenu-attachment">
+			<div id="restaurant-selector">
+				<p>restaurant:</p>
+				<h2>DAWN</h2>
+			</div>
+			<div id="progress-container">
+				<div class="progress-tab-container unlocked active" id="details-tab-container">
+					<p>Details</p>
+					<div class="progress-tab-next-arrow">
+					</div>
+				</div>
+				<div class="progress-tab-container" id="guests-tab-container">
+					<p>Guests</p>
+					<div class="progress-tab-next-arrow">
+					</div>
+				</div>
+				<div class="progress-tab-container" id="payment-tab-container">
+					<p>Payment</p>
+					<div class="progress-tab-next-arrow">
+					</div>
+				</div>
+				<div class="progress-tab-container" id="confirmation-tab-container">
+					<p>Confirmation</p>
+				</div>
+			</div>
+		</div>
+		<div id="page-window">
+			<div id="details-page-container" class="page-window active">
+				<div class="page-header-container">
+					<h1>Details</h1>
+					<button class="page-header-next-navigbtn">Next</button>
+				</div>
+				<div id="details-pform-container">
+					<div id="details-pform-timing-display">
+						<p>Timings will be shown here</p>
+					</div>
+					<div id="details-pform-header">
+						<p class="active">Date</p><p>Time</p>
+					</div>
+					<div id="details-pform-date" class="hidde">
+						<div id="details-pform-date-header">
+							<button id="pform-date-prev-month">
+							</button>
+							<h2>May 2023</h2>
+							<button id="pform-date-next-month">
+							</button>
+						</div>
+						<table>
+							<thead>
+								<tr>
+									<th>Sun</th>
+									<th>Mon</th>
+									<th>Tue</th>
+									<th>Wed</th>
+									<th>Thu</th>
+									<th>Fri</th>
+									<th>Sat</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<th class="nim">30</th>
+									<th class="pcd">1</th>
+									<th class="pcd">2</th>
+									<th class="pcd">3</th>
+									<th class="pcd">4</th>
+									<th class="ava">5</th>
+									<th class="ava">6</th>
+								</tr>
+								<tr>
+									<th class="ava">7</th>
+									<th class="ava">8</th>
+									<th class="ava">9</th>
+									<th class="ava">10</th>
+									<th class="ava">11</th>
+									<th class="ava">12</th>
+									<th class="ava">13</th>
+								</tr>
+								<tr>
+									<th class="ava">14</th>
+									<th class="ava">15</th>
+									<th class="ava">16</th>
+									<th class="ava">17</th>
+									<th class="ava">18</th>
+									<th class="ava">19</th>
+									<th class="ava">20</th>
+								</tr>
+								<tr>
+									<th class="ava">21</th>
+									<th class="ava">22</th>
+									<th class="ava">23</th>
+									<th class="ava">24</th>
+									<th class="ava">25</th>
+									<th class="ava">26</th>
+									<th class="ava">27</th>
+								</tr>
+								<tr>
+									<th class="ava">28</th>
+									<th class="ava">29</th>
+									<th class="ava">30</th>
+									<th class="ava">31</th>
+									<th class="nim">1</th>
+									<th class="nim">2</th>
+									<th class="nim">3</th>
+								</tr>
+								<tr>
+									<th class="nim">4</th>
+									<th class="nim">5</th>
+									<th class="nim">6</th>
+									<th class="nim">7</th>
+									<th class="nim">8</th>
+									<th class="nim">9</th>
+									<th class="nim">10</th>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div id="details-pform-time">
+						<h3>Breakfast</h3>
+						<div class="details-pform-timeslots-container">
+							<p>08:00</p>
+							<p>09:00</p>
+							<p>10:00</p>
+							<p>11:00</p>
+						</div>
+						<h3>Lunch / Brunch</h3>
+						<div class="details-pform-timeslots-container">
+							<p>12:00</p>
+							<p>13:00</p>
+							<p>14:00</p>
+							<p>15:00</p>
+						</div>
+						<h3>Dinner</h3>
+						<div class="details-pform-timeslots-container">
+							<p>16:00</p>
+							<p>17:00</p>
+							<p>18:00</p>
+							<p>19:00</p>
+							<p>20:00</p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div id="guests-page-container" class="page-window">
+			</div>
+			<div id="payment-page-container" class="page-window">
+			</div>
+			<div id="confirmation-page-container" class="page-window">
+			</div>
+		</div>
+	</body>
+	<script>
+		// pages object
+		const pages = {
+			dir: ["details", "guests", "payment", "confirmation"],
+			pageElements: {
+				"details": {
+					tabContainer: document.getElementById("details-tab-container"),
+					pageContainer: document.getElementById("details-page-container"),
+
+					tabNextArrow: document.getElementById("details-tab-container").getElementsByClassName("progress-tab-next-arrow")[0]
+				},
+				"guests": {
+					tabContainer: document.getElementById("guests-tab-container"),
+					pageContainer: document.getElementById("guests-page-container"),
+
+					tabNextArrow: document.getElementById("guests-tab-container").getElementsByClassName("progress-tab-next-arrow")[0]
+				},
+				"payment": {
+					tabContainer: document.getElementById("payment-tab-container"),
+					pageContainer: document.getElementById("payment-page-container"),
+
+					tabNextArrow: document.getElementById("payment-tab-container").getElementsByClassName("progress-tab-next-arrow")[0]
+				},
+				"confirmation": {
+					tabContainer: document.getElementById("confirmation-tab-container"),
+					pageContainer: document.getElementById("confirmation-page-container")
+				}
+			},
+
+			currentPage: 0,
+			highestPage: 10
+		}
+
+		console.log(pages.pageElements.details.tabNextArrow)
+
+		pages.navbarArrowsHighlight = function() {
+			// highlights arrow up till this.currentPage
+			for (let i = 0; i < this.currentPage; i++) {
+				this.pageElements[this.dir[i]].tabNextArrow.classList.add("active")
+			}
+
+			// un-highlight remaining arrows
+			// last tab-container has no arrows
+			for (let i = this.currentPage; i < this.dir.length -1; i++) {
+				this.pageElements[this.dir[i]].tabNextArrow.classList.remove("active")
+			}
+		}
+
+		pages.switchPage = function(pageId, forced) {
+			// returns boolean (whether operation was successful or not)
+			// function should only be used to traverse through completed pages
+			// to progress page, use nextPage method
+
+			// already on the page
+			if (pageId == this.currentPage && !forced) {
+				return false
+			}
+
+			// determine if page we want to switch to has been 'completed' (unlocked)
+			if (pageId > this.highestPage) {
+				return false
+			}
+
+			// hide current page
+			this.pageElements[this.dir[this.currentPage]].tabContainer.classList.remove("active")
+			this.pageElements[this.dir[this.currentPage]].pageContainer.classList.remove("active")
+
+			// set current page
+			this.currentPage = pageId
+			this.pageElements[this.dir[pageId]].tabContainer.classList.add("active")
+			this.pageElements[this.dir[pageId]].pageContainer.classList.add("active")
+
+			// highlight navigation bar arrows
+			this.navbarArrowsHighlight()
+
+			// return value
+			return true
+		}
+
+		pages.register = function() {
+			// initialisation function
+
+			// attach click events for all the tabs trigger
+			for (const [pageName, links] of Object.entries(this.pageElements)) {
+				let pageId = this.dir.indexOf(pageName)
+				if (pageId === -1) {
+					// not found
+					console.warn("[WARN]: .register() unable to register page", pageName, "due to mismatch pageName with directory")
+					continue
+				}
+
+				links.tabContainer.addEventListener("click", e => {
+					this.switchPage(pageId)
+				})
+			}
+		}
+
+		pages.nextPage = function() {
+			// unlocks the next page upon verification
+			// returns true if unlock was successful, else false
+			if (this.currentPage === this.dir.length -1) {
+				// already at the end
+				return false
+			}
+
+			// add styles
+			this.pageElements[this.dir[this.currentPage +1]].tabContainer.classList.add("unlocked")
+
+			// set highest page
+			this.highestPage = this.currentPage +1
+
+			// switch page
+			var success = this.switchPage(this.currentPage +1, true)
+
+			console.log(success, this.currentPage)
+		}
+
+
+		// caller
+		pages.register()
+		pages.nextPage()
+		pages.nextPage()
+	</script>
+</html>

@@ -1,0 +1,412 @@
+:root {
+	--primary-color: #faf5e2; /* golden yellow */
+	--primary-compl-color: #bd9526; /* darker yellow, slightly more gold */
+	--secondary-color: #e0d7c7; /* khaki */
+	--secondary-compl-color: #f5f3ef; /* peach white */
+	--secondary-trans-color: #e0d7c700;
+	--tertiary-color: #56453e; /* pruce */
+
+	--black-color: #211c1d;
+}
+
+/* DEFAULT STYLES */
+html {
+	height: 100%;
+}
+
+body {
+	position: relative;
+	font-family: 'Playfair Display', serif;
+
+	word-wrap: break-word;
+}
+
+h1 {
+	font-size: 46px;
+	font-weight: 900;
+
+	letter-spacing: .2rem;
+
+	color: var(--primary-compl-color);
+}
+
+h2 {
+	color: var(--primary-compl-color);
+}
+
+p {
+	font-weight: 300;
+	letter-spacing: normal;
+	line-height: 1.5;
+}
+
+/* STANDARD UTIL CLASSES */
+.hidden {
+	display: none;
+}
+
+/* WIDE IMAGE WINDOW */
+#window-image-container {
+	width: 100%;
+	height: 450px;
+
+	background-image: url(https://www.moorhallhotel.co.uk/assets/slideshows/dining-oak-room/da849f7405/The-Oak-Room-Restaurant-1__FocusFillWzE5MjAsODkyLCJ5IiwxOTNd_ScaleMaxWidthWzE5MjBd.jpg);
+	background-repeat: no-repeat;
+	background-size: cover;
+}
+
+/* STICKY NAV MENU */
+#navmenu-attachment {
+	--horizontal-gap: 20px;
+
+	display: flex;
+
+	position: relative;
+	top: -34px;
+
+	width: calc(100% - var(--page-horizontal-whitespace) * 2);
+	height: auto;
+
+	padding: 10px calc(var(--page-horizontal-whitespace) - var(--horizontal-gap));
+	margin: 0 var(--horizontal-gap);
+
+	border-radius: .2rem;	
+	background-color: #fff;
+	box-shadow: rgba(99, 99, 99, 0.2) 0px 3px 8px 0px;
+}
+
+#restaurant-selector {
+	margin-right: 10px;
+	padding-right: 10px;
+
+	font-family: monospace;
+
+	cursor: pointer;
+
+	border-right-style: solid;
+	border-right-width: 2px;
+	border-right-color: #eee;
+}
+
+#restaurant-selector > h2 {
+	font-size: 1.5em;
+	color: var(--black-color);
+}
+
+/* PROGRESS NAV BAR CONTAINER */
+#progress-container {
+	display: flex;
+	flex-direction: row;
+
+	overflow-y: auto;
+}
+
+.progress-tab-container {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+
+	color: #eee;
+}
+
+.progress-tab-container > p {
+	cursor: pointer;
+}
+
+.progress-tab-container.unlocked > p {
+	color: #898989;
+}
+
+.progress-tab-container.active > p {
+	color: #000;
+	font-weight: 600;
+}
+
+.progress-tab-next-arrow {
+	width: 16px;
+	height: 16px;
+
+	margin: 0 12px;
+
+	background-image: url("/hotel_assets/right.png");
+	background-repeat: no-repeat;
+	background-size: cover;
+
+	filter: invert(100%) sepia(3%) saturate(3447%) hue-rotate(272deg) brightness(130%) contrast(87%);
+}
+
+.progress-tab-next-arrow.active {
+	filter: invert(24%) sepia(0%) saturate(1361%) hue-rotate(231deg) brightness(108%) contrast(75%);
+}
+
+/* PAGE WINDOW */
+.page-window {
+	width: 	calc(100% - var(--page-horizontal-whitespace) * 2);
+
+	padding: 10px var(--page-horizontal-whitespace);
+}
+
+.page-header-container {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+
+	padding-bottom: 30px;
+}
+
+.page-header-next-navigbtn {
+	padding: 10px 20px;
+
+	border-style: solid;
+	border-width: 1px;
+	border-color: var(--tertiary-color);
+
+	border-radius: .2rem;
+	background-color: var(--secondary-compl-color);
+}
+
+.page-header-next-navigbtn:focus,
+.page-header-next-navigbtn:hover {
+	background-color: var(--secondary-color);
+}
+
+/* DETAILS FORM CONTAINER */
+#details-pform-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+#details-pform-header {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+}
+
+/* DETAILS FORM EVENT DETAILS INPUT */
+#details-pform-timing-display > p {
+	padding: 20px 0;
+
+	font-size: 1.2rem;
+	font-weight: 600;
+}
+
+#details-pform-header > p {
+	position: relative;
+
+	padding: 10px 30px;
+
+	cursor: pointer;
+
+	border-radius: .2rem .2rem 0 0;
+
+	transition-property: background-color;
+	transition-duration: 150ms;
+	transition-timing-function: linear;
+}
+
+#details-pform-header > p.active {
+	background-color: #efefef;
+}
+
+#details-pform-header > p:before {
+	display: block;
+	content: "";
+
+	position: absolute;
+	left: 0;
+	bottom: 0;
+
+	width: 100%;
+	height: 2px;
+
+	visibility: hidden;
+	background-color: var(--primary-compl-color);
+
+	-webkit-transform: scaleX(0);
+	transform: scaleX(0);
+	transform-origin: 0 0;
+
+	transition-property: visibility, transform;
+	transition-duration: 150ms;
+	transition-timing-function: linear;
+}
+
+#details-pform-header > p.active:before {
+	visibility: visible;
+	transform: scaleX(1);
+}
+
+#details-pform-header > p:hover {
+	background-color: #e6e6e6;
+}
+
+#details-pform-header > p:hover:before {
+	visibility: visible;
+
+	-webkit-transform: scaleX(1);
+	transform: scaleX(1);
+}
+
+#details-pform-date {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+
+	width: 100%;
+}
+
+#details-pform-date.hidden {
+	display: hidden;
+}
+
+#details-pform-date-header {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+
+	padding: 30px 0;
+}
+
+#details-pform-date-header > h2 {
+	padding: 0 20px;
+}
+
+#details-pform-date-header > button {
+	width: 24px;
+	height: 24px;
+
+	padding: 6px;
+
+	border-radius: 12px;
+
+	background-origin: content-box;
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: cover;
+
+	transition-property: background-color;
+	transition-duration: 150ms;
+	transition-timing-function: linear;
+}
+
+#details-pform-date-header > button:hover {
+	background-color: #efefef;
+}
+
+button#pform-date-prev-month {
+	background-image: url("/hotel_assets/back.svg");
+}
+
+button#pform-date-next-month {
+	background-image: url("/hotel_assets/next.svg");
+}
+
+#details-pform-date > table {
+	border-collapse: separate;
+	border-spacing: 10px 20px;
+}
+
+/* available dates to book (ava) */
+#details-pform-date > table > tbody > tr > th.ava {
+	padding: 15px;
+
+	cursor: pointer;
+
+	border-radius: .2rem;
+	border-style: solid;
+	border-width: 1px;
+	border-color: var(--secondary-compl-color);
+
+	transition-property: background-color, color;
+	transition-duration: 150ms;
+	transition-timing-function: linear;
+}
+
+#details-pform-date > table > tbody > tr > th.ava.active {
+	color: #fff;
+
+	background-color: var(--tertiary-color);
+}
+
+#details-pform-date > table > tbody > tr > th.ava:hover {
+	color: #fff;
+
+	background-color: var(--tertiary-color);
+}
+
+/* dates not in month (nim) */
+#details-pform-date > table > tbody > tr > th.nim {
+	color: #efefef;
+}
+
+/* dates past current day (pcd) */
+#details-pform-date > table > tbody > tr > th.pcd {
+	color: #9a5d5d;
+}
+
+/* time slots container */
+#details-pform-time {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+
+	width: 100%;
+}
+
+#details-pform-time.hidden {
+	display: hidden;
+}
+
+#details-pform-time > h3 {
+	padding-top: 20px;
+	padding-bottom: 10px;
+	margin-top: 10px;
+}
+
+.details-pform-timeslots-container {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	grid-template-rows: repeat(auto-fill, minmax(min-content, 0));
+	column-gap: 10px;
+	row-gap: 15px;
+
+	width: 100%;
+}
+
+.details-pform-timeslots-container > p {
+	padding: 10px 20px;
+
+	cursor: pointer;
+
+	border-radius: .2rem;
+	border-style: solid;
+	border-width: 1px;
+	border-color: var(--secondary-compl-color);
+
+	transition-property: background-color, color;
+	transition-duration: 150ms;
+	transition-timing-function: linear;
+}
+
+.details-pform-timeslots-container > p.active {
+	color: #fff;
+
+	background-color: var(--tertiary-color);
+}
+
+.details-pform-timeslots-container > p:hover {
+	color: #fff;
+
+	background-color: var(--tertiary-color);
+}
+
+/* MEDIA QUERIES */
+@media only screen and (max-width: 900px) {
+	/* add horizontal padding to nav menu */
+	#navmenu-attachment {
+		--horizontal-gap: 10px;
+	}
+}

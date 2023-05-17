@@ -1,0 +1,149 @@
+/* DEFAULT COLOR */
+:root {
+	--primary-color: #faf5e2; /* golden yellow */
+	--primary-compl-color: #bd9526; /* darker yellow, slightly more gold */
+	--secondary-color: #e0d7c7; /* khaki */
+	--secondary-compl-color: #f5f3ef; /* peach white */
+	--tertiary-color: #56453e; /* pruce */
+
+	--black-color: #211c1d;
+
+	--topbar-height: 82px;
+	--page-horizontal-whitespace: 150px;
+}
+
+/* TOPBAR STYLING */
+#topbar-container {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+
+	position: sticky;
+	top: 0;
+
+	width: calc(100% - var(--page-horizontal-whitespace) * 2);
+	height: var(--topbar-height);
+
+	padding: 0 var(--page-horizontal-whitespace);
+
+	border-bottom-style: solid;
+	border-bottom-width: 2px;
+	border-bottom-color: var(--primary-color);
+
+	color: var(--tertiary-color);
+	background-color: var(--secondary-compl-color);
+
+	z-index: 3;
+}
+
+#comp-logo {
+	width: auto;
+	height: 100%;
+
+	object-fit: cover;
+}
+
+#topbar-right-container {
+	display: flex;
+	flex-direction: row;
+}
+
+#topbar-member-login-btn {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+
+	padding-right: 8px;
+	margin-left: 20px;
+	margin-right: 35px;
+
+	transition-property: background-color;
+	transition-duration: 150ms;
+	transition-timing-function: linear;
+}
+
+#topbar-member-login-btn > img {
+	width: 24px;
+	height: 24px;
+	padding: 8px;
+}
+
+#topbar-member-login-btn:hover,
+#topbar-member-login-btn:focus {
+	color: var(--black-color);
+	background-color: #fff;
+}
+
+#topbar-booknow-btn {
+	padding: 10px;
+
+	color: #fff;
+
+	background-color: var(--primary-compl-color);
+
+	transition-property: color, background-color;
+	transition-duration: 150ms;
+	transition-timing-function: linear;
+}
+
+#topbar-booknow-btn:hover,
+#topbar-booknow-btn:focus {
+	color: #000;
+	background-color: var(--primary-color);
+}
+
+
+/* MEDIA QUERIES */
+@media only screen and (max-width: 900px) {
+	:root {
+		--page-horizontal-whitespace: 40px;
+	}
+
+	/* reduce whitespace between member sign in button and login button */
+	/* add whitespace between company logo and member sign in button */
+	#topbar-member-login-btn {
+		margin-left: 15px;
+		margin-right: 20px;
+	}
+
+	/* reduce amount of columns for promotions-card */
+	.promo-card-grid-container {
+		grid-template-columns: repeat(3, 1fr);
+	}
+}
+
+@media only screen and (max-width: 620px) {
+	:root {
+		/* reduce topbar height */
+		--topbar-height: 64px;
+
+		/* reduce horizontal padding */
+		--page-horizontal-whitespace: 20px;
+	}
+
+	/* reduce whitespace between member sign in button and login button */
+	/* add whitespace between company logo and member sign in button */
+	#topbar-member-login-btn {
+		margin-left: 15px;
+		margin-right: 15px;
+	}
+
+	/* shorten section header banner & reduce bottom margin */
+	.section-header-container {
+		height: 200px;
+
+		margin-bottom: 10px;
+	}
+}
+
+@media only screen and (max-width: 400px) {
+	:root {
+		--page-horizontal-whitespace: 15px;
+	}
+
+	/* hide member sign in button completely */
+	#topbar-member-login-btn {
+		display: none;
+	}
+}
