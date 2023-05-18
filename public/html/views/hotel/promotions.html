@@ -324,10 +324,28 @@
 	</body>
 	<script>
 		// promotions entry
+		const promotionsDataConds = {
+			"WSL": "While stocks last",
+			"MEO": "Members exclusive only",
+			"TCA": "Tems & conds. apply",
+			"LTSS": "Limited to selected suites"
+		}
 		const promotionsData = {
 			"2023HT2NDP20OFF": {
 				name: "20% Off 2nd Pax for High Tea",
-				description: "2nd pax dine at a discounted price of 65.90++ (U.P. 82.75++)\nLimited to only one second for a table"
+				description: "2nd pax dine at a discounted price of 65.90++ (U.P. 82.75++)\nLimited to only one second for a table",
+				date: "14/05/23 - 21/05/23",
+				conds: {
+					"WSL", "MEO", "TCA"
+				}
+			},
+			"UOB10OFF": {
+				name: "10% Off Rooms w/ UOB Card",
+				description: "10% off for regular rooms when you pay with UOB card",
+				date: "01/01/23 - 01/06/23",
+				conds: {
+					"LTSS", "TCA"
+				}
 			}
 		}
 

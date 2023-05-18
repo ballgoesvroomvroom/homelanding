@@ -19,7 +19,7 @@ html {
 
 body {
 	position: relative;
-	font-family: serif;
+	font-family: 'Playfair Display', serif;
 
 	word-wrap: break-word;
 }
@@ -44,6 +44,11 @@ p {
 	line-height: 1.5;
 
 	color: var(--black-color);
+}
+
+a {
+	color: var(--primary-compl-color);
+	font-family: 'Times New Roman', serif;
 }
 
 /* STANDARD UTIL CLASSES */

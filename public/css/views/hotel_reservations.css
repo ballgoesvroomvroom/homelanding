@@ -34,10 +34,35 @@ h2 {
 	color: var(--primary-compl-color);
 }
 
+hr {
+	width: 100%;
+}
+
 p {
 	font-weight: 300;
 	letter-spacing: normal;
 	line-height: 1.5;
+}
+
+a {
+	color: var(--primary-compl-color);
+	font-family: 'Times New Roman', serif;
+}
+
+input {
+	padding: 10px 8px;
+	margin: 10px 0;
+
+	border-radius: .2rem;
+	border-style: solid;
+	border-width: 1px;
+	border-color: var(--black-color);
+}
+
+input:focus,
+input:hover {
+	background-color: var(--secondary-compl-color);
+	outline: none;
 }
 
 /* STANDARD UTIL CLASSES */
@@ -139,11 +164,27 @@ p {
 	filter: invert(24%) sepia(0%) saturate(1361%) hue-rotate(231deg) brightness(108%) contrast(75%);
 }
 
-/* PAGE WINDOW */
-.page-window {
-	width: 	calc(100% - var(--page-horizontal-whitespace) * 2);
+/* PAGE WINDOW & PAGE CONTAINER CLASSES */
+#page-window {
+	width: calc(100% - var(--page-horizontal-whitespace) * 2);
 
 	padding: 10px var(--page-horizontal-whitespace);
+}
+
+.page-container {
+	display: none;
+
+	width: 100%;
+}
+
+.page-container.active {
+	display: block;
+}
+
+.page-container > hr {
+	width: 80%;
+
+	margin-bottom: 30px;
 }
 
 .page-header-container {
@@ -152,7 +193,7 @@ p {
 	align-items: center;
 	justify-content: space-between;
 
-	padding-bottom: 30px;
+	padding-bottom: 15px;
 }
 
 .page-header-next-navigbtn {
@@ -308,10 +349,12 @@ button#pform-date-next-month {
 	border-spacing: 10px 20px;
 }
 
+#details-pform-date > table > tbody > tr > th {
+	padding: 15px;
+}
+
 /* available dates to book (ava) */
 #details-pform-date > table > tbody > tr > th.ava {
-	padding: 15px;
-
 	cursor: pointer;
 
 	border-radius: .2rem;
@@ -396,6 +439,268 @@ button#pform-date-next-month {
 	background-color: var(--tertiary-color);
 }
 
+/* GUEST FORM CONTAINER */
+#guests-pform-container {
+	display: flex;
+	flex-direction: column;
+}
+
+.guest-particulars-form {
+	display: flex;
+	flex-direction: column;
+
+	margin-bottom: 20px;
+}
+
+.guest-particulars-form-header > h1 {
+	padding-top: 10px;
+	padding-bottom: 5px;
+
+	color: black;
+
+	font-family: "Times New Roman";
+	font-weight: 700;
+	font-size: 2rem;
+
+	letter-spacing: .6px;
+}
+
+.guest-particulars-form-header > h4 {
+	font-weight: 400;
+	font-size: .9rem;
+}
+
+.guest-particulars-name-container {
+	display: flex;
+	flex-direction: row;
+
+	margin-top: 25px;
+}
+
+.guest-particulars-name-container > div {
+	display: flex;
+	flex-direction: column;
+
+	flex-grow: 1;
+	flex-shrink: 1;
+
+	min-width: 0;
+}
+
+.guest-particulars-name-container > div:first-child {
+	padding-right: 10px;
+}
+
+.guest-particulars-form > label {
+	margin-top: 10px;
+}
+
+.guest-ismainguest-container {
+	display: flex;
+	flex-direction: row-reverse;
+	justify-content: flex-end;
+	align-items: center;
+}
+
+.guest-ismainguest-container > input {
+	width: 18px;
+	height: 18px;
+
+	margin-right: 6px;
+}
+
+#guest-pform-addguest {
+	padding: 20px;
+
+	border-radius: .2rem;
+	border-style: solid;
+	border-width: 1px;
+	border-color: var(--tertiary-color);
+
+	transition-property: background-color, color;
+	transition-duration: 150ms;
+	transition-timing-function: linear;
+}
+
+#guest-pform-addguest:focus,
+#guest-pform-addguest:hover {
+	color: #fff;
+	background-color: var(--tertiary-color);
+}
+
+/* PAYMENT FORM CONTAINER */
+#payment-details-container {
+	padding-bottom: 10px;
+}
+
+#reservation-details-container {
+	padding: 15px 0;
+}
+
+#payment-pform-container {
+	display: flex;
+	flex-direction: column;
+}
+
+#payment-card-name-input {
+	font-family: inherit !important;
+}
+
+#payment-pform-container input {
+	font-family: Arial, sans-serif;
+	font-size: 1.2rem;
+}
+
+#payment-pform-card-details-row-container {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+
+	padding-bottom: 20px;
+}
+
+.payment-pform-card-details-input-group {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+
+	min-width: 0;
+}
+
+.payment-pform-card-details-input-group:first-child {
+	flex-grow: 1;
+	flex-shrink: 0;
+
+	margin-right: 10px;
+}
+
+.payment-pform-card-details-input-group:last-child {
+	flex-grow: 1;
+	flex-shrink: 1;
+}
+
+#payment-pform-cardexp-input-group {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+
+	margin-top: 10px;
+}
+
+#payment-pform-cardexp-input-group > input {
+	width: 32px;
+
+	text-align: center;
+
+	margin-top: 0;
+}
+
+#payment-pform-cardexp-input-group > p {
+	padding: 0 4px;
+
+	font-size: 1.5rem;
+	font-weight: 700;
+}
+
+#payment-card-cvv-input {
+	width: calc(100% - 18px);
+}
+
+#payment-pform-processpayment {
+	padding: 20px;
+
+	border-radius: .2rem;
+	border-style: solid;
+	border-width: 1px;
+	border-color: var(--tertiary-color);
+
+	transition-property: background-color, color;
+	transition-duration: 150ms;
+	transition-timing-function: linear;
+}
+
+#payment-pform-processpayment:focus,
+#payment-pform-processpayment:hover {
+	color: #fff;
+	background-color: var(--tertiary-color);
+}
+
+/* CONFIRMATION PAGE */
+#confirmation-invoice-slip {
+	width: calc(100% - 22px);
+
+	padding: 10px;
+
+	border-radius: .2rem;
+	border-style: solid;
+	border-width: 1px;
+	border-color: black;
+
+	font-family: "Times New Roman", sans-serif;
+}
+
+#confirmation-invoice-slip-header {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+
+	padding-bottom: 10px;
+}
+
+#confirmation-invoice-slip-header > h2 {
+	font-weight: 500;
+	padding-right: 10px;
+}
+
+#confirmation-invoice-contact-details > h2 {
+	padding: 10px 0;
+	font-weight: 500;
+}
+
+#confirmation-invoice-reservation-details > h2 {
+	padding: 10px 0;
+	font-weight: 500;
+}
+
+#confirmation-invoice-guestlist {
+	--guest-count: 3;
+
+	display: grid;
+	grid-template-columns: repeat(var(--guest-count), 1fr);
+	grid-column-gap: 5px;
+	grid-row-gap: 8px;
+
+	width: 100%;
+}
+
+.confirmation-invoice-guestcontainer {
+	padding: 10px 5px;
+
+	border-style: none solid none solid;
+	border-width: 0 1px;
+	border-color: black;
+
+	background-color: var(--secondary-compl-color);
+}
+
+.confirmation-invoice-guestcontainer > h2 {
+	font-weight: 500;
+	color: black;
+}
+
+.confirmation-invoice-guestspecialremarks {
+	padding-top: 10px;
+}
+
+#confirmation-invoice-payment-details > h2 {
+	padding: 10px 0;
+	font-weight: 500;
+}
+
+#confirmation-invoice-thankyou {
+	padding: 20px 0;
+}
+
 /* MEDIA QUERIES */
 @media only screen and (max-width: 900px) {
 	/* add horizontal padding to nav menu */
@@ -408,5 +713,22 @@ button#pform-date-next-month {
 	/* reduce gaps between dates input */
 	#details-pform-date > table {
 		border-spacing: 2px 5px;
+	}
+}
+
+@media only screen and (max-width: 400px) {
+	/* reduce gaps between dates input */
+	#details-pform-date > table {
+		border-spacing: 8px 8px;
+	}
+
+	/* reduce individual date selection padding */
+	#details-pform-date > table > tbody > tr > th {
+		padding: 10px;
+	}
+
+	/* reduce column number to 3 */
+	.details-pform-timeslots-container {
+		grid-template-columns: repeat(3, 1fr);
 	}
 }

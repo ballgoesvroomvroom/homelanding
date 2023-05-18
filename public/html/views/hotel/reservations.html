@@ -59,11 +59,12 @@
 			</div>
 		</div>
 		<div id="page-window">
-			<div id="details-page-container" class="page-window active">
+			<div id="details-page-container" class="page-container active">
 				<div class="page-header-container">
 					<h1>Details</h1>
 					<button class="page-header-next-navigbtn">Next</button>
 				</div>
+				<hr>
 				<div id="details-pform-container">
 					<div id="details-pform-timing-display">
 						<p>Timings will be shown here</p>
@@ -157,13 +158,6 @@
 							<p>10:00</p>
 							<p>11:00</p>
 						</div>
-						<h3>Lunch / Brunch</h3>
-						<div class="details-pform-timeslots-container">
-							<p>12:00</p>
-							<p>13:00</p>
-							<p>14:00</p>
-							<p>15:00</p>
-						</div>
 						<h3>Dinner</h3>
 						<div class="details-pform-timeslots-container">
 							<p>16:00</p>
@@ -175,11 +169,136 @@
 					</div>
 				</div>
 			</div>
-			<div id="guests-page-container" class="page-window">
+			<div id="guests-page-container" class="page-container">
+				<div class="page-header-container">
+					<h1>Guests</h1>
+					<button class="page-header-next-navigbtn">Next</button>
+				</div>
+				<hr>
+				<div id="guests-pform-container">
+					<form class="guest-particulars-form" name="guest-1-particulars">
+						<div class="guest-particulars-form-header">
+							<h1>GUEST 1</h1>
+							<h4>&nbsp;</h4>
+						</div>
+						<div class="guest-particulars-name-container">
+							<div>
+								<label for="guest-1-firstname">First name</label>
+								<input name="guest-1-firstname" placeholder="First name" type="text" pattern="[a-zA-Z\s\/]{3, 255}" maxlength="255">
+							</div>
+							<div>
+								<label for="guest-1-lastname">Last name</label>
+								<input name="guest-1-lastname" placeholder="Last name" type="text" pattern="[a-zA-Z\s\/]{3, 255}" maxlength="255">
+							</div>
+						</div>
+
+						<label for="guest-1-special">Special remarks</label>
+						<input name="guest-1-special" placeholder="Dietary requirements, high chair, etc.." type="text" maxlength="255">
+
+						<div class="guest-ismainguest-container">
+							<label for="guest-1-ismainguest">Is main guest</label>
+							<input name="guest-1-ismainguest" type="checkbox">
+						</div>
+					</form>
+					<hr>
+					<button id="guest-pform-addguest">+ Add guests +</button>
+				</div>
 			</div>
-			<div id="payment-page-container" class="page-window">
+			<div id="payment-page-container" class="page-container">
+				<div class="page-header-container">
+					<h1>Payment</h1>
+					<button class="page-header-next-navigbtn">Next</button>
+				</div>
+				<hr>
+				<div id="payment-details-container">
+					<h2>Reservation details</h2>
+					<div id="reservation-details-container">
+						<p>Date: 26/05/23</p>
+						<p>Time: 18:00</p>
+						<p>Service: Dinner</p>
+						<p>Location: DAWN restaurant</p>
+						<p>Guests: 2pax</p>
+					</div>
+					<p>A credit hold of $50 is required for reservations.<br>Upon completing your reservation, the credit hold will be released back into your bank immediately.<br>For more details, read our <a class="faq-hyperlink" href="/faq#credit-hold">FAQ ↪</a>.</p>
+				</div>
+				<hr>
+				<form id="payment-pform-container" name="payment-card-details">
+					<label id="payment-card-name-label" for="payment-card-name">Name on card</label>
+					<input id="payment-card-name-input" name="payment-card-name" placeholder="Name" type="text" pattern="[a-zA-Z\s\/]{3, 255}" autocomplete="cc-name" minlength="3" maxlength="255">
+					<label id="payment-card-no-label" for="payment-card-no">Card number</label>
+					<input id="payment-card-no-input" name="payment-card-no" placeholder="0000 0000 0000 0000" type="tel" inputmode="numeric" pattern="[0-9\s]{13,19}" autocomplete="cc-number" maxlength="19">
+
+					<div id="payment-pform-card-details-row-container">
+						<div class="payment-pform-card-details-input-group">
+							<label id="payment-card-expmnth-label" for="payment-card-expmnth">Expiry</label>
+							<div id="payment-pform-cardexp-input-group">
+								<input id="payment-card-expmnth-input" name="payment-card-expmnth" placeholder="MM" inputmode="numeric" pattern="[0-9]{2}" type="text" autocomplete="cc-exp-month" minlength="2" maxlength="2">
+								<p>/</p>
+								<input id="payment-card-expyr-input" name="payment-card-expyr" placeholder="YY" inputmode="numeric" pattern="[0-9]{2}" type="text" autocomplete="cc-exp-year" minlength="2" maxlength="2">
+							</div>
+						</div>
+						<div class="payment-pform-card-details-input-group">
+							<label id="payment-card-cvv-label" for="payment-card-cvv">CVV</label>
+							<input id="payment-card-cvv-input" name="payment-card-cvv" placeholder="•••" inputmode="numeric" pattern="[0-9]{3}" type="text" minlength="3" maxlength="3" min="0" autocomplete="cc-cvv">
+						</div>
+					</div>
+					<hr>
+					<button id="payment-pform-processpayment" disabled>Process payment</button>
+				</form>
 			</div>
-			<div id="confirmation-page-container" class="page-window">
+			<div id="confirmation-page-container" class="page-container">
+				<div class="page-header-container">
+					<h1>Confirmation</h1>
+				</div>
+				<hr>
+				<div id="confirmation-invoice-slip">
+					<div id="confirmation-invoice-slip-header">
+						<h2>Reservation @ DAWN [success]</h2>
+						<div id="confirmation-invoice-slip-details">
+							<p>Invoice ID: #14e89ad</p>
+							<p>Date: 18/05/2023</p>
+							<p>Time: 16:43</p>
+						</div>
+					</div>
+					<hr>
+					<div id="confirmation-invoice-reservation-details">
+						<h2>Reservation details</h2>
+						<p>Date: 26/05/23</p>
+						<p>Time: 18:00</p>
+						<p>Service: Dinner</p>
+						<p>Guests: 2pax</p>
+					</div>
+					<hr>
+					<div id="confirmation-invoice-contact-details">
+						<h2>Contact details</h2>
+						<p>Name: John Doe</p>
+						<p>Email: 230643M@mymail.nyp.edu.sg</p>
+						<p>Phone number: +6592224896</p>
+					</div>
+					<hr>
+					<div id="confirmation-invoice-guestlist">
+						<div class="confirmation-invoice-guestcontainer">
+							<h2>Jane Doe</h2>
+							<p class="confirmation-invoice-guestspecialremarks">Special remarks:<br>None</p>
+						</div>
+					</div>
+					<hr>
+					<div id="confirmation-invoice-payment-details">
+						<h2>Payment details</h2>
+						<p>Credit hold: $50 [paid]</p>
+					</div>
+					<hr>
+					<div id="confirmation-invoice-footer">
+						<p>An email copy has already been sent to your email!</p>
+						<p>Please do not hesitate to contact us at <a href="/">customerservice@dusk.com</a> or at <a href="/">+65 0000 1800</a>.</p>
+						<p id="confirmation-invoice-thankyou">
+							We are proud to serve your occassion.
+						</p>
+						<p id="confirmation-invoice-signoff">
+							Regards,<br>The Dusk Hotel Group
+						</p>
+					</div>
+				</div>
 			</div>
 		</div>
 	</body>
