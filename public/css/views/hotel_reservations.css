@@ -233,15 +233,13 @@ p {
 	transition-timing-function: linear;
 }
 
-#details-pform-header > p.active:before {
-	visibility: visible;
-	transform: scaleX(1);
-}
-
+#details-pform-header > p:focus,
 #details-pform-header > p:hover {
 	background-color: #e6e6e6;
 }
 
+#details-pform-header > p.active:before,
+#details-pform-header > p:focus:before,
 #details-pform-header > p:hover:before {
 	visibility: visible;
 
@@ -258,7 +256,7 @@ p {
 }
 
 #details-pform-date.hidden {
-	display: hidden;
+	display: none;
 }
 
 #details-pform-date-header {
@@ -292,6 +290,7 @@ p {
 	transition-timing-function: linear;
 }
 
+#details-pform-date-header > button:focus,
 #details-pform-date-header > button:hover {
 	background-color: #efefef;
 }
@@ -318,22 +317,16 @@ button#pform-date-next-month {
 	border-radius: .2rem;
 	border-style: solid;
 	border-width: 1px;
-	border-color: var(--secondary-compl-color);
+	border-color: var(--tertiary-color);
 
 	transition-property: background-color, color;
 	transition-duration: 150ms;
 	transition-timing-function: linear;
 }
 
-#details-pform-date > table > tbody > tr > th.ava.active {
-	color: #fff;
-
-	background-color: var(--tertiary-color);
-}
-
+#details-pform-date > table > tbody > tr > th.ava.active,
 #details-pform-date > table > tbody > tr > th.ava:hover {
-	color: #fff;
-
+	color: var(--secondary-compl-color);
 	background-color: var(--tertiary-color);
 }
 
@@ -357,7 +350,7 @@ button#pform-date-next-month {
 }
 
 #details-pform-time.hidden {
-	display: hidden;
+	display: none;
 }
 
 #details-pform-time > h3 {
@@ -384,7 +377,7 @@ button#pform-date-next-month {
 	border-radius: .2rem;
 	border-style: solid;
 	border-width: 1px;
-	border-color: var(--secondary-compl-color);
+	border-color: var(--tertiary-color);
 
 	transition-property: background-color, color;
 	transition-duration: 150ms;
@@ -392,11 +385,11 @@ button#pform-date-next-month {
 }
 
 .details-pform-timeslots-container > p.active {
-	color: #fff;
-
+	color: var(--secondary-compl-color);
 	background-color: var(--tertiary-color);
 }
 
+.details-pform-timeslots-container > p:focus,
 .details-pform-timeslots-container > p:hover {
 	color: #fff;
 
@@ -408,5 +401,12 @@ button#pform-date-next-month {
 	/* add horizontal padding to nav menu */
 	#navmenu-attachment {
 		--horizontal-gap: 10px;
+	}
+}
+
+@media only screen and (max-width: 620px) {
+	/* reduce gaps between dates input */
+	#details-pform-date > table {
+		border-spacing: 2px 5px;
 	}
 }
