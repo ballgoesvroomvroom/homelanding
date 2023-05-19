@@ -70,7 +70,7 @@
 						<p id="details-pform-timing-display-text">Timings will be shown here</p>
 					</div>
 					<div id="details-pform-header">
-						<p class="active" tabindex="0">Date</p><p tabindex="0">Time</p>
+						<p id="details-pform-date-input-selector" class="active" tabindex="0">Date</p><p id="details-pform-time-input-selector" tabindex="0">Time</p>
 					</div>
 					<div id="details-pform-date" class="">
 						<div id="details-pform-date-header">
@@ -395,6 +395,14 @@
 			this.updateDateTimeDetails()
 
 			return true
+		}
+
+		receiptionist.register = function() {
+			// initialisation call
+			var dateSelectorTab = document.getElementById("details-pform-date-input-selector");
+			var timeSelectorTab = document.getElementById("details-pform-time-input-selector");
+
+			dateSelectorTab.addEventListener()
 		}
 
 		console.log(pages.pageElements.details.tabNextArrow)
