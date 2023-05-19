@@ -67,7 +67,7 @@
 				<hr>
 				<div id="details-pform-container">
 					<div id="details-pform-timing-display">
-						<p>Timings will be shown here</p>
+						<p id="details-pform-timing-display-text">Timings will be shown here</p>
 					</div>
 					<div id="details-pform-header">
 						<p class="active" tabindex="0">Date</p><p tabindex="0">Time</p>
@@ -333,6 +333,68 @@
 
 			currentPage: 0,
 			highestPage: 10
+		}
+
+		// receiptionist object
+		const receiptionist = {
+			availableTimeslots: [["Breakfast", "08:00", "09:00", "10:00", "11:00"], ["Dinner", "16:00", "17:00", "18:00", "19:00", "20:00"]],
+			timingDisplayEle: document.getElementById("details-pform-timing-display-text"),
+			date: "",
+			time: "",
+			service: "",
+		}
+
+		receiptionist.updateDateTimeDetails = function() {
+			// updates contents of this.timingDisplayEle with this.date and this.time
+			var o = this.date
+			if (this.time.length > 0) {
+				o += `, ${time}`
+			}
+
+			this.timingDisplayEle.innerHTML = o
+		}
+
+		receiptionist.chooseDate = function(date) {
+			// date: string, in ISO format (YYYYMMDD)
+			var dateObj = new Date(date +"T00:00:00.000")
+			var month = date.toLocaleString("default", {month: "short"})
+			var dateNum = dateObj.getDate()
+
+			this.date = `${dateNum} ${month}`
+			this.updateDateTimeDetails()
+		}
+
+		receiptionist.chooseTime = function(idx) {
+			// idx: number, time slot choosen (can infer type of service)
+			// returns true if found timeslot & service successfully, else false
+
+			// find service
+			var i = 0;
+			var service, timeslot;
+			for (let serviceIdx = 0; serviceIdx < this.availableTimeslots.length; serviceIdx++) {
+				if (i > idx) {
+					// finder pointer already exceeded target index no match
+					return false
+				} else if ((idx -i) >= (this.availableTimeslots[serviceIdx].length -1)) {
+					// can skip this service
+					i += this.availableTimeslots[serviceIdx].length -1
+					continue
+				} else {
+					service = this.availableTimeslots[serviceIdx][0]
+					timeslot = this.availableTimeslots[serviceIdx][idx -i +1]
+				}
+			}
+
+			if (service == null) {
+				// not found
+				return false
+			}
+
+			this.service = service
+			this.time = timeslot
+			this.updateDateTimeDetails()
+
+			return true
 		}
 
 		console.log(pages.pageElements.details.tabNextArrow)
