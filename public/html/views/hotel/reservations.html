@@ -38,24 +38,24 @@
 				<h2>DAWN</h2>
 			</div>
 			<div id="progress-container">
-				<div class="progress-tab-container unlocked active" id="details-tab-container">
+				<button class="progress-tab-container unlocked active" id="details-tab-container">
 					<p>Details</p>
 					<div class="progress-tab-next-arrow">
 					</div>
-				</div>
-				<div class="progress-tab-container" id="guests-tab-container">
+				</button>
+				<button class="progress-tab-container" id="guests-tab-container">
 					<p>Guests</p>
 					<div class="progress-tab-next-arrow">
 					</div>
-				</div>
-				<div class="progress-tab-container" id="payment-tab-container">
+				</button>
+				<button class="progress-tab-container" id="payment-tab-container">
 					<p>Payment</p>
 					<div class="progress-tab-next-arrow">
 					</div>
-				</div>
-				<div class="progress-tab-container" id="confirmation-tab-container">
+				</button>
+				<button class="progress-tab-container" id="confirmation-tab-container">
 					<p>Confirmation</p>
-				</div>
+				</button>
 			</div>
 		</div>
 		<div id="page-window">
@@ -70,7 +70,7 @@
 						<p id="details-pform-timing-display-text">Timings will be shown here</p>
 					</div>
 					<div id="details-pform-header">
-						<p id="details-pform-date-input-selector" class="active" tabindex="0">Date</p><p id="details-pform-time-input-selector" tabindex="0">Time</p>
+						<button id="details-pform-date-input-selector" class="active">Date</button><button id="details-pform-time-input-selector">Time</button>
 					</div>
 					<div id="details-pform-date" class="">
 						<div id="details-pform-date-header">
@@ -150,7 +150,7 @@
 							</tbody>
 						</table>
 					</div>
-					<div id="details-pform-time">
+					<div id="details-pform-time" class="hidden">
 						<h3>Breakfast</h3>
 						<div class="details-pform-timeslots-container">
 							<p>08:00</p>
@@ -399,10 +399,53 @@
 
 		receiptionist.register = function() {
 			// initialisation call
+			var activeTab = 0; // 0 for date selector, 1 for time selector
 			var dateSelectorTab = document.getElementById("details-pform-date-input-selector");
 			var timeSelectorTab = document.getElementById("details-pform-time-input-selector");
 
-			dateSelectorTab.addEventListener()
+			var dateSelectorPage = document.getElementById("details-pform-date")
+			var timeSelectorPage = document.getElementById("details-pform-time")
+
+			dateSelectorTab.addEventListener("click", e => {
+				if (activeTab === 0) {
+					// already at date selector, ignore
+					return
+				}
+
+				// set activeTab
+				activeTab = 0;
+
+				// remove active class from timeSelector, and add it to date selector
+				timeSelectorTab.classList.remove("active")
+				dateSelectorTab.classList.add("active")
+
+				// show dateSelector page
+				dateSelectorPage.classList.remove("hidden")
+
+				// hide timeSelector page
+				timeSelectorPage.classList.add("hidden")
+
+			})
+
+			timeSelectorTab.addEventListener("click", e => {
+				if (activeTab === 1) {
+					// already at date selector, ignore
+					return
+				}
+
+				// set activeTab
+				activeTab = 1;
+
+				// remove active class from date selector, and add it to timeSelector
+				dateSelectorTab.classList.remove("active")
+				timeSelectorTab.classList.add("active")
+
+				// show timeSelector page
+				timeSelectorPage.classList.remove("hidden")
+
+				// hide dateeSelector page
+				dateSelectorPage.classList.add("hidden")
+			})
 		}
 
 		console.log(pages.pageElements.details.tabNextArrow)
@@ -491,6 +534,7 @@
 
 
 		// caller
+		receiptionist.register()
 		pages.register()
 		pages.nextPage()
 		pages.nextPage()
