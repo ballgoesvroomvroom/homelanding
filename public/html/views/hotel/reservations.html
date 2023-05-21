@@ -72,99 +72,92 @@
 					<div id="details-pform-header">
 						<button id="details-pform-date-input-selector" class="active">Date</button><button id="details-pform-time-input-selector">Time</button>
 					</div>
-					<div id="details-pform-date" class="">
-						<div id="details-pform-date-header">
-							<button id="pform-date-prev-month">
-							</button>
-							<h2>May 2023</h2>
-							<button id="pform-date-next-month">
-							</button>
+					<div id="details-pform-selectors-page-container">
+						<div id="details-pform-date" class="">
+							<div id="details-pform-date-header">
+								<button id="pform-date-prev-month" class="pform-date-calendar-btn">
+								</button>
+								<h2 id="pform-date-calendar-header">May 2023</h2>
+								<button id="pform-date-next-month" class="pform-date-calendar-btn active">
+								</button>
+							</div>
+							<table>
+								<thead>
+									<tr>
+										<th>Sun</th>
+										<th>Mon</th>
+										<th>Tue</th>
+										<th>Wed</th>
+										<th>Thu</th>
+										<th>Fri</th>
+										<th>Sat</th>
+									</tr>
+								</thead>
+								<tbody id="pform-date-selection-container">
+									<tr>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+									</tr>
+									<tr>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+									</tr>
+									<tr>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+									</tr>
+									<tr>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+									</tr>
+									<tr>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+									</tr>
+									<tr>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+									</tr>
+								</tbody>
+							</table>
 						</div>
-						<table>
-							<thead>
-								<tr>
-									<th>Sun</th>
-									<th>Mon</th>
-									<th>Tue</th>
-									<th>Wed</th>
-									<th>Thu</th>
-									<th>Fri</th>
-									<th>Sat</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr>
-									<th class="nim">30</th>
-									<th class="pcd">1</th>
-									<th class="pcd">2</th>
-									<th class="pcd">3</th>
-									<th class="pcd">4</th>
-									<th class="ava">5</th>
-									<th class="ava">6</th>
-								</tr>
-								<tr>
-									<th class="ava">7</th>
-									<th class="ava">8</th>
-									<th class="ava">9</th>
-									<th class="ava">10</th>
-									<th class="ava">11</th>
-									<th class="ava">12</th>
-									<th class="ava">13</th>
-								</tr>
-								<tr>
-									<th class="ava">14</th>
-									<th class="ava">15</th>
-									<th class="ava">16</th>
-									<th class="ava">17</th>
-									<th class="ava">18</th>
-									<th class="ava">19</th>
-									<th class="ava">20</th>
-								</tr>
-								<tr>
-									<th class="ava">21</th>
-									<th class="ava">22</th>
-									<th class="ava">23</th>
-									<th class="ava">24</th>
-									<th class="ava">25</th>
-									<th class="ava">26</th>
-									<th class="ava">27</th>
-								</tr>
-								<tr>
-									<th class="ava">28</th>
-									<th class="ava">29</th>
-									<th class="ava">30</th>
-									<th class="ava">31</th>
-									<th class="nim">1</th>
-									<th class="nim">2</th>
-									<th class="nim">3</th>
-								</tr>
-								<tr>
-									<th class="nim">4</th>
-									<th class="nim">5</th>
-									<th class="nim">6</th>
-									<th class="nim">7</th>
-									<th class="nim">8</th>
-									<th class="nim">9</th>
-									<th class="nim">10</th>
-								</tr>
-							</tbody>
-						</table>
-					</div>
-					<div id="details-pform-time" class="hidden">
-						<h3>Breakfast</h3>
-						<div class="details-pform-timeslots-container">
-							<p>08:00</p>
-							<p>09:00</p>
-							<p>10:00</p>
-							<p>11:00</p>
-						</div>
-						<h3>Dinner</h3>
-						<div class="details-pform-timeslots-container">
-							<p>16:00</p>
-							<p>17:00</p>
-							<p>18:00</p>
-							<p>19:00</p>
-							<p>20:00</p>
+						<div id="details-pform-time" class="hidden">
+							<div id="details-pform-time-block">
+								<img src="https://svgsilh.com/svg/1801287.svg">
+								<p>Please select a date first</p>
+							</div>
+							<div id="details-pform-time-booking-container" class="hidden">
+							</div>
 						</div>
 					</div>
 				</div>
@@ -303,6 +296,49 @@
 		</div>
 	</body>
 	<script>
+		// util object
+		const utils = {}
+
+		utils.generateTableDates = (year, month) => {
+			var tableDates = []
+			var availableDateRange = [-1, -1] // index (referenced from absValue defined in the loop)
+			console.log(year, month)
+
+			var currentMonthFirstDay = new Date(year, month).getDay()
+			var currentMonthTotalDays = new Date(year, month +1, 0).getDate()
+			var previousMonthTotalDays = new Date(year, month, 0).getDate()
+
+			for (let i = 0; i < 6; i++) {
+				var row = []
+				for (let j = 0; j < 7; j++) {
+					var absValue = j +i *7 // value representing the current amount of days passed
+					if (absValue -currentMonthFirstDay >= currentMonthTotalDays) {
+						// current month exceeded, use days in next month
+						row.push(absValue -currentMonthFirstDay -currentMonthTotalDays +1)
+
+						// update date range
+						if (availableDateRange[1] === -1) {
+							availableDateRange[1] = absValue -1
+						}
+					} else if (absValue >= currentMonthFirstDay) {
+						// still in current month
+						row.push(absValue -currentMonthFirstDay +1)
+
+						// update date range
+						if (availableDateRange[0] === -1) {
+							availableDateRange[0] = absValue
+						}
+					} else {
+						// use previous months date
+						row.push(previousMonthTotalDays -currentMonthFirstDay +absValue +1)
+					}
+				}
+				tableDates.push(row)
+			}
+
+			return [tableDates, availableDateRange]
+		}
+
 		// pages object
 		const pages = {
 			dir: ["details", "guests", "payment", "confirmation"],
@@ -342,25 +378,30 @@
 			date: "",
 			time: "",
 			service: "",
+
+			generatedCalender: null, // to be generated (by .register())
+			generatedCalenderRange: null, // to be generated
+			calendarYear: null, // to be generated
+			calendarMonth: null, // to be generated
 		}
 
 		receiptionist.updateDateTimeDetails = function() {
 			// updates contents of this.timingDisplayEle with this.date and this.time
 			var o = this.date
 			if (this.time.length > 0) {
-				o += `, ${time}`
+				o += `, ${this.time}`
 			}
 
 			this.timingDisplayEle.innerHTML = o
 		}
 
-		receiptionist.chooseDate = function(date) {
+		receiptionist.chooseDate = function(dateObj) {
 			// date: string, in ISO format (YYYYMMDD)
-			var dateObj = new Date(date +"T00:00:00.000")
-			var month = date.toLocaleString("default", {month: "short"})
+			var year = dateObj.getFullYear()
+			var month = dateObj.toLocaleString("default", {month: "short"})
 			var dateNum = dateObj.getDate()
 
-			this.date = `${dateNum} ${month}`
+			this.date = `${dateNum} ${month} ${year}`
 			this.updateDateTimeDetails()
 		}
 
@@ -368,7 +409,14 @@
 			// idx: number, time slot choosen (can infer type of service)
 			// returns true if found timeslot & service successfully, else false
 
+			// only selects when date has been chosen
+			if (this.date.length === 0) {
+				// date not yet chosen, return false
+				return false
+			}
+
 			// find service
+			console.log("TIME CHOOSEN", idx)
 			var i = 0;
 			var service, timeslot;
 			for (let serviceIdx = 0; serviceIdx < this.availableTimeslots.length; serviceIdx++) {
@@ -382,6 +430,7 @@
 				} else {
 					service = this.availableTimeslots[serviceIdx][0]
 					timeslot = this.availableTimeslots[serviceIdx][idx -i +1]
+					break
 				}
 			}
 
@@ -397,6 +446,65 @@
 			return true
 		}
 
+		receiptionist.redrawCalendarDateBooking = function(yearIdx, mnthIdx) {
+			// generate dates in current month with respect to the day (mon - sun)
+			var todayDate = new Date()
+			var [tableDates, availableDateRange] = utils.generateTableDates(yearIdx, mnthIdx)
+			var pastDateRange = (yearIdx === todayDate.getFullYear() && mnthIdx === todayDate.getMonth()) ? availableDateRange[0] +todayDate.getDate() : 0 // index that indicates the current date (used to determine whether if dates in tableDates has been past)
+
+			// store generated calendar
+			this.generatedCalender = tableDates
+			this.generatedCalenderRange = availableDateRange
+
+			// store calendar params
+			this.calendarMonth = mnthIdx
+			this.calendarYear = yearIdx
+
+			// modify dateselection container (and their classes)
+			var dateSelectionContainer = document.getElementById("pform-date-selection-container")
+			for (let i = 0; i < dateSelectionContainer.children.length; i++) {
+				var tr = dateSelectionContainer.children[i]
+				for (let j = 0; j < tr.children.length; j++) {
+					var th = tr.children[j]
+
+					// write date value
+					th.innerHTML = tableDates[i][j]
+
+					// set date property (depending whether its in month) [nim, pcd, ava]
+					th.className = "" // reset classes
+					if (j +i *7 >= availableDateRange[0] && j +i *7 < pastDateRange) {
+						// pcd (past current date)
+						th.classList.add("pcd")
+
+						// remove role & aria-label & tab-index attribute
+						th.removeAttribute("role")
+						th.removeAttribute("aria-label")
+						th.removeAttribute("tabindex")
+					} else if (j +i *7 >= availableDateRange[0] && j +i *7 <= availableDateRange[1]) {
+						// ava
+						th.classList.add("ava")
+
+						// set role & aria-label & tab-index attribute
+						th.setAttribute("role", "button")
+						th.setAttribute("aria-label", `select date ${new Date(yearIdx, mnthIdx, tableDates[i][j]).toLocaleDateString("en-US", {weekday: "long", year: "numeric", month: "long", day: "numeric"})}`)
+						th.setAttribute("tabindex", "0")
+					} else {
+						// nim (not in this month)
+						th.classList.add("nim")
+
+						// remove role & aria-label & tab-index attribute
+						th.removeAttribute("role")
+						th.removeAttribute("aria-label")
+						th.removeAttribute("tabindex")
+					}
+				}
+			}
+
+			var mnthString = new Date(yearIdx, mnthIdx).toLocaleString("default", {month: "short"})
+			mnthString = mnthString.charAt(0).toUpperCase() +mnthString.slice(1) // capitalise first character
+			document.getElementById("pform-date-calendar-header").innerHTML = `${mnthString} ${yearIdx}`
+		}
+
 		receiptionist.register = function() {
 			// initialisation call
 			var activeTab = 0; // 0 for date selector, 1 for time selector
@@ -405,6 +513,14 @@
 
 			var dateSelectorPage = document.getElementById("details-pform-date")
 			var timeSelectorPage = document.getElementById("details-pform-time")
+
+			var timeBlockMsg = document.getElementById("details-pform-time-block")
+			var timeBookingContainer = document.getElementById("details-pform-time-booking-container")
+
+			var calendarPrevBtn = document.getElementById("pform-date-prev-month")
+			var calendarNextBtn = document.getElementById("pform-date-next-month")
+
+			var todayDate = new Date()
 
 			dateSelectorTab.addEventListener("click", e => {
 				if (activeTab === 0) {
@@ -419,12 +535,15 @@
 				timeSelectorTab.classList.remove("active")
 				dateSelectorTab.classList.add("active")
 
-				// show dateSelector page
+				// show dateSelector page (and make active the calendar navig buttons)
 				dateSelectorPage.classList.remove("hidden")
+				if (!(todayDate.getFullYear() === this.calendarYear && todayDate.getMonth() === this.calendarMonth)) {
+					calendarPrevBtn.classList.add("active")
+				}
+				calendarNextBtn.classList.add("active")
 
 				// hide timeSelector page
 				timeSelectorPage.classList.add("hidden")
-
 			})
 
 			timeSelectorTab.addEventListener("click", e => {
@@ -436,6 +555,16 @@
 				// set activeTab
 				activeTab = 1;
 
+				// determine if date was already selected (if so, hide block message)
+				if (this.date.length === 0) {
+					// not selected yet, show block message, high time booking container
+					timeBlockMsg.classList.remove("hidden")
+					timeBookingContainer.classList.add("hidden")
+				} else {
+					timeBlockMsg.classList.add("hidden")
+					timeBookingContainer.classList.remove("hidden")
+				}
+
 				// remove active class from date selector, and add it to timeSelector
 				dateSelectorTab.classList.remove("active")
 				timeSelectorTab.classList.add("active")
@@ -443,9 +572,174 @@
 				// show timeSelector page
 				timeSelectorPage.classList.remove("hidden")
 
-				// hide dateeSelector page
+				// hide dateeSelector page (and the calendar buttons)
 				dateSelectorPage.classList.add("hidden")
+				calendarPrevBtn.classList.remove("active")
+				calendarNextBtn.classList.remove("active")
 			})
+
+			// generate dates in current month with respect to the day (mon - sun)
+			var [tableDates, availableDateRange] = utils.generateTableDates(todayDate.getFullYear(), todayDate.getMonth())
+			var pastDateRange = availableDateRange[0] +todayDate.getDate() // index that indicates the current date (used to determine whether if dates in tableDates has been past)
+
+			// store generated calendar
+			this.generatedCalender = tableDates
+			this.generatedCalenderRange = availableDateRange
+
+			// store calendar params
+			this.calendarMonth = todayDate.getMonth()
+			this.calendarYear = todayDate.getFullYear()
+
+			// modify dateselection container (register click events)
+			// initialisation call (use this.redrawCalendarDateBooking on subsequent calls)
+			var dateSelectionContainer = document.getElementById("pform-date-selection-container")
+			for (let i = 0; i < dateSelectionContainer.children.length; i++) {
+				var tr = dateSelectionContainer.children[i]
+				for (let j = 0; j < tr.children.length; j++) {
+					let absValue = j +i *7
+					var th = tr.children[j]
+
+					// write date value
+					th.innerHTML = tableDates[i][j]
+
+					// set date property (depending whether its in month) [nim, pcd, ava]
+					if (absValue >= availableDateRange[0] && absValue < pastDateRange) {
+						// pcd (past current date)
+						th.classList.add("pcd")
+					} else if (absValue >= availableDateRange[0] && absValue <= availableDateRange[1]) {
+						// ava
+						th.classList.add("ava")
+
+						// set role & aria-label & tab-index attribute
+						th.setAttribute("role", "button")
+						th.setAttribute("aria-label", `select booking date ${new Date(todayDate.getFullYear(), todayDate.getMonth(), tableDates[i][j]).toLocaleDateString("en-US", {weekday: "long", year: "numeric", month: "long", day: "numeric"})}`)
+						th.setAttribute("tabindex", "0")
+					} else {
+						// nim (not in this month)
+						th.classList.add("nim")
+					}
+
+					let thClickFn = e => {
+						// determine if this selection is a valid one since month may have changed (yet click works on the same registeration)
+						// get date
+						var date = this.generatedCalender[i][j]
+
+						// see if date is within range
+						if (absValue < availableDateRange[0] || absValue > availableDateRange[1]) {
+							// out of range, return (invalid click)
+							return
+						} else {
+							// see if the date is already past (pcd)
+							if (todayDate.getFullYear() === this.calendarYear && todayDate.getMonth() >= this.calendarMonth && todayDate.getDate() > date) {
+								// at current month and year AND today date has past selected date
+								// out of range, return (invalid date)
+								return
+							}
+						}
+
+						// valid date
+						this.chooseDate(new Date(this.calendarYear, this.calendarMonth, date))
+					}
+
+					// set click events
+					th.addEventListener("click", thClickFn)
+					th.addEventListener("keydown", e => {
+						if (e.keyCode === 32 || e.keyCode == 13) {
+							// space and enter key (for compatibility)
+							thClickFn()
+						}
+					})
+				}
+			}
+
+			// update text display
+			var mnthString = todayDate.toLocaleString("default", {month: "short"})
+			mnthString = mnthString.charAt(0).toUpperCase() +mnthString.slice(1) // capitalise first character
+			document.getElementById("pform-date-calendar-header").innerHTML = `${mnthString} ${todayDate.getFullYear()}`
+
+			// register calendar prev/next buttons
+			calendarPrevBtn.addEventListener("click", e => {
+				// go back previous month (unless calendarMonth is already this month -- cant go back any more)
+				if (todayDate.getFullYear() === this.calendarYear && todayDate.getMonth() === this.calendarMonth) {
+					// already at the current month, hide this button
+					calendarPrevBtn.classList.remove("active")
+
+					// do nothing
+					return
+				}
+
+				// calculate month index
+				var year, month
+				if (this.calendarMonth <= 0) {
+					year = this.calendarYear -1
+					month = 11
+				} else {
+					year = this.calendarYear
+					month = this.calendarMonth -1
+				}
+
+				// redraw calendar
+				this.redrawCalendarDateBooking(year, month)
+
+				// determine if need to hide prevbtn
+				if (todayDate.getFullYear() === this.calendarYear && todayDate.getMonth() === this.calendarMonth) {
+					// cannot go back any more
+					calendarPrevBtn.classList.remove("active")
+				}
+			})
+
+			calendarNextBtn.addEventListener("click", e => {
+				// go next month
+				// calculate month index
+				var year, month
+				if (this.calendarMonth >= 11) {
+					// jump to next year
+					year = this.calendarYear +1
+					month = 0
+				} else {
+					year = this.calendarYear
+					month = this.calendarMonth +1
+				}
+
+				// redraw calendar
+				this.redrawCalendarDateBooking(year, month)
+
+				// show prevbtn
+				calendarPrevBtn.classList.add("active")
+			})
+
+
+			// write timeslots
+			let iterIdx = 0;
+			for (let i = 0; i < this.availableTimeslots.length; i++) {
+				var timeslotData = this.availableTimeslots[i]
+
+				// create header
+				const header = document.createElement("h3")
+				header.innerHTML = timeslotData[0]
+				timeBookingContainer.appendChild(header)
+
+				// create container
+				var container = document.createElement("div")
+				container.className = "details-pform-timeslots-container"
+				timeBookingContainer.appendChild(container)
+
+				// time slot cards (start from index 1 since index 0 is the service header name)
+				for (j = 1; j < this.availableTimeslots[i].length; j++) {
+					// compute global index
+					let timeslotGlobalIdx = iterIdx++
+
+					// create card (p tag)
+					const timeslotCard = document.createElement("p")
+					timeslotCard.innerHTML = this.availableTimeslots[i][j]
+					container.appendChild(timeslotCard)
+
+					// register click events
+					timeslotCard.addEventListener("click", e => {
+						this.chooseTime(timeslotGlobalIdx)
+					})
+				}
+			}
 		}
 
 		console.log(pages.pageElements.details.tabNextArrow)
@@ -528,8 +822,6 @@
 
 			// switch page
 			var success = this.switchPage(this.currentPage +1, true)
-
-			console.log(success, this.currentPage)
 		}
 
 

@@ -237,6 +237,8 @@ input:hover {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+
+	position: relative;
 }
 
 #details-pform-header {
@@ -308,16 +310,19 @@ input:hover {
 	transform: scaleX(1);
 }
 
+#details-pform-selectors-page-container {
+	position: relative;
+}
+
 #details-pform-date {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-
 	width: 100%;
 }
 
 #details-pform-date.hidden {
-	display: none;
+	visibility: hidden;
 }
 
 #details-pform-date-header {
@@ -333,13 +338,15 @@ input:hover {
 	padding: 0 20px;
 }
 
-#details-pform-date-header > button {
+.pform-date-calendar-btn {
 	width: 24px;
 	height: 24px;
 
 	padding: 6px;
 
 	border-radius: 12px;
+
+	visibility: hidden;
 
 	background-origin: content-box;
 	background-position: center;
@@ -351,16 +358,20 @@ input:hover {
 	transition-timing-function: linear;
 }
 
-#details-pform-date-header > button:focus,
-#details-pform-date-header > button:hover {
+.pform-date-calendar-btn.active {
+	visibility: visible;
+}
+
+.pform-date-calendar-btn.active:focus,
+.pform-date-calendar-btn.active:hover {
 	background-color: #efefef;
 }
 
-button#pform-date-prev-month {
+.pform-date-calendar-btn#pform-date-prev-month {
 	background-image: url("/hotel_assets/back.svg");
 }
 
-button#pform-date-next-month {
+.pform-date-calendar-btn#pform-date-next-month {
 	background-image: url("/hotel_assets/next.svg");
 }
 
@@ -388,6 +399,7 @@ button#pform-date-next-month {
 }
 
 #details-pform-date > table > tbody > tr > th.ava.active,
+#details-pform-date > table > tbody > tr > th.ava:focus,
 #details-pform-date > table > tbody > tr > th.ava:hover {
 	color: var(--secondary-compl-color);
 	background-color: var(--tertiary-color);
@@ -409,14 +421,46 @@ button#pform-date-next-month {
 	flex-direction: column;
 	align-items: center;
 
+	position: absolute;
+	top: 0;
+
 	width: 100%;
 }
 
 #details-pform-time.hidden {
+	visibility: hidden;
+}
+
+#details-pform-time-block {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+
+	padding: 30px 0;
+}
+
+#details-pform-time-block.hidden {
 	display: none;
 }
 
-#details-pform-time > h3 {
+#details-pform-time-block > img {
+	width: 100%;
+	height: 120px;
+
+	margin-bottom: 10px;
+}
+
+#details-pform-time-booking-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+#details-pform-time-booking-container.hidden {
+	display: none;
+}
+
+#details-pform-time-booking-container > h3 {
 	padding-top: 20px;
 	padding-bottom: 10px;
 	margin-top: 10px;
