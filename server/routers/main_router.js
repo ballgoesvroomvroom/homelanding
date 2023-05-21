@@ -11,6 +11,7 @@ const router = express.Router();
 // article domain
 const articleViewRouter = require(path.join(viewsRouteHandler, "docs.js"))
 const hotelViewRouter = require(path.join(viewsRouteHandler, "hotel.js"))
+const qrillerInterfaceViewRouter = require(path.join(viewsRouteHandler, "qrillerInterface.js"))
 
 // HOME PAGE
 router.get("/", (req, res) => {
@@ -62,6 +63,7 @@ router.get("/secret-get-path", (req, res) => {
 
 router.use(articleViewRouter.baseURL, articleViewRouter.router)
 router.use(hotelViewRouter.baseURL, hotelViewRouter.router)
+router.use(qrillerInterfaceViewRouter.baseURL, qrillerInterfaceViewRouter.router)
 
 module.exports = {
 	baseURL, router

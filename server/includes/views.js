@@ -16,6 +16,10 @@ class Hotel {
 	static reservations = path.join(html, "views/hotel/reservations.html")
 }
 
+class Qriller {
+	static document = path.join(html, "views/latex_home.html")
+}
+
 class Views {
 	static home = path.join(html, "base.html")
 	static upload_lockscreen = path.join(html, "views/upload_lock.html")
@@ -25,6 +29,7 @@ class Views {
 
 	static docs = Docs
 	static hotel = Hotel
+	static qriller = Qriller
 }
 
 module.exports = Views;
