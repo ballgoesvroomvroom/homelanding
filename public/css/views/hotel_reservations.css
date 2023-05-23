@@ -65,6 +65,10 @@ input:hover {
 	outline: none;
 }
 
+input:invalid {
+	border-color: var(--tertiary-color);
+}
+
 /* STANDARD UTIL CLASSES */
 .hidden {
 	display: none;
@@ -137,7 +141,7 @@ input:hover {
 	color: #eee;
 }
 
-.progress-tab-container > p {
+.progress-tab-container > button {
 	display: flex;
 	flex-direction: row;
 	align-items: center;
@@ -152,17 +156,17 @@ input:hover {
 }
 
 
-.progress-tab-container.unlocked > p {
+.progress-tab-container.unlocked > button {
 	color: #898989;
 }
 
-.progress-tab-container.unlocked:hover > p,
-.progress-tab-container.unlocked:focus > p {
+.progress-tab-container.unlocked:hover > button,
+.progress-tab-container.unlocked:focus > button {
 	color: #424242;
 	background-color: #efefef;
 }
 
-.progress-tab-container.active > p {
+.progress-tab-container.active > button {
 	color: #000;
 	font-weight: 600;
 }
@@ -336,6 +340,11 @@ input:hover {
 
 #details-pform-date-header > h2 {
 	padding: 0 20px;
+}
+
+#pform-date-calendar-header {
+	min-width: 200px;
+	text-align: center;
 }
 
 .pform-date-calendar-btn {

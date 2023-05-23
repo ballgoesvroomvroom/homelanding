@@ -38,24 +38,24 @@
 				<h2>DAWN</h2>
 			</div>
 			<div id="progress-container">
-				<button class="progress-tab-container unlocked active" id="details-tab-container">
-					<p>Details</p>
+				<div class="progress-tab-container unlocked active" id="details-tab-container">
+					<button>Details</button>
 					<div class="progress-tab-next-arrow">
 					</div>
-				</button>
-				<button class="progress-tab-container" id="guests-tab-container">
-					<p>Guests</p>
+				</div>
+				<div class="progress-tab-container" id="guests-tab-container">
+					<button>Guests</button>
 					<div class="progress-tab-next-arrow">
 					</div>
-				</button>
-				<button class="progress-tab-container" id="payment-tab-container">
-					<p>Payment</p>
+				</div>
+				<div class="progress-tab-container" id="payment-tab-container">
+					<button>Payment</button>
 					<div class="progress-tab-next-arrow">
 					</div>
-				</button>
-				<button class="progress-tab-container" id="confirmation-tab-container">
-					<p>Confirmation</p>
-				</button>
+				</div>
+				<div class="progress-tab-container" id="confirmation-tab-container">
+					<button>Confirmation</button>
+				</div>
 			</div>
 		</div>
 		<div id="page-window">
@@ -217,26 +217,26 @@
 				<hr>
 				<form id="payment-pform-container" name="payment-card-details">
 					<label id="payment-card-name-label" for="payment-card-name">Name on card</label>
-					<input id="payment-card-name-input" name="payment-card-name" placeholder="Name" type="text" pattern="[a-zA-Z\s\/]{3, 255}" autocomplete="cc-name" minlength="3" maxlength="255">
+					<input id="payment-card-name-input" name="payment-card-name" placeholder="Name" type="text" pattern="[a-zA-Z\s\/]{3,255}" autocomplete="cc-name" minlength="3" maxlength="255" required>
 					<label id="payment-card-no-label" for="payment-card-no">Card number</label>
-					<input id="payment-card-no-input" name="payment-card-no" placeholder="0000 0000 0000 0000" type="tel" inputmode="numeric" pattern="[0-9\s]{13,19}" autocomplete="cc-number" maxlength="19">
+					<input id="payment-card-no-input" name="payment-card-no" placeholder="0000 0000 0000 0000" type="tel" inputmode="numeric" pattern="[0-9\s]{13,19}" autocomplete="cc-number" maxlength="19" required>
 
 					<div id="payment-pform-card-details-row-container">
 						<div class="payment-pform-card-details-input-group">
 							<label id="payment-card-expmnth-label" for="payment-card-expmnth">Expiry</label>
 							<div id="payment-pform-cardexp-input-group">
-								<input id="payment-card-expmnth-input" name="payment-card-expmnth" placeholder="MM" inputmode="numeric" pattern="[0-9]{2}" type="text" autocomplete="cc-exp-month" minlength="2" maxlength="2">
+								<input id="payment-card-expmnth-input" name="payment-card-expmnth" placeholder="MM" inputmode="numeric" pattern="[0-9]{2}" type="text" autocomplete="cc-exp-month" required>
 								<p>/</p>
-								<input id="payment-card-expyr-input" name="payment-card-expyr" placeholder="YY" inputmode="numeric" pattern="[0-9]{2}" type="text" autocomplete="cc-exp-year" minlength="2" maxlength="2">
+								<input id="payment-card-expyr-input" name="payment-card-expyr" placeholder="YY" inputmode="numeric" pattern="[0-9]{2}" type="text" autocomplete="cc-exp-year" required>
 							</div>
 						</div>
 						<div class="payment-pform-card-details-input-group">
 							<label id="payment-card-cvv-label" for="payment-card-cvv">CVV</label>
-							<input id="payment-card-cvv-input" name="payment-card-cvv" placeholder="•••" inputmode="numeric" pattern="[0-9]{3}" type="text" minlength="3" maxlength="3" min="0" autocomplete="cc-cvv">
+							<input id="payment-card-cvv-input" name="payment-card-cvv" placeholder="•••" inputmode="numeric" pattern="[0-9]{2}" type="text" minlength="3" maxlength="3" min="0" autocomplete="cc-cvv" required>
 						</div>
 					</div>
 					<hr>
-					<button id="payment-pform-processpayment" disabled>Process payment</button>
+					<button id="payment-pform-processpayment">Process payment</button>
 				</form>
 			</div>
 			<div id="confirmation-page-container" class="page-container">
@@ -368,7 +368,7 @@
 			},
 
 			currentPage: 0,
-			highestPage: 10
+			highestPage: 0
 		}
 
 		// receiptionist object
@@ -740,6 +740,82 @@
 					})
 				}
 			}
+
+
+			// card no input, auto insert space
+			var cardnoInput = document.getElementById("payment-card-no-input")
+			cardnoInput.addEventListener("input", e => {
+				if (cardnoInput.value.length === 0) {
+					return;
+				}
+
+				cardnoInput.value = cardnoInput.value.replaceAll(" ", "").match(/.{1,4}/g).join(" ")
+			})
+
+			// card exp input, auto pad zero
+			var cardexpmnthInput = document.getElementById("payment-card-expmnth-input")
+			var cardexpyrInput = document.getElementById("payment-card-expyr-input")
+			var singlePad = e => {
+				if (e.currentTarget.value.length >= 2) {
+					if (e.currentTarget.value[0] == "0") {
+						// remove '0' padding
+						e.currentTarget.value = e.currentTarget.value.slice(1, 3)
+						return
+					} else {
+						// prevent entry
+						e.currentTarget.value = e.currentTarget.value.slice(0, 2)
+					}
+				}
+				e.currentTarget.value = e.currentTarget.value.padStart(2, "0")
+			}
+			cardexpmnthInput.addEventListener("input", singlePad)
+			cardexpyrInput.addEventListener("input", singlePad)
+
+			// card process payment
+			var cardnameInput = document.getElementById("payment-card-name-input")
+			var cardcvvInput = document.getElementById("payment-card-cvv-input")
+			var procPaymentBtn = document.getElementById("payment-pform-processpayment")
+			procPaymentBtn.addEventListener("click", e => {
+				// validate input
+				/*
+				 * name must be at least 3 chars long, not longer than 255 chars
+				 * card no has exactly 13-16 digits, not including the inserted spaces
+				 * card exp (both mnth and year) must be exactly 2 chars
+				 * card exp (mnth) must be between 01-12 inclusive, must be greater than current month if year is equal
+				 * card exp (year) must be greater or equal to current year
+				 * card cvv must be exactly 3 chars
+				 */
+				e.preventDefault();
+				var cardname = cardnameInput.value
+				var cardno = cardnoInput.value.replaceAll(" ", "")
+				var cardexpmnth = parseInt(cardexpmnthInput.value)
+				var cardexpyr = parseInt(cardexpyrInput.value)
+				var cardcvv = cardcvvInput.value
+				if (cardname.length < 3 || cardname.length > 255
+					|| cardno.length < 13 || cardno.length > 16
+					|| cardexpmnthInput.value.length !== 2
+					|| cardexpyrInput.value.length !== 2
+					|| isNaN(cardexpmnth) || isNaN(cardexpyr)
+					|| cardexpmnth <= 0 || cardexpmnth > 12
+					|| (cardexpyr == parseInt(new Date().getFullYear().toString().slice(2)) && cardexpmnth <= (new Date().getMonth() +1))
+					|| cardcvv.length !== 3
+					) {
+					// invalid card details
+					console.log("INVALID CARD DETAILS")
+					return false
+				}
+
+				// parse form into formdata
+
+				// move on with next page
+				if (pages.highestPage === 3) {
+					pages.nextPage()
+				}
+
+				// success return
+				console.log("VALID CARD DETAILS")
+				return true
+			})
 		}
 
 		console.log(pages.pageElements.details.tabNextArrow)
