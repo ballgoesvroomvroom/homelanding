@@ -130,7 +130,11 @@ input:invalid {
 	margin-top: -10px;
 	margin-bottom: -10px;
 
-	overflow-y: auto;
+	overflow-x: auto;
+}
+
+#progress-containe::-webkit-scrollbar {
+	display: none;
 }
 
 .progress-tab-container {
@@ -160,8 +164,8 @@ input:invalid {
 	color: #898989;
 }
 
-.progress-tab-container.unlocked:hover > button,
-.progress-tab-container.unlocked:focus > button {
+.progress-tab-container.unlocked > button:focus,
+.progress-tab-container.unlocked > button:hover {
 	color: #424242;
 	background-color: #efefef;
 }

@@ -44,17 +44,17 @@
 					</div>
 				</div>
 				<div class="progress-tab-container" id="guests-tab-container">
-					<button>Guests</button>
+					<button disabled>Guests</button>
 					<div class="progress-tab-next-arrow">
 					</div>
 				</div>
 				<div class="progress-tab-container" id="payment-tab-container">
-					<button>Payment</button>
+					<button disabled>Payment</button>
 					<div class="progress-tab-next-arrow">
 					</div>
 				</div>
 				<div class="progress-tab-container" id="confirmation-tab-container">
-					<button>Confirmation</button>
+					<button disabled>Confirmation</button>
 				</div>
 			</div>
 		</div>
@@ -67,7 +67,7 @@
 				<hr>
 				<div id="details-pform-container">
 					<div id="details-pform-timing-display">
-						<p id="details-pform-timing-display-text">Timings will be shown here</p>
+						<p id="details-pform-timing-display-text"></p>
 					</div>
 					<div id="details-pform-header">
 						<button id="details-pform-date-input-selector" class="active">Date</button><button id="details-pform-time-input-selector">Time</button>
@@ -347,23 +347,28 @@
 					tabContainer: document.getElementById("details-tab-container"),
 					pageContainer: document.getElementById("details-page-container"),
 
+					tabButton: document.getElementById("details-tab-container").getElementsByTagName("button")[0],
 					tabNextArrow: document.getElementById("details-tab-container").getElementsByClassName("progress-tab-next-arrow")[0]
 				},
 				"guests": {
 					tabContainer: document.getElementById("guests-tab-container"),
 					pageContainer: document.getElementById("guests-page-container"),
 
+					tabButton: document.getElementById("guests-tab-container").getElementsByTagName("button")[0],
 					tabNextArrow: document.getElementById("guests-tab-container").getElementsByClassName("progress-tab-next-arrow")[0]
 				},
 				"payment": {
 					tabContainer: document.getElementById("payment-tab-container"),
 					pageContainer: document.getElementById("payment-page-container"),
 
+					tabButton: document.getElementById("payment-tab-container").getElementsByTagName("button")[0],
 					tabNextArrow: document.getElementById("payment-tab-container").getElementsByClassName("progress-tab-next-arrow")[0]
 				},
 				"confirmation": {
 					tabContainer: document.getElementById("confirmation-tab-container"),
-					pageContainer: document.getElementById("confirmation-page-container")
+					pageContainer: document.getElementById("confirmation-page-container"),
+
+					tabButton: document.getElementById("confirmation-tab-container").getElementsByTagName("button")[0],
 				}
 			},
 
@@ -375,6 +380,8 @@
 		const receiptionist = {
 			availableTimeslots: [["Breakfast", "08:00", "09:00", "10:00", "11:00"], ["Dinner", "16:00", "17:00", "18:00", "19:00", "20:00"]],
 			timingDisplayEle: document.getElementById("details-pform-timing-display-text"),
+			selectedDateThEle: null, // to be set by th.click event
+			selectedTimeEle: null, // to be set by button.click event
 			date: "",
 			time: "",
 			service: "",
@@ -387,6 +394,13 @@
 
 		receiptionist.updateDateTimeDetails = function() {
 			// updates contents of this.timingDisplayEle with this.date and this.time
+			if (this.date.length === 0) {
+				// empty
+				this.timingDisplayEle.innerHTML = "Timings will be shown here"
+				return
+			}
+
+			// normal populated behaviour
 			var o = this.date
 			if (this.time.length > 0) {
 				o += `, ${this.time}`
@@ -397,12 +411,14 @@
 
 		receiptionist.chooseDate = function(dateObj) {
 			// date: string, in ISO format (YYYYMMDD)
+			// returns boolean on whether operation was successful
 			var year = dateObj.getFullYear()
 			var month = dateObj.toLocaleString("default", {month: "short"})
 			var dateNum = dateObj.getDate()
 
 			this.date = `${dateNum} ${month} ${year}`
 			this.updateDateTimeDetails()
+			return true
 		}
 
 		receiptionist.chooseTime = function(idx) {
@@ -446,6 +462,25 @@
 			return true
 		}
 
+		receiptionist.resetDateTimeSelection = function() {
+			// reset values and stylings for date and time selection
+			if (this.date.length > 0) {
+				// reset values first
+				this.date = ""
+				this.time = ""
+
+				// update display
+				this.updateDateTimeDetails();
+
+				// remove 'active' class for date selection (th element)
+				this.selectedDateThEle.classList.remove("active")
+				this.selectedDateThEle = null;
+
+				this.selectedTimeEle.classList.remove("active")
+				this.selectedTimeEle = null;
+			}
+		}
+
 		receiptionist.redrawCalendarDateBooking = function(yearIdx, mnthIdx) {
 			// generate dates in current month with respect to the day (mon - sun)
 			var todayDate = new Date()
@@ -459,6 +494,11 @@
 			// store calendar params
 			this.calendarMonth = mnthIdx
 			this.calendarYear = yearIdx
+
+			// remove styling for active selections (both time and date) if any
+			if (this.date.length > 0) {
+				this.resetDateTimeSelection()
+			}
 
 			// modify dateselection container (and their classes)
 			var dateSelectionContainer = document.getElementById("pform-date-selection-container")
@@ -531,7 +571,7 @@
 				// set activeTab
 				activeTab = 0;
 
-				// remove active class from timeSelector, and add it to date selector
+				// remove active class from timeSelector tab, and add it to date selector
 				timeSelectorTab.classList.remove("active")
 				dateSelectorTab.classList.add("active")
 
@@ -565,7 +605,7 @@
 					timeBookingContainer.classList.remove("hidden")
 				}
 
-				// remove active class from date selector, and add it to timeSelector
+				// remove active class from date selector tab, and add it to timeSelector
 				dateSelectorTab.classList.remove("active")
 				timeSelectorTab.classList.add("active")
 
@@ -622,6 +662,7 @@
 					let thClickFn = e => {
 						// determine if this selection is a valid one since month may have changed (yet click works on the same registeration)
 						// get date
+						e.stopPropagation();
 						var date = this.generatedCalender[i][j]
 
 						// see if date is within range
@@ -638,10 +679,26 @@
 						}
 
 						// valid date
-						this.chooseDate(new Date(this.calendarYear, this.calendarMonth, date))
+						// remove active styling for previous selection if any
+						if (this.date.length > 0 && this.selectedDateThEle != null) {
+							this.selectedDateThEle.classList.remove("active")
+							this.selectedDateThEle = null; // remove reference since we cannot it will be set again later if errors occur
+						}
+
+						// choose date
+						var success = this.chooseDate(new Date(this.calendarYear, this.calendarMonth, date))
+
+						// if successfully chose date, set active element and styling, auto trigger time tab
+						if (success) {
+							this.selectedDateThEle = e.currentTarget // th element (only text node and no other children element inside th, so no bubbling)
+							e.currentTarget.classList.add("active")
+
+							// auto switch tab to time selection
+							timeSelectorTab.click() // stimulate click; timeSelectorTab is defined on local scope of receiptionist.register(), where this inner function is held
+						}
 					}
 
-					// set click events
+					// set click events (since this is an initialisation call)
 					th.addEventListener("click", thClickFn)
 					th.addEventListener("keydown", e => {
 						if (e.keyCode === 32 || e.keyCode == 13) {
@@ -730,16 +787,30 @@
 					let timeslotGlobalIdx = iterIdx++
 
 					// create card (p tag)
-					const timeslotCard = document.createElement("p")
+					let timeslotCard = document.createElement("p")
 					timeslotCard.innerHTML = this.availableTimeslots[i][j]
 					container.appendChild(timeslotCard)
 
 					// register click events
 					timeslotCard.addEventListener("click", e => {
+						// remove active styling for previous selection if any
+						if (this.time.length > 0 && this.selectedTimeEle != null) {
+							this.selectedTimeEle.classList.remove("active")
+							this.selectedTimeEle = null; // remove reference, even though will be set later down (error might occur with .chooseTime method)
+						}
+
+						// set time
 						this.chooseTime(timeslotGlobalIdx)
+
+						// set new target (and add styling)
+						this.selectedTimeEle = timeslotCard
+						timeslotCard.classList.add("active")
 					})
 				}
 			}
+
+			// update date & time display
+			this.updateDateTimeDetails();
 
 
 			// card no input, auto insert space
@@ -808,7 +879,8 @@
 				// parse form into formdata
 
 				// move on with next page
-				if (pages.highestPage === 3) {
+				console.log(pages.highestPage)
+				if (pages.highestPage === 2) {
 					pages.nextPage()
 				}
 
@@ -818,7 +890,9 @@
 			})
 		}
 
-		console.log(pages.pageElements.details.tabNextArrow)
+		receiptionist.generateConfirmationReceipt = function() {
+			// populates the confirmation page with booking details upon successful payment
+		}
 
 		pages.navbarArrowsHighlight = function() {
 			// highlights arrow up till this.currentPage
@@ -876,7 +950,7 @@
 					continue
 				}
 
-				links.tabContainer.addEventListener("click", e => {
+				links.tabButton.addEventListener("click", e => {
 					this.switchPage(pageId)
 				})
 			}
@@ -890,8 +964,9 @@
 				return false
 			}
 
-			// add styles
+			// add styles (remove disabled attribute so can be tab navigated)
 			this.pageElements[this.dir[this.currentPage +1]].tabContainer.classList.add("unlocked")
+			this.pageElements[this.dir[this.currentPage +1]].tabButton.removeAttribute("disabled")
 
 			// set highest page
 			this.highestPage = this.currentPage +1
