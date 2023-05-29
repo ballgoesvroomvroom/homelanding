@@ -17,7 +17,8 @@ class Hotel {
 }
 
 class Qriller {
-	static document = path.join(html, "views/latex_home.html")
+	static document = path.join(html, "views/qriller/latex_home.html")
+	static answerSheet = path.join(html, "views/qriller/answer_page.html")
 }
 
 class Views {

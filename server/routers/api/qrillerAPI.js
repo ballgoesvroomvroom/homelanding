@@ -9,11 +9,11 @@ const auth_router = require(path.join(__dirname, "../auth_router.js"));
 const router = express.Router()
 
 // fetches questions in a specific document
-router.get("/db/:documentId/qn", (req, res) => {
+router.get("/db/:documentId/qns", (req, res) => {
 	// return a js script to be runned in the browser
 	if (req.params.documentId in mem) {
 		var qriller = mem[req.params.documentId]
-		var plaintextqns = qriller.questions.map(qnObj => [qnObj.question, qnObj.equationList])
+		var plaintextqns = qriller.questions.map(qnObj => [qnObj.qnReprString, qnObj.qnLatexEqn])
 
 		res.type("text/javascript")
 		res.write(`var QRILLER_ID = "${req.params.documentId}"; var QUESTIONS = ${JSON.stringify(plaintextqns)};`)
@@ -28,10 +28,18 @@ router.get("/db/:documentId/ans", (req, res) => {
 	// return a js script to be runned in the browser
 	if (req.params.documentId in mem) {
 		var qriller = mem[req.params.documentId]
-		var plaintextqns = qriller.questions.map(qnObj => qnObj.answer)
+
+		var plaintextanswers = qriller.questions.map(qnObj => {
+			var answerObj = qnObj.answerObj
+			if (answerObj.isAlgebraic) {
+				return [answerObj.ansReprString, answerObj.ansLatexEqn]
+			} else {
+				return [answerObj.ansReprString]
+			}
+		})
 
 		res.type("text/javascript")
-		res.write(`var QRILLER_ID = "${req.params.documentId}"; var QUESTIONS = ${JSON.stringify(plaintextqns)};`)
+		res.write(`var QRILLER_ID = "${req.params.documentId}"; var ANSWERS = ${JSON.stringify(plaintextanswers)};`)
 		return res.status(200).end()
 	}
 

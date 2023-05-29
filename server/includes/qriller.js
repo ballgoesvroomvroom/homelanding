@@ -1,4 +1,5 @@
 const crypto = require("crypto")
+const {rando, randoSequence} = require('@nastyox/rando.js');
 const mem = require("./qrillerMemory.js")
 
 class Qriller {
@@ -23,12 +24,18 @@ class Qriller {
 	}
 }
 
-class BaseQuestion {
-	question = ""
-	equationList = []
+class Database {
+	// objects to be used in word scenarios
+	people = ["John", "Emma", "Michael", "Olivia", "William", "Ava", "James", "Isabella", "Alexander", "Sophia", "Daniel", "Mia", "David", "Charlotte", "Joseph", "Amelia", "Matthew", "Harper", "Samuel", "Evelyn", "Henry", "Abigail", "Andrew", "Emily", "Gabriel", "Elizabeth", "Benjamin", "Sofia", "Christopher", "Ella", "Jackson", "Victoria", "Anthony", "Avery", "Jonathan", "Grace", "Ryan", "Chloe", "Nicholas", "Scarlett", "Christian", "Zoey", "Nathan", "Lily", "Adam", "Hannah", "Thomas", "Madison", "Joshua", "Layla", "Aaron", "Aubrey", "Ethan", "Penelope", "William", "Eleanor", "Logan", "Nora", "Isaac", "Riley", "Elijah", "Savannah", "Connor", "Brooklyn", "Owen", "Leah", "Caleb", "Zoe", "Luke", "Stella", "Isaiah", "Hazel", "Jack", "Ellie", "Jordan", "Paisley", "Jeremiah", "Audrey", "Liam", "Skylar", "Wyatt", "Violet", "Sebastian", "Claire", "Jayden", "Bella", "Julian", "Lucy", "Carter", "Anna", "Brayden", "Samantha", "Gavin", "Caroline", "Levi", "Genesis", "Austin", "Aaliyah", "Charles", "Kennedy", "Hunter", "Kylie", "Aaron", "Allison", "Jason", "Maya", "Ian", "Sarah", "Connor", "Madelyn", "Colton", "Adeline", "Dominic", "Alexa", "Kevin", "Ariana", "Evan", "Elena", "Cooper", "Gabriella", "Henry", "Naomi", "Hudson", "Alice", "Adrian", "Sadie", "Jace", "Hailey", "Dylan", "Eva", "Leo", "Emilia", "Lucas", "Autumn", "Eli", "Piper", "Max", "Nevaeh", "Nolan", "Ruby", "Miles", "Serenity", "Elias", "Aria", "Brady", "Kaylee", "Adam", "Annabelle", "Asher", "Alyssa", "Jaxon", "Taylor", "Greyson", "Brielle", "Roman", "Lillian", "Santiago", "Angelina", "Mateo", "Liliana", "Sawyer", "Ashley", "Diego", "Lauren", "Leonardo", "Gianna", "Caleb", "Peyton", "Finn", "Adalyn", "Jayce", "Arianna", "Luis", "Makayla", "Maxwell", "Addison", "Axel", "Natalie", "Nathaniel", "Mia", "Juan", "Brooke", "Bryson", "Leila", "Carlos", "Nicole"]
+	things = ["apple", "fruit", "pen", "orange", "banana", "book", "car", "dog", "cat", "chair", "table", "computer", "phone", "cup", "shirt", "shoe", "ball", "guitar", "hat", "bottle", "watch", "key", "camera", "sock", "flower", "cookie", "lamp", "bag", "bicycle", "knife", "chair", "pencil", "paper", "notebook", "umbrella", "glasses", "ring", "wallet", "headphone", "clock", "brush", "mirror", "globe", "tie", "scarf", "plate", "spoon", "fork", "knife", "pillow", "bed", "blanket", "wallet", "door", "window", "bookshelf", "candle", "oven", "refrigerator", "television", "toothbrush", "toothpaste", "soap", "towel", "shirt", "pants", "dress", "sock", "shoe", "sweater", "jacket", "coat", "belt", "hat", "gloves", "boots", "earrings", "bracelet", "necklace", "ring", "watch", "glasses", "bag", "backpack", "suitcase", "camera", "laptop", "keyboard", "mouse", "charger", "bottle", "cup", "plate", "spoon", "fork", "knife", "napkin", "tablecloth", "vase", "flower", "lamp", "candle", "painting", "sculpture", "guitar", "drum", "piano", "violin", "trumpet", "flute", "basketball", "soccer ball", "baseball", "tennis ball", "golf ball", "volleyball", "football", "helmet", "bat", "glove", "net", "brush", "comb", "mirror", "hairdryer", "soap", "shampoo", "conditioner", "toothbrush", "toothpaste", "towel", "lotion", "perfume", "wallet", "key", "phone", "tablet", "camera", "headphone", "speaker", "clock", "remote", "charger", "umbrella", "suitcase", "backpack", "map", "guidebook", "passport", "ticket", "sunglasses", "hat", "sunscreen", "water bottle", "snack", "camera", "binoculars", "journal", "pencil", "pen", "notebook", "bookmark", "calendar", "calculator", "ruler", "tape", "scissors", "glue", "stapler", "paperclip", "eraser", "highlighter", "folder", "envelope", "sticker", "postcard", "stamp", "paper"]
+	rigidbody = ["car", "bike"]
+}
 
-	isAlgebraic = false
-	answer = null
+class BaseQuestion {
+	qnReprString = ""
+	qnLatexEqn = []
+
+	answerObj = null // to be set
 
 	static roundOffSf(n, s) {
 		var h;
@@ -59,10 +66,35 @@ class BaseQuestion {
 
 		return j
 	}
+
+	static gcd(a, b) {
+		if (a == 0) {
+			return b
+		}
+		return BaseQuestion.gcd(b %a, a)
+	}
+}
+
+class BaseAnswer {
+	constructor(isRawNumber) {
+		this.isAlgebraic = !isRawNumber
+
+		this.ansReprString = ""
+		this.ansLatexEqn = !isRawNumber ? [] : null // only exists if answer object is not a raw number
+	}
+
+	set(answer, latexEqn) {
+		if (this.isAlgebraic && latexEqn == null) {
+			console.warn("[WARN]: answer object is algebraic yet raw answer provided,", answer)
+		} else if (this.isAlgebraic && latexEqn) {
+			this.ansLatexEqn = [...latexEqn] // shallow copy so new reference
+		}
+
+		this.ansReprString = answer.toString()
+	}
 }
 
 class FracToPerc extends BaseQuestion {
-	isAlgebraic = false
 	constructor() {
 		super();
 
@@ -73,11 +105,168 @@ class FracToPerc extends BaseQuestion {
 		var numer = basearg +Math.floor(Math.random() *vararg)
 		var denom = basearg +Math.floor(Math.random() *Math.abs(numer -vararg)) // guaranteed to be at least 1 with basearg
 
-		// insert latex equation into this.equationList
-		this.equationList.push(`\\frac{${numer}}{${denom}}`)
+		// format question with equation
+		this.qnReprString = `Convert the following %%0%% to percentage.`
+		this.qnLatexEqn.push(`\\frac{${numer}}{${denom}}`)
 
-		this.answer = BaseQuestion.roundOffSf(numer / denom)
-		this.question = `Convert the following %%0%% to percentage.`
+		// generate answer
+		var answer = BaseQuestion.roundOffSf(numer / denom, 3)
+
+		this.answerObj = new BaseAnswer(true)
+		this.answerObj.set(answer)
+	}
+}
+
+class PercToFrac extends BaseQuestion {
+	constructor() {
+		super();
+
+		// compute a random number
+		var largeNum = rando()
+		var intPart;
+		if (largeNum > .8) {
+			intPart = 1 +rando(1, 5000)
+		} else {
+			intPart = 1 +rando(0, 200)
+		}
+
+		var precision = 1000 // decimal places
+		var decimalPart = rando(0, 180) *5 // so that it is a multiple of 5
+		var percVal = intPart +decimalPart /precision
+
+		// form the fractions
+		var num = intPart *precision +decimalPart
+		var den = precision *100 // 100 is to convert between percentage and fractions
+
+		// simplify it using gcd
+		var gcd = BaseQuestion.gcd(num, den)
+		num = Math.floor(num /gcd)
+		den = Math.floor(den /gcd)
+
+		// set fields
+		this.qnReprString = `Convert the following %%0%% to a fraction.`
+		this.qnLatexEqn.push(`${percVal}\\%`)
+		this.answerObj = new BaseAnswer(false)
+		this.answerObj.set("%%0%%", [`\\frac{${num}}{${den}}`])
+	}
+}
+
+class PercChange extends BaseQuestions {
+	// answer is rounded off to 3 significant figures
+	constructor(wordContext) {
+		// wordContext: boolean, if true will generate scenarios instead 
+		super();
+
+		// choose scenario
+		// scenario list (walk speed, travelling speed, car A & B, bike speed)
+		// salary
+		// 
+
+		if (wordContext) {
+			var scenario = rando(1, 5)
+			switch (scenario) {
+				case 1:
+					// speed
+					var person = Database.people[Math.floor(Math.random() *Database.people.length)]
+
+					var speedGauge = rando(1, 5) // decision making
+					var action, small, big
+					var unit = "km/h"
+					switch (speedGauge) {
+						case 1:
+							// foot
+							small = rando(1, 600)
+							big = small +rando(390)
+							action = small < 400 ? "walks" : "runs" // determine action by walk speed (m/h)
+							unit = "m/h"
+							break
+						case 2:
+							// driving
+							small = rando(5, 80) +(Math.floor(rando() *10) /10) // speed up to 1 d.p.
+							big = small +rando(70) +(Math.floor(rando() *10) /10)
+							action = "drives a car"
+							break
+						case 3:
+							// cycling
+							small = rando(1, 5) +(Math.floor(rando() *100) /100) // speed up to 2 d.p.
+							big = small +rando(30) +(Math.floor(rando() *100) /100)
+							action = "cycles"
+							break
+						case 4:
+							// rides a bus
+							small = rando(5, 20) +(Math.floor(rando() *10) /10) // speed up to 1 d.p.
+							big = small +rando(20) +(Math.floor(rando() *10) /10)
+							action = "rides a bus which goes"
+							break
+						case 5:
+							// swimming
+							small = rando(1, 5) +(Math.floor(rando() *100) /100) // speed up to 2 d.p.
+							big = small +rando(8) +(Math.floor(rando() *100) /100) // speed up to 2 d.p.
+							action = "swims"
+					}
+
+					// form question
+					var incr = rando() >= .6
+					var mode, first, second;
+					if (incr) {
+						mode = "increases"
+						first = small
+						second = big
+					} else {
+						mode = "decreases"
+						first = big
+						second = small
+					}
+
+					// set fields
+					this.qnLatexEqn.push(first)
+					this.qnLatexEqn.push(second)
+					this.qnReprString = `${person} ${action} at a speed of %%0%% and later it ${mode} to %%1%%. Find the percentage change.`
+
+					// answer
+					var answer = BaseQuestion.roundOffSf((second -first) /first, 3)
+					this.answerObj = new BaseAnswer(false)
+					this.answerObj.set("%%0%%\\%", [`${first} ${unit}`, `${second} ${unit}`])
+			}
+		} else {
+			var basearg = rando(1, 5000)
+			var a = basearg +rando(1, 100)
+			var b;
+
+			// include negatives?
+			var includeNegatives = rando() > .95
+			if (includeNegatives) {
+				b = -rando(1, 100 *Math.floor(basearg /5))
+			} else {
+				b = basearg +rando(1, 100 *Math.floor(basearg /2))
+			}
+
+			// determine whether format question as increasing or decreasing
+			var increasingOrder = rando() >= .6
+			var small = a < b ? a : b
+			var big = a > b ? a : b
+			if (increasingOrder) {
+				// small change to big (+ve % change)
+				this.qnReprString = `Find the percentage change when %%0%% is increased to %%1%%.`
+				this.qnLatexEqn.push(small)
+				this.qnLatexEqn.push(big)
+
+				var answer = BaseQuestion.roundOffSf((big -small) /small, 3)
+			} else {
+				// big change to small (-ve % change)
+				this.qnReprString = `Find the percentage change when %%0%% is decreased to %%1%%.`
+				this.qnLatexEqn.push(big)
+				this.qnLatexEqn.push(small)
+
+				var answer = BaseQuestion.roundOffSf((small -big) /big, 3)
+			}
+
+			// set fields
+			this.answerObj = new BaseAnswer(true)
+			this.answerObj.set("%%0%%", [`${answer}`])
+		}
+		// compute two reandom numbers
+
 	}
 }
 
@@ -91,4 +280,4 @@ class TwoSimQn extends BaseQuestion {
 	}
 }
 
-module.exports = {Qriller, FracToPerc}
+module.exports = {Qriller, FracToPerc, PercToFrac}

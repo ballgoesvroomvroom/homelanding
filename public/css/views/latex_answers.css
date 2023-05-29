@@ -1,16 +1,13 @@
-#questions-container {
-	display: grid;
-	grid-template-rows: repeat(2, 1fr);
-	grid-template-columns: repeat(2, 1fr);
-
-	padding-top: 1px;
+#answers-container {
+	display: flex;
+	flex-direction: column;
 
 	counter-reset: question;
 }
 
-.question-element {
+.answer-element {
 	min-width: 0;
-	min-height: 200px;
+	min-height: 0;
 
 	padding: 5px;
 	margin-top: -1px;
@@ -20,15 +17,15 @@
 	border-color: #d9d9d9;
 }
 
-.question-element:nth-child(even) {
-	margin-left: -1px;
+.answer-element:first-child {
+	margin-top: 0;
 }
 
-.question-element:nth-child(8n) {
+.answer-element:nth-child(22n) {
 	break-after: page;
 }
 
-.question-header {
+.answer-header {
 	display: flex;
 	flex-direction: row;
 	align-items: center;
@@ -38,7 +35,7 @@
 	counter-increment: question;
 }
 
-.question-header::before {
+.answer-header::before {
 	display: block;
 	content: counter(question) ".";
 
