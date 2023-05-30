@@ -31,7 +31,7 @@
 .question-header {
 	display: flex;
 	flex-direction: row;
-	align-items: center;
+	align-items: flex-start;
 
 	padding-bottom: 5px;
 
@@ -44,5 +44,6 @@
 
 	position: relative;
 
+	padding-top: 5px;
 	padding-right: 5px;
 }

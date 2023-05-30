@@ -13,8 +13,9 @@ class Qriller {
 	}
 
 	createQuestions(questionClass, repeatCount, ...args) {
+		// ...args use to pass into qnClass for construction
 		for (let i = 0; i < repeatCount; i++) {
-			this.questions.push(new questionClass(args))
+			this.questions.push(new questionClass(...args))
 		}
 	}
 
@@ -124,15 +125,15 @@ class PercToFrac extends BaseQuestion {
 		// compute a random number
 		var largeNum = rando()
 		var intPart;
-		if (largeNum > .8) {
+		if (largeNum > .95) {
 			intPart = 1 +rando(1, 5000)
 		} else {
-			intPart = 1 +rando(0, 200)
+			intPart = 1 +rando(0, 900)
 		}
 
-		var precision = 1000 // decimal places
+		var precision = 10 // decimal places
 		var decimalPart = rando(0, 180) *5 // so that it is a multiple of 5
-		var percVal = intPart +decimalPart /precision
+		var percVal = intPart +(decimalPart /precision)
 
 		// form the fractions
 		var num = intPart *precision +decimalPart
@@ -153,15 +154,12 @@ class PercToFrac extends BaseQuestion {
 
 class PercChange extends BaseQuestion {
 	// answer is rounded off to 3 significant figures
-	constructor(wordContext) {
+	constructor(wordContext, determineIncrOrder) {
 		// wordContext: boolean, if true will generate scenarios instead 
+		// determineIncrOrder: boolean, if true will generate percentage increase qns, if false, will generate decreasing, else if null, will generate percentage change
 		super();
 
 		// choose scenario
-		// scenario list (walk speed, travelling speed, car A & B, bike speed)
-		// salary
-		// 
-
 		if (wordContext) {
 			var scenario = rando(1, 2)
 			switch (scenario) {
@@ -182,33 +180,48 @@ class PercChange extends BaseQuestion {
 							break
 						case 2:
 							// driving
-							small = rando(5, 80) +(Math.floor(rando() *10) /10) // speed up to 1 d.p.
-							big = small +rando(70) +(Math.floor(rando() *10) /10)
+							small = rando(5, 80) +(rando(9) /10)
+							// small = rando(5, 80) +(Math.floor(rando() *10) /10) // speed up to 1 d.p.
+							big = small +rando(70) +(rando(9) /10)
+
 							action = "drives a car"
 							break
 						case 3:
 							// cycling
-							small = rando(1, 5) +(Math.floor(rando() *100) /100) // speed up to 2 d.p.
-							big = small +rando(30) +(Math.floor(rando() *100) /100)
+							small = rando(1, 5) +(rando(19) *5) /100
+							big = small +rando(30) +(rando(19) *5) /100
+
 							action = "cycles"
 							break
 						case 4:
 							// rides a bus
-							small = rando(5, 20) +(Math.floor(rando() *10) /10) // speed up to 1 d.p.
-							big = small +rando(20) +(Math.floor(rando() *10) /10)
+							small = rando(1, 5) +(rando(1, 9) /10)
+							big = small +rando(20) +(rando(9) /10)
+
 							action = "rides a bus which goes"
 							break
 						case 5:
 							// swimming
-							small = rando(1, 5) +(Math.floor(rando() *100) /100) // speed up to 2 d.p.
-							big = small +rando(8) +(Math.floor(rando() *100) /100) // speed up to 2 d.p.
+							small = rando(1, 5) +(rando(19) *5) /100
+							big = small +rando(8) +(rando(19) *5) /100
+
 							action = "swims"
 					}
 
 					// form question
 					var incr = rando() >= .6
-					var mode, first, second;
-					if (incr) {
+					var mode, qnMode, first, second;
+					if (determineIncrOrder) {
+						qnMode = "increase"
+					} else if (determineIncrOrder === false) {
+						// decreasing qn
+						qnMode = "decrease"
+					} else {
+						// null
+						qnMode = "change"
+					}
+
+					if ((determineIncrOrder && incr) || determineIncrOrder) {
 						mode = "increases"
 						first = small
 						second = big
@@ -219,15 +232,14 @@ class PercChange extends BaseQuestion {
 					}
 
 					// set fields
-					this.qnReprString = `${person} ${action} at a speed of %%0%% and later it ${mode} to %%1%%. Find the percentage change.`
+					this.qnReprString = `${person} ${action} at a speed of %%0%% and later it ${mode} to %%1%%. Find the percentage ${qnMode}.`
 					this.qnLatexEqn.push(`${first} ${unit}`)
 					this.qnLatexEqn.push(`${second} ${unit}`)
 
 					// answer
 					var answer = BaseQuestion.roundOffSf((second -first) /first, 3)
 					this.answerObj = new BaseAnswer(false)
-					this.answerObj.set("%%0%%\\%", [`${first} ${unit}`, `${second} ${unit}`])
-					console.log(this.qnLatexEqn)
+					this.answerObj.set("%%0%%\\%", [answer.toString()])
 					break
 				case 2:
 					// temperature change
@@ -237,24 +249,38 @@ class PercChange extends BaseQuestion {
 					switch (tempGauge) {
 						case 1:
 							// outside temperature
-							small = rando(1, 20) +(Math.floor(rando() *10) /10) // temp up to 1 d.p.
-							big = small +rando(1, 20) +(Math.floor(rando() *10) /10)
+							small = rando(1, 20) +(rando(9) /10)
+							big = small +rando(1, 20) +(rando(9) /10)
+
 							noun = "environment"
 						case 2:
 							// fridge temperature
-							small = rando(4, 10) +(Math.floor(rando() *10) /10) // temp up to 1 d.p.
-							big = small +rando(1, 10) +(Math.floor(rando() *10) /10)
+							small = rando(4, 10) +(rando(9) /10)
+							big = small +rando(1, 10) +(rando(9) /10)
+
 							noun = "fridge"
 						case 3:
 							// freezer
-							small = rando(-5, 5) +(Math.floor(rando() *10) /10) // temp up to 1 d.p.
-							big = small +rando(5) +(Math.floor(rando() *10) /10)
+							small = rando(-5, 5) +(rando(9) /10) // temp up to 1 d.p.
+							big = small +rando(5) +(rando(9) /10)
+
+							noun = "freezer"
 					}
 
 					// form qn
 					var incr = rando() >= .6
-					var mode, first, second;
-					if (incr) {
+					var mode, qnMode, first, second;
+					if (determineIncrOrder) {
+						qnMode = "increase"
+					} else if (determineIncrOrder === false) {
+						// decreasing qn
+						qnMode = "decrease"
+					} else {
+						// null
+						qnMode = "change"
+					}
+
+					if ((determineIncrOrder && incr) || determineIncrOrder) {
 						mode = "increases"
 						first = small
 						second = big
@@ -265,14 +291,14 @@ class PercChange extends BaseQuestion {
 					}
 
 					// set fields
-					this.qnReprString = `The temperature of the ${noun} ${mode} from %%0%%°C to %%1%%°C. Find the percentage change.`
-					this.qnLatexEqn.push(first.toString())
-					this.qnLatexEqn.push(second.toString())
+					this.qnReprString = `The temperature of the ${noun} ${mode} from %%0%%°C to %%1%%°C. Find the percentage ${qnMode}.`
+					this.qnLatexEqn.push(first.toFixed(2))
+					this.qnLatexEqn.push(second.toFixed(2))
 
 					// answer
 					var answer = BaseQuestion.roundOffSf((second -first) /first, 3)
 					this.answerObj = new BaseAnswer(false)
-					this.answerObj.set("%%0%%\\%", [`${first}°C`, `${second}°C`])
+					this.answerObj.set("%%0%%\\%", [answer.toString()])
 			}
 		} else {
 			var basearg = rando(1, 5000)
@@ -287,20 +313,29 @@ class PercChange extends BaseQuestion {
 				b = basearg +rando(1, 100 *Math.floor(basearg /2))
 			}
 
+			// determine qn context mode (whether phrase is 'percentage change', 'percentage increase' or 'percentage decrease')
+			var qnMode = "change"; // when determineIncrOrder is null
+			if (determineIncrOrder) {
+				qnMode = "increase"
+			} else if (determineIncrOrder === false) {
+				// decreasing qn
+				qnMode = "decrease"
+			}
+
 			// determine whether format question as increasing or decreasing
 			var increasingOrder = rando() >= .6
 			var small = a < b ? a : b
 			var big = a > b ? a : b
-			if (increasingOrder) {
+			if ((determineIncrOrder && increasingOrder) || determineIncrOrder) {
 				// small change to big (+ve % change)
-				this.qnReprString = `Find the percentage change when %%0%% is increased to %%1%%.`
+				this.qnReprString = `Find the percentage ${qnMode} when %%0%% is increased to %%1%%.`
 				this.qnLatexEqn.push(small.toString())
 				this.qnLatexEqn.push(big.toString())
 
 				var answer = BaseQuestion.roundOffSf((big -small) /small, 3)
 			} else {
 				// big change to small (-ve % change)
-				this.qnReprString = `Find the percentage change when %%0%% is decreased to %%1%%.`
+				this.qnReprString = `Find the percentage ${qnMode} when %%0%% is decreased to %%1%%.`
 				this.qnLatexEqn.push(big.toString())
 				this.qnLatexEqn.push(small.toString())
 

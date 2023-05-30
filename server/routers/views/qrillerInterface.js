@@ -19,6 +19,29 @@ class Skeleton {
 
 // utils
 class Utils {
+	static generateQriller(res, title, note, qnClass, qnAmt, ...qnArgs) {
+		// wrapper for res object, generates qriller
+		res.type("html")
+
+		// generate qriller object
+		var qrillerObj = new qriller.Qriller()
+		qrillerObj.title = title
+		qrillerObj.note = note
+
+		// attach new questions
+		qrillerObj.createQuestions(qnClass, qnAmt, ...qnArgs)
+
+		// push reference
+		qrillerObj.updateRefsToMem()
+
+		var hydrated = Skeleton.document.replaceAll("%QRILLER-ID%", qrillerObj.id)
+		hydrated = hydrated.replaceAll("%DOCUMENT-TITLE%", qrillerObj.title)
+		hydrated = hydrated.replaceAll("%DOCUMENT-NOTE%", qrillerObj.note)
+
+		res.write(hydrated)
+		res.status(200).end()
+	}
+
 	static hydrateDocument(documentId) {
 		if (documentId in mem) {
 			var qrillerObj = mem[documentId]
@@ -121,25 +144,51 @@ presetRouter.get("/perctofrac", (req, res) => {
 })
 
 presetRouter.get("/percchange", (req, res) => {
-	res.type("html")
+	return Utils.generateQriller(
+		res,
+		"[2.3.4] Percentage Change Word Problems", "Round off your answer to 3 significant figures wherever possible.",
+		qriller.PercChange,
+		100,
+		true)
+})
 
-	// generate qriller object
-	var qrillerObj = new qriller.Qriller()
-	qrillerObj.title = "[2.3] Percentage Change"
-	qrillerObj.note = "Round off your answer to 3 significant figures wherever possible."
+presetRouter.get("/percincr", (req, res) => {
+	return Utils.generateQriller(
+		res,
+		"[2.3.1] Percentage Increase", "Round off your answer to 3 significant figures wherever possible.",
+		qriller.PercChange,
+		100,
+		true,
+		true)
+})
 
-	// attach new questions
-	qrillerObj.createQuestions(qriller.PercChange, 100, true)
+presetRouter.get("/percdecr", (req, res) => {
+	return Utils.generateQriller(
+		res,
+		"[2.3.2] Percentage Decrease", "Round off your answer to 3 significant figures wherever possible.",
+		qriller.PercChange,
+		100,
+		true,
+		false)
+})
 
-	// push reference
-	qrillerObj.updateRefsToMem()
-
-	var hydrated = Skeleton.document.replaceAll("%QRILLER-ID%", qrillerObj.id)
-	hydrated = hydrated.replaceAll("%DOCUMENT-TITLE%", qrillerObj.title)
-	hydrated = hydrated.replaceAll("%DOCUMENT-NOTE%", qrillerObj.note)
-
-	res.write(hydrated)
-	res.status(200).end()
+presetRouter.get("/percchangeraw", (req, res) => {
+	return Utils.generateQriller(
+		res,
+		"[2.3.3] Percentage Change", "Round off your answer to 3 significant figures wherever possible.",
+		qriller.PercChange,
+		100,
+		false)
+})
+presetRouter.get("/percchangerawflip", (req, res) => {
+	return Utils.generateQriller(
+		res,
+		"[2.3.5] Percentage Change Part 2", "Round off your answer to 3 significant figures wherever possible.",
+		qriller.PercChange,
+		100,
+		false,
+		null,
+		true)
 })
 router.use("/presets", presetRouter)
 
