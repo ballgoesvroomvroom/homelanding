@@ -126,13 +126,15 @@ class PercToFrac extends BaseQuestion {
 		var largeNum = rando()
 		var intPart;
 		if (largeNum > .95) {
-			intPart = 1 +rando(1, 5000)
+			intPart = 1 +rando(5000)
+		} else if (largeNum > .85) {
+			intPart = 1 +rando(900)
 		} else {
-			intPart = 1 +rando(0, 900)
+			intPart = 1 +rando(100)
 		}
 
-		var precision = 10 // decimal places
-		var decimalPart = rando(0, 180) *5 // so that it is a multiple of 5
+		var precision = 10 // 1 decimal places
+		var decimalPart = rando(0, 10)
 		var percVal = intPart +(decimalPart /precision)
 
 		// form the fractions
@@ -146,7 +148,7 @@ class PercToFrac extends BaseQuestion {
 
 		// set fields
 		this.qnReprString = `Convert the following %%0%% to a fraction.`
-		this.qnLatexEqn.push(`${percVal}\\%`)
+		this.qnLatexEqn.push(`${percVal.toFixed(1)}\\%`)
 		this.answerObj = new BaseAnswer(false)
 		this.answerObj.set("%%0%%", [`\\frac{${num}}{${den}}`])
 	}
@@ -221,11 +223,13 @@ class PercChange extends BaseQuestion {
 						qnMode = "change"
 					}
 
-					if ((determineIncrOrder && incr) || determineIncrOrder) {
+					if (determineIncrOrder === true || (determineIncrOrder == null && incr)) {
+						// increases
 						mode = "increases"
 						first = small
 						second = big
-					} else {
+					} else if (determineIncrOrder === false || (determineIncrOrder == null && !incr)) {
+						// decreases
 						mode = "decreases"
 						first = big
 						second = small
@@ -233,13 +237,13 @@ class PercChange extends BaseQuestion {
 
 					// set fields
 					this.qnReprString = `${person} ${action} at a speed of %%0%% and later it ${mode} to %%1%%. Find the percentage ${qnMode}.`
-					this.qnLatexEqn.push(`${first} ${unit}`)
-					this.qnLatexEqn.push(`${second} ${unit}`)
+					this.qnLatexEqn.push(`${first.toFixed(2)} ${unit}`)
+					this.qnLatexEqn.push(`${second.toFixed(2)} ${unit}`)
 
 					// answer
-					var answer = BaseQuestion.roundOffSf((second -first) /first, 3)
+					var answer = BaseQuestion.roundOffSf((second -first) /first *100, 3)
 					this.answerObj = new BaseAnswer(false)
-					this.answerObj.set("%%0%%\\%", [answer.toString()])
+					this.answerObj.set("%%0%%\%", [answer.toString()])
 					break
 				case 2:
 					// temperature change
@@ -261,7 +265,7 @@ class PercChange extends BaseQuestion {
 							noun = "fridge"
 						case 3:
 							// freezer
-							small = rando(-5, 5) +(rando(9) /10) // temp up to 1 d.p.
+							small = rando(0, 5) +(rando(1, 9) /10) // temp up to 1 d.p. (at least 0.1)
 							big = small +rando(5) +(rando(9) /10)
 
 							noun = "freezer"
@@ -280,11 +284,13 @@ class PercChange extends BaseQuestion {
 						qnMode = "change"
 					}
 
-					if ((determineIncrOrder && incr) || determineIncrOrder) {
+					if (determineIncrOrder === true || (determineIncrOrder == null && incr)) {
+						// increases
 						mode = "increases"
 						first = small
 						second = big
-					} else {
+					} else if (determineIncrOrder === false || (determineIncrOrder == null && !incr)) {
+						// decreases
 						mode = "decreases"
 						first = big
 						second = small
@@ -296,9 +302,9 @@ class PercChange extends BaseQuestion {
 					this.qnLatexEqn.push(second.toFixed(2))
 
 					// answer
-					var answer = BaseQuestion.roundOffSf((second -first) /first, 3)
+					var answer = BaseQuestion.roundOffSf((second -first) /first *100, 3)
 					this.answerObj = new BaseAnswer(false)
-					this.answerObj.set("%%0%%\\%", [answer.toString()])
+					this.answerObj.set("%%0%%\%", [answer.toString()])
 			}
 		} else {
 			var basearg = rando(1, 5000)
@@ -326,25 +332,33 @@ class PercChange extends BaseQuestion {
 			var increasingOrder = rando() >= .6
 			var small = a < b ? a : b
 			var big = a > b ? a : b
-			if ((determineIncrOrder && increasingOrder) || determineIncrOrder) {
+			var first, second;
+
+			if (determineIncrOrder === true || (determineIncrOrder == null && increasingOrder)) {
+				// increases
 				// small change to big (+ve % change)
-				this.qnReprString = `Find the percentage ${qnMode} when %%0%% is increased to %%1%%.`
-				this.qnLatexEqn.push(small.toString())
-				this.qnLatexEqn.push(big.toString())
+				mode = "increased"
+				first = small
+				second = big
 
-				var answer = BaseQuestion.roundOffSf((big -small) /small, 3)
-			} else {
+				var answer = BaseQuestion.roundOffSf((big -small) /small *100, 3)
+			} else if (determineIncrOrder === false || (determineIncrOrder == null && !increasingOrder)) {
+				// decreases
 				// big change to small (-ve % change)
-				this.qnReprString = `Find the percentage ${qnMode} when %%0%% is decreased to %%1%%.`
-				this.qnLatexEqn.push(big.toString())
-				this.qnLatexEqn.push(small.toString())
+				mode = "decreased"
+				first = big
+				second = small
 
-				var answer = BaseQuestion.roundOffSf((small -big) /big, 3)
+				var answer = BaseQuestion.roundOffSf((small -big) /big *100, 3)
 			}
 
 			// set fields
+			this.qnReprString = `Find the percentage ${qnMode} when %%0%% is ${mode} to %%1%%.`
+			this.qnLatexEqn.push(first)
+			this.qnLatexEqn.push(second)
+
 			this.answerObj = new BaseAnswer(true)
-			this.answerObj.set("%%0%%", [`${answer}`])
+			this.answerObj.set("%%0%%\%", [`${answer}`])
 		}
 	}
 }
