@@ -119,6 +119,28 @@ presetRouter.get("/perctofrac", (req, res) => {
 	res.write(hydrated)
 	res.status(200).end()
 })
+
+presetRouter.get("/percchange", (req, res) => {
+	res.type("html")
+
+	// generate qriller object
+	var qrillerObj = new qriller.Qriller()
+	qrillerObj.title = "[2.3] Percentage Change"
+	qrillerObj.note = "Round off your answer to 3 significant figures wherever possible."
+
+	// attach new questions
+	qrillerObj.createQuestions(qriller.PercChange, 100, true)
+
+	// push reference
+	qrillerObj.updateRefsToMem()
+
+	var hydrated = Skeleton.document.replaceAll("%QRILLER-ID%", qrillerObj.id)
+	hydrated = hydrated.replaceAll("%DOCUMENT-TITLE%", qrillerObj.title)
+	hydrated = hydrated.replaceAll("%DOCUMENT-NOTE%", qrillerObj.note)
+
+	res.write(hydrated)
+	res.status(200).end()
+})
 router.use("/presets", presetRouter)
 
 

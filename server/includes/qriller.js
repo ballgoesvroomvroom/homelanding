@@ -12,9 +12,9 @@ class Qriller {
 		this.questions = []
 	}
 
-	createQuestions(questionClass, repeatCount) {
+	createQuestions(questionClass, repeatCount, ...args) {
 		for (let i = 0; i < repeatCount; i++) {
-			this.questions.push(new questionClass())
+			this.questions.push(new questionClass(args))
 		}
 	}
 
@@ -26,9 +26,9 @@ class Qriller {
 
 class Database {
 	// objects to be used in word scenarios
-	people = ["John", "Emma", "Michael", "Olivia", "William", "Ava", "James", "Isabella", "Alexander", "Sophia", "Daniel", "Mia", "David", "Charlotte", "Joseph", "Amelia", "Matthew", "Harper", "Samuel", "Evelyn", "Henry", "Abigail", "Andrew", "Emily", "Gabriel", "Elizabeth", "Benjamin", "Sofia", "Christopher", "Ella", "Jackson", "Victoria", "Anthony", "Avery", "Jonathan", "Grace", "Ryan", "Chloe", "Nicholas", "Scarlett", "Christian", "Zoey", "Nathan", "Lily", "Adam", "Hannah", "Thomas", "Madison", "Joshua", "Layla", "Aaron", "Aubrey", "Ethan", "Penelope", "William", "Eleanor", "Logan", "Nora", "Isaac", "Riley", "Elijah", "Savannah", "Connor", "Brooklyn", "Owen", "Leah", "Caleb", "Zoe", "Luke", "Stella", "Isaiah", "Hazel", "Jack", "Ellie", "Jordan", "Paisley", "Jeremiah", "Audrey", "Liam", "Skylar", "Wyatt", "Violet", "Sebastian", "Claire", "Jayden", "Bella", "Julian", "Lucy", "Carter", "Anna", "Brayden", "Samantha", "Gavin", "Caroline", "Levi", "Genesis", "Austin", "Aaliyah", "Charles", "Kennedy", "Hunter", "Kylie", "Aaron", "Allison", "Jason", "Maya", "Ian", "Sarah", "Connor", "Madelyn", "Colton", "Adeline", "Dominic", "Alexa", "Kevin", "Ariana", "Evan", "Elena", "Cooper", "Gabriella", "Henry", "Naomi", "Hudson", "Alice", "Adrian", "Sadie", "Jace", "Hailey", "Dylan", "Eva", "Leo", "Emilia", "Lucas", "Autumn", "Eli", "Piper", "Max", "Nevaeh", "Nolan", "Ruby", "Miles", "Serenity", "Elias", "Aria", "Brady", "Kaylee", "Adam", "Annabelle", "Asher", "Alyssa", "Jaxon", "Taylor", "Greyson", "Brielle", "Roman", "Lillian", "Santiago", "Angelina", "Mateo", "Liliana", "Sawyer", "Ashley", "Diego", "Lauren", "Leonardo", "Gianna", "Caleb", "Peyton", "Finn", "Adalyn", "Jayce", "Arianna", "Luis", "Makayla", "Maxwell", "Addison", "Axel", "Natalie", "Nathaniel", "Mia", "Juan", "Brooke", "Bryson", "Leila", "Carlos", "Nicole"]
-	things = ["apple", "fruit", "pen", "orange", "banana", "book", "car", "dog", "cat", "chair", "table", "computer", "phone", "cup", "shirt", "shoe", "ball", "guitar", "hat", "bottle", "watch", "key", "camera", "sock", "flower", "cookie", "lamp", "bag", "bicycle", "knife", "chair", "pencil", "paper", "notebook", "umbrella", "glasses", "ring", "wallet", "headphone", "clock", "brush", "mirror", "globe", "tie", "scarf", "plate", "spoon", "fork", "knife", "pillow", "bed", "blanket", "wallet", "door", "window", "bookshelf", "candle", "oven", "refrigerator", "television", "toothbrush", "toothpaste", "soap", "towel", "shirt", "pants", "dress", "sock", "shoe", "sweater", "jacket", "coat", "belt", "hat", "gloves", "boots", "earrings", "bracelet", "necklace", "ring", "watch", "glasses", "bag", "backpack", "suitcase", "camera", "laptop", "keyboard", "mouse", "charger", "bottle", "cup", "plate", "spoon", "fork", "knife", "napkin", "tablecloth", "vase", "flower", "lamp", "candle", "painting", "sculpture", "guitar", "drum", "piano", "violin", "trumpet", "flute", "basketball", "soccer ball", "baseball", "tennis ball", "golf ball", "volleyball", "football", "helmet", "bat", "glove", "net", "brush", "comb", "mirror", "hairdryer", "soap", "shampoo", "conditioner", "toothbrush", "toothpaste", "towel", "lotion", "perfume", "wallet", "key", "phone", "tablet", "camera", "headphone", "speaker", "clock", "remote", "charger", "umbrella", "suitcase", "backpack", "map", "guidebook", "passport", "ticket", "sunglasses", "hat", "sunscreen", "water bottle", "snack", "camera", "binoculars", "journal", "pencil", "pen", "notebook", "bookmark", "calendar", "calculator", "ruler", "tape", "scissors", "glue", "stapler", "paperclip", "eraser", "highlighter", "folder", "envelope", "sticker", "postcard", "stamp", "paper"]
-	rigidbody = ["car", "bike"]
+	static people = ["John", "Emma", "Michael", "Olivia", "William", "Ava", "James", "Isabella", "Alexander", "Sophia", "Daniel", "Mia", "David", "Charlotte", "Joseph", "Amelia", "Matthew", "Harper", "Samuel", "Evelyn", "Henry", "Abigail", "Andrew", "Emily", "Gabriel", "Elizabeth", "Benjamin", "Sofia", "Christopher", "Ella", "Jackson", "Victoria", "Anthony", "Avery", "Jonathan", "Grace", "Ryan", "Chloe", "Nicholas", "Scarlett", "Christian", "Zoey", "Nathan", "Lily", "Adam", "Hannah", "Thomas", "Madison", "Joshua", "Layla", "Aaron", "Aubrey", "Ethan", "Penelope", "William", "Eleanor", "Logan", "Nora", "Isaac", "Riley", "Elijah", "Savannah", "Connor", "Brooklyn", "Owen", "Leah", "Caleb", "Zoe", "Luke", "Stella", "Isaiah", "Hazel", "Jack", "Ellie", "Jordan", "Paisley", "Jeremiah", "Audrey", "Liam", "Skylar", "Wyatt", "Violet", "Sebastian", "Claire", "Jayden", "Bella", "Julian", "Lucy", "Carter", "Anna", "Brayden", "Samantha", "Gavin", "Caroline", "Levi", "Genesis", "Austin", "Aaliyah", "Charles", "Kennedy", "Hunter", "Kylie", "Aaron", "Allison", "Jason", "Maya", "Ian", "Sarah", "Connor", "Madelyn", "Colton", "Adeline", "Dominic", "Alexa", "Kevin", "Ariana", "Evan", "Elena", "Cooper", "Gabriella", "Henry", "Naomi", "Hudson", "Alice", "Adrian", "Sadie", "Jace", "Hailey", "Dylan", "Eva", "Leo", "Emilia", "Lucas", "Autumn", "Eli", "Piper", "Max", "Nevaeh", "Nolan", "Ruby", "Miles", "Serenity", "Elias", "Aria", "Brady", "Kaylee", "Adam", "Annabelle", "Asher", "Alyssa", "Jaxon", "Taylor", "Greyson", "Brielle", "Roman", "Lillian", "Santiago", "Angelina", "Mateo", "Liliana", "Sawyer", "Ashley", "Diego", "Lauren", "Leonardo", "Gianna", "Caleb", "Peyton", "Finn", "Adalyn", "Jayce", "Arianna", "Luis", "Makayla", "Maxwell", "Addison", "Axel", "Natalie", "Nathaniel", "Mia", "Juan", "Brooke", "Bryson", "Leila", "Carlos", "Nicole"]
+	static things = ["apple", "fruit", "pen", "orange", "banana", "book", "car", "dog", "cat", "chair", "table", "computer", "phone", "cup", "shirt", "shoe", "ball", "guitar", "hat", "bottle", "watch", "key", "camera", "sock", "flower", "cookie", "lamp", "bag", "bicycle", "knife", "chair", "pencil", "paper", "notebook", "umbrella", "glasses", "ring", "wallet", "headphone", "clock", "brush", "mirror", "globe", "tie", "scarf", "plate", "spoon", "fork", "knife", "pillow", "bed", "blanket", "wallet", "door", "window", "bookshelf", "candle", "oven", "refrigerator", "television", "toothbrush", "toothpaste", "soap", "towel", "shirt", "pants", "dress", "sock", "shoe", "sweater", "jacket", "coat", "belt", "hat", "gloves", "boots", "earrings", "bracelet", "necklace", "ring", "watch", "glasses", "bag", "backpack", "suitcase", "camera", "laptop", "keyboard", "mouse", "charger", "bottle", "cup", "plate", "spoon", "fork", "knife", "napkin", "tablecloth", "vase", "flower", "lamp", "candle", "painting", "sculpture", "guitar", "drum", "piano", "violin", "trumpet", "flute", "basketball", "soccer ball", "baseball", "tennis ball", "golf ball", "volleyball", "football", "helmet", "bat", "glove", "net", "brush", "comb", "mirror", "hairdryer", "soap", "shampoo", "conditioner", "toothbrush", "toothpaste", "towel", "lotion", "perfume", "wallet", "key", "phone", "tablet", "camera", "headphone", "speaker", "clock", "remote", "charger", "umbrella", "suitcase", "backpack", "map", "guidebook", "passport", "ticket", "sunglasses", "hat", "sunscreen", "water bottle", "snack", "camera", "binoculars", "journal", "pencil", "pen", "notebook", "bookmark", "calendar", "calculator", "ruler", "tape", "scissors", "glue", "stapler", "paperclip", "eraser", "highlighter", "folder", "envelope", "sticker", "postcard", "stamp", "paper"]
+	static rigidbody = ["car", "bike"]
 }
 
 class BaseQuestion {
@@ -151,7 +151,7 @@ class PercToFrac extends BaseQuestion {
 	}
 }
 
-class PercChange extends BaseQuestions {
+class PercChange extends BaseQuestion {
 	// answer is rounded off to 3 significant figures
 	constructor(wordContext) {
 		// wordContext: boolean, if true will generate scenarios instead 
@@ -163,7 +163,7 @@ class PercChange extends BaseQuestions {
 		// 
 
 		if (wordContext) {
-			var scenario = rando(1, 5)
+			var scenario = rando(1, 2)
 			switch (scenario) {
 				case 1:
 					// speed
@@ -219,14 +219,60 @@ class PercChange extends BaseQuestions {
 					}
 
 					// set fields
-					this.qnLatexEqn.push(first)
-					this.qnLatexEqn.push(second)
 					this.qnReprString = `${person} ${action} at a speed of %%0%% and later it ${mode} to %%1%%. Find the percentage change.`
+					this.qnLatexEqn.push(`${first} ${unit}`)
+					this.qnLatexEqn.push(`${second} ${unit}`)
 
 					// answer
 					var answer = BaseQuestion.roundOffSf((second -first) /first, 3)
 					this.answerObj = new BaseAnswer(false)
 					this.answerObj.set("%%0%%\\%", [`${first} ${unit}`, `${second} ${unit}`])
+					console.log(this.qnLatexEqn)
+					break
+				case 2:
+					// temperature change
+
+					var tempGauge = rando(1, 3)
+					var noun, small, big
+					switch (tempGauge) {
+						case 1:
+							// outside temperature
+							small = rando(1, 20) +(Math.floor(rando() *10) /10) // temp up to 1 d.p.
+							big = small +rando(1, 20) +(Math.floor(rando() *10) /10)
+							noun = "environment"
+						case 2:
+							// fridge temperature
+							small = rando(4, 10) +(Math.floor(rando() *10) /10) // temp up to 1 d.p.
+							big = small +rando(1, 10) +(Math.floor(rando() *10) /10)
+							noun = "fridge"
+						case 3:
+							// freezer
+							small = rando(-5, 5) +(Math.floor(rando() *10) /10) // temp up to 1 d.p.
+							big = small +rando(5) +(Math.floor(rando() *10) /10)
+					}
+
+					// form qn
+					var incr = rando() >= .6
+					var mode, first, second;
+					if (incr) {
+						mode = "increases"
+						first = small
+						second = big
+					} else {
+						mode = "decreases"
+						first = big
+						second = small
+					}
+
+					// set fields
+					this.qnReprString = `The temperature of the ${noun} ${mode} from %%0%%°C to %%1%%°C. Find the percentage change.`
+					this.qnLatexEqn.push(first.toString())
+					this.qnLatexEqn.push(second.toString())
+
+					// answer
+					var answer = BaseQuestion.roundOffSf((second -first) /first, 3)
+					this.answerObj = new BaseAnswer(false)
+					this.answerObj.set("%%0%%\\%", [`${first}°C`, `${second}°C`])
 			}
 		} else {
 			var basearg = rando(1, 5000)
@@ -248,15 +294,15 @@ class PercChange extends BaseQuestions {
 			if (increasingOrder) {
 				// small change to big (+ve % change)
 				this.qnReprString = `Find the percentage change when %%0%% is increased to %%1%%.`
-				this.qnLatexEqn.push(small)
-				this.qnLatexEqn.push(big)
+				this.qnLatexEqn.push(small.toString())
+				this.qnLatexEqn.push(big.toString())
 
 				var answer = BaseQuestion.roundOffSf((big -small) /small, 3)
 			} else {
 				// big change to small (-ve % change)
 				this.qnReprString = `Find the percentage change when %%0%% is decreased to %%1%%.`
-				this.qnLatexEqn.push(big)
-				this.qnLatexEqn.push(small)
+				this.qnLatexEqn.push(big.toString())
+				this.qnLatexEqn.push(small.toString())
 
 				var answer = BaseQuestion.roundOffSf((small -big) /big, 3)
 			}
@@ -265,8 +311,6 @@ class PercChange extends BaseQuestions {
 			this.answerObj = new BaseAnswer(true)
 			this.answerObj.set("%%0%%", [`${answer}`])
 		}
-		// compute two reandom numbers
-
 	}
 }
 
@@ -280,4 +324,4 @@ class TwoSimQn extends BaseQuestion {
 	}
 }
 
-module.exports = {Qriller, FracToPerc, PercToFrac}
+module.exports = {Qriller, FracToPerc, PercToFrac, PercChange}
