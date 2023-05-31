@@ -18,6 +18,9 @@
 		<title>Dusk | Promotions</title>
 	</head>
 	<body>
+		<div id="popup-container">
+			<div id="popup-msg-container"></div>
+		</div>
 		<div id="topbar-container">
 			<img id="comp-logo" src="/hotel_assets/icon.svg">
 			<div id="topbar-right-container">
@@ -169,19 +172,27 @@
 				</div>
 				<hr>
 				<div id="guests-pform-container">
+					<form id="contact-particulars-form" name="contact-particulars-form">
+						<div id="contact-particulars-form-header">
+							<h1>CONTACT</h1>
+						</div>
+						<label for="contact-email-addr">Email address</label>
+						<input name="contact-email-addr" placeholder="Email address" type="text">
+					</form>
+					<hr>
 					<form class="guest-particulars-form" name="guest-1-particulars">
 						<div class="guest-particulars-form-header">
 							<h1>GUEST 1</h1>
-							<h4>&nbsp;</h4>
+							<h4 class="guest-particulars-name-disp">&nbsp;</h4>
 						</div>
 						<div class="guest-particulars-name-container">
 							<div>
 								<label for="guest-1-firstname">First name</label>
-								<input name="guest-1-firstname" placeholder="First name" type="text" pattern="[a-zA-Z\s\/]{3, 255}" maxlength="255">
+								<input name="guest-1-firstname" placeholder="First name" type="text" pattern="[a-zA-Z\s\/]{3,255}" maxlength="255">
 							</div>
 							<div>
 								<label for="guest-1-lastname">Last name</label>
-								<input name="guest-1-lastname" placeholder="Last name" type="text" pattern="[a-zA-Z\s\/]{3, 255}" maxlength="255">
+								<input name="guest-1-lastname" placeholder="Last name" type="text" pattern="[a-zA-Z\s\/]{3,255}" maxlength="255">
 							</div>
 						</div>
 
@@ -190,7 +201,7 @@
 
 						<div class="guest-ismainguest-container">
 							<label for="guest-1-ismainguest">Is main guest</label>
-							<input name="guest-1-ismainguest" type="checkbox">
+							<input name="guest-1-ismainguest" type="checkbox" checked>
 						</div>
 					</form>
 					<hr>
@@ -296,7 +307,10 @@
 	</body>
 	<script>
 		// util object
-		const utils = {}
+		const utils = {
+			_popupTicker: 0, // ticker that acts as session id for every pop up instance
+			popupMsgContainer: document.getElementById("popup-msg-container")
+		}
 
 		utils.generateTableDates = (year, month) => {
 			var tableDates = []
@@ -337,6 +351,51 @@
 
 			return [tableDates, availableDateRange]
 		}
+
+		utils.popup = function(status, msg) {
+			// status: boolean, denoting success value of message, if true, will show success style, else fail style
+
+			// increment ticker
+			let localTick = ++this._popupTicker
+
+			// remove class
+			this.popupMsgContainer.className = ""
+
+			// set message
+			this.popupMsgContainer.innerHTML = msg
+
+			// show popup message with status
+			this.popupMsgContainer.className = status ? "success" : "fail"
+
+			// set timer
+			window.setTimeout(() => {
+				console.log(this)
+				console.log("OUR TICKER", localTick, "global tick", this._popupTicker)
+				if (this._popupTicker === localTick) {
+					// still same tick, remove class
+					this.popupMsgContainer.className = ""
+				}
+			}, 4000)
+		}
+
+		utils.initialisePopup = function() {
+			// one time initialisation call
+			this.popupMsgContainer.addEventListener("click", e => {
+				// prevent bubbling
+				e.stopPropagation();
+
+				console.log("hello")
+
+				// remove class
+				this._popupTicker++; // increment ticker
+
+				// remove class
+				this.popupMsgContainer.className = ""
+			})
+		}
+
+		// initialisation caller
+		utils.initialisePopup()
 
 		// pages object
 		const pages = {
@@ -394,7 +453,16 @@
 			calendarYear: null, // to be generated
 			calendarMonth: null, // to be generated
 
+			contactEmailAddr: "", // to be set after validation
+			contactFormContainer: document.getElementById("contact-particulars-form"),
+
+			guestList: [{"name": "", "specreq": "", isMainGuest: true}],
 			guestListContainerFormEle: document.getElementById("guests-pform-container"),
+
+			invoice: {
+				detailsContainer: document.getElementById("confirmation-invoice-slip-details"),
+				reservationDetailsContainer: document.getElementById("confirmation-invoice-reservation-details")
+			},
 		}
 
 		receiptionist.updateDateTimeDetails = function() {
@@ -710,7 +778,7 @@
 					th.addEventListener("keydown", e => {
 						if (e.keyCode === 32 || e.keyCode == 13) {
 							// space and enter key (for compatibility)
-							thClickFn()
+							thClickFn(e)
 						}
 					})
 				}
@@ -772,7 +840,6 @@
 				calendarPrevBtn.classList.add("active")
 			})
 
-
 			// write timeslots
 			let iterIdx = 0;
 			for (let i = 0; i < this.availableTimeslots.length; i++) {
@@ -795,10 +862,11 @@
 
 					// create card (p tag)
 					let timeslotCard = document.createElement("p")
+					timeslotCard.setAttribute("tabindex", "0")
 					timeslotCard.innerHTML = this.availableTimeslots[i][j]
 					container.appendChild(timeslotCard)
 
-					// register click events
+					// register click events and enter key events
 					timeslotCard.addEventListener("click", e => {
 						// remove active styling for previous selection if any
 						if (this.time.length > 0 && this.selectedTimeEle != null) {
@@ -813,11 +881,63 @@
 						this.selectedTimeEle = timeslotCard
 						timeslotCard.classList.add("active")
 					})
+					timeslotCard.addEventListener("keydown", e => {
+						if (e.keyCode === 32 || e.keyCode == 13) {
+							// space and enter key (for compatibility)
+							timeslotCard.click()
+						}
+					})
 				}
 			}
 
 			// update date & time display
 			this.updateDateTimeDetails();
+
+			// update guest title upon keying in name
+			var initialGuestForm = this.guestListContainerFormEle.getElementsByClassName("guest-particulars-form")[0]
+			var initialGuestNameDisp = initialGuestForm.getElementsByClassName("guest-particulars-name-disp")[0]
+			var initialGuestFormInputs = initialGuestForm.getElementsByTagName("input")
+			var firstnameInput = initialGuestFormInputs[0]
+			var lastnameInput = initialGuestFormInputs[1]
+
+			var initialGuestFirstName = "";
+			var initialGuestLastName = "";
+			firstnameInput.addEventListener("input", e => {
+				initialGuestFirstName = firstnameInput.value
+
+				// generate content
+				var content = "&nbsp;"
+				if (initialGuestFirstName.length > 0) {
+					content = initialGuestFirstName.charAt(0).toUpperCase() +initialGuestFirstName.slice(1)
+
+					if (initialGuestLastName.length > 0) {
+						content += ` ${initialGuestLastName.charAt(0).toUpperCase() +initialGuestLastName.slice(1)}`
+					}
+				} else if (initialGuestLastName.length > 0) {
+					content = initialGuestLastName.charAt(0).toUpperCase() +initialGuestLastName.slice(1)
+				}
+
+				// write content
+				initialGuestNameDisp.innerHTML = content
+			})
+			lastnameInput.addEventListener("input", e => {
+				initialGuestLastName = lastnameInput.value
+
+				// generate content
+				var content = "&nbsp;"
+				if (initialGuestFirstName.length > 0) {
+					content = initialGuestFirstName.charAt(0).toUpperCase() +initialGuestFirstName.slice(1)
+
+					if (initialGuestLastName.length > 0) {
+						content += ` ${initialGuestLastName.charAt(0).toUpperCase() +initialGuestLastName.slice(1)}`
+					}
+				} else if (initialGuestLastName.length > 0) {
+					content = initialGuestLastName.charAt(0).toUpperCase() +initialGuestLastName.slice(1)
+				}
+
+				// write content
+				initialGuestNameDisp.innerHTML = content
+			})
 
 			// card no input, auto insert space
 			var cardnoInput = document.getElementById("payment-card-no-input")
@@ -852,6 +972,8 @@
 			var cardnameInput = document.getElementById("payment-card-name-input")
 			var cardcvvInput = document.getElementById("payment-card-cvv-input")
 			var procPaymentBtn = document.getElementById("payment-pform-processpayment")
+
+			var paymentProcessed = false
 			procPaymentBtn.addEventListener("click", e => {
 				// validate input
 				/*
@@ -863,6 +985,12 @@
 				 * card cvv must be exactly 3 chars
 				 */
 				e.preventDefault();
+
+				// do not allow clicks when it has already been processed
+				if (paymentProcessed) {
+					return
+				}
+
 				var cardname = cardnameInput.value
 				var cardno = cardnoInput.value.replaceAll(" ", "")
 				var cardexpmnth = parseInt(cardexpmnthInput.value)
@@ -870,6 +998,7 @@
 				var cardcvv = cardcvvInput.value
 				if (cardname.length < 3 || cardname.length > 255
 					|| cardno.length < 13 || cardno.length > 16
+					|| isNaN(parseInt(cardno))
 					|| cardexpmnthInput.value.length !== 2
 					|| cardexpyrInput.value.length !== 2
 					|| isNaN(cardexpmnth) || isNaN(cardexpyr)
@@ -879,6 +1008,7 @@
 					) {
 					// invalid card details
 					console.log("INVALID CARD DETAILS")
+					utils.popup(false, "Invalid card details")
 					return false
 				}
 
@@ -893,9 +1023,21 @@
 				// success return
 				console.log("VALID CARD DETAILS")
 
+				// set disabled style for payment button
+				procPaymentBtn.innerHTML = "Payment has been processed"
+				procPaymentBtn.classList.add("disabled")
+				procPaymentBtn.setAttribute("disabled", "")
+
 				// move on to confirmation
 				this.generateConfirmationReceipt();
-				this.nextPage();
+				pages.nextPage();
+
+				// set debounce value
+				paymentProcessed = true
+
+				// notify user
+				utils.popup(true, "Payment processed!")
+
 
 				return true
 			})
@@ -905,7 +1047,6 @@
 				// verify date and time filled in
 				if (this.date.length > 0 && this.time.length > 0) {
 					// move on with next page
-					console.log(pages.highestPage)
 					if (pages.highestPage === 0) {
 						pages.nextPage()
 					} else {
@@ -917,9 +1058,65 @@
 
 			// register guests next page
 			pages.pageElements.guests.nextPageBtn.addEventListener("click", e => {
+				// verify contact email is valid
+				var success = this.validateContactEmail()
+				if (!success) {
+					utils.popup(false, "Invalid contact email address")
+					return
+				}
+
 				// verify main guest details are all populated
-				this.fetchGuestList()
+				var [valid, newGuestList] = this.fetchGuestList()
+				if (valid) {
+					this.guestList = newGuestList
+
+					// move to next page
+					if (pages.highestPage === 1) {
+						pages.nextPage()
+					} else {
+						// switch to next page
+						pages.switchPage(2)
+					}
+				}
 			})
+		}
+
+		receiptionist.createNewGuest = function() {
+			// works with this.guestList = []
+		}
+
+		const emailNameMatch = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+$/
+		const emailDomainMatch = /^[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
+		receiptionist.validateContactEmail = function() {
+			// returns boolean whether contact email is right
+			var emailAddrInput = this.contactFormContainer.getElementsByTagName("input")[0]
+
+			var email = emailAddrInput.value
+
+			// validating email (both name and domain)
+			var email_split = email.split("@")
+			if (email_split.length != 2) {
+				// not formatted right
+				return false
+			}
+
+			// validate name
+			if (!emailNameMatch.test(email_split[0])) {
+				// no match, invalid name
+				return false
+			}
+
+			// validate domain
+			if (!emailDomainMatch.test(email_split[1])) {
+				// no match, invalid domain
+				return false
+			}
+
+			// all valid, set email
+			this.contactEmailAddr = email
+
+			// return true
+			return true
 		}
 
 		receiptionist.fetchGuestList = function() {
@@ -928,23 +1125,64 @@
 			var guestList = []; // details to be appended here
 			var mainGuestIdx = -1; // to be pointed to the guest idx who is the main guest
 			
-			var guestsFormElements = this.guestListContainerFormEle.children
+			var guestsFormElements = this.guestListContainerFormEle.getElementsByClassName("guest-particulars-form")
 			for (let i = 0; i < guestsFormElements.length; i++) {
 				var guestFormEle = guestsFormElements[i];
 
-				var guestNameFieldContainer = guestFormEle.getElementsByClassName("guest-particulars-name-container")[0]
-				var guestNameFieldLeft, guestNameFieldRight
-				guestNameFieldLeft = guestNameFieldContainer.children[0]
-				guestNameFieldRight = guestNameFieldContainer.children[1]
+				var guestInputs = guestFormEle.getElementsByTagName("input")
 
-				var firstName, lastName
-				// firstName = guestNameFieldLeft
+				var firstname = guestInputs[0].value
+				var lastname = guestInputs[1].value
+				var specialreq = guestInputs[2].value
+				var ismainguest = guestInputs[3].value
+				console.log("ismainguest", ismainguest)
+
+				// validate guest
+				if (firstname.length < 3 || lastname.length < 3 || specialreq.length > 255) {
+					// failed to meet requirements
+					console.log("[DEBUG]: PARTIAL GUEST DETAILS WRONG FOR GUESTIDX", i)
+					return false 
+				}
+
+				// valid guest
+				guestList.push({
+					firstname,
+					lastname,
+					specreq: specialreq,
+					isMainGuest: ismainguest
+				})
+
+				if (ismainguest == "on") {
+					// set main guest
+					mainGuestIdx = i
+				}
 			}
+
+			return mainGuestIdx !== -1, guestList
 		}
 
 		receiptionist.generateConfirmationReceipt = function() {
 			// populates the confirmation page with booking details upon successful payment
 			// doesnt show the next page
+			if (this.date.length === 0 || this.time.length === 0 || this.service.length === 0) {
+				// details not failed up
+				console.warn("[WARN]: details not filled up,", this.date, this.time, this.service)
+				utils.popup(false, "ERROR: missing details")
+				return false
+			}
+
+			var invoiceDetailsContainer = this.invoice.detailsContainer
+			var invoiceDetailsElements = invoiceDetailsContainer.children
+			invoiceDetailsElements[0].innerHTML = `Invoice ID: #${([...Array(4)].map(() => (Math.floor(Math.random() *255)).toString(16).padStart(2, "0"))).join("")}` // generate a 4 bytes long hex string
+			invoiceDetailsElements[1].innerHTML = `Date: ${new Date().toLocaleDateString("en-SG")}` // dd/mm/yyyy with zero padding, yay!
+			invoiceDetailsElements[2].innerHTML = `Time: ${new Date().toLocaleTimeString("en-US", {hour12: false, hour: "2-digit", minute: "2-digit"})}`
+
+			var reservationDetailsContainer = this.reservationDetailsContainer
+			var reservationDetailsElements = reservationDetailsContainer.getElementsByTagName("p")
+			reservationDetailsElements[0].innerHTML = `Date: ${this.date}`
+			reservationDetailsElements[1].innerHTML = `Time: ${this.time}`
+			reservationDetailsElements[2].innerHTML = `Service: ${this.service}`
+			reservationDetailsElements[3].innerHTML = `Guests: ${this.guestList.length}pax`
 		}
 
 		pages.navbarArrowsHighlight = function() {

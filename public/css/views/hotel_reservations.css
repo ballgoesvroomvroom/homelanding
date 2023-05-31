@@ -19,6 +19,8 @@ body {
 	font-family: 'Playfair Display', serif;
 
 	word-wrap: break-word;
+
+	height: 100%;
 }
 
 h1 {
@@ -72,6 +74,95 @@ input:invalid {
 /* STANDARD UTIL CLASSES */
 .hidden {
 	display: none;
+}
+
+/* POPUP MESSAGE CONTAINER */
+#popup-container {
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+	align-items: center;
+
+	position: fixed;
+	top: 0;
+	left: 0;
+
+	width: 100%;
+	height: 100%;
+
+	z-index: 2;
+	pointer-events: none;
+}
+
+#popup-msg-container {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+
+	padding: 10px 7px;
+	margin-bottom: 20px;
+
+	opacity: 0;
+	cursor: pointer;
+
+	transform: scaleY(.5);
+	transform-origin: bottom;
+
+	border-radius: .2rem;
+
+	transition-property: opacity;
+	transition-duration: 50ms;
+	transition-timing-function: ease-out;
+
+	z-index: 12;
+	pointer-events: all;
+}
+
+#popup-msg-container::before {
+	display: block;
+	content: "";
+
+	width: 16px;
+	height: 16px;
+
+	margin-right: 5px;
+
+	background-repeat: no-repeat;
+	background-size: cover;
+}
+
+#popup-msg-container.success {
+	transform: scaleY(1);
+
+	opacity: 1;
+	color: #073d19;
+	background-color: #bdd9c6cc;
+}
+
+#popup-msg-container.success:hover {
+	background-color: #bdd9c6ff;
+}
+
+#popup-msg-container.success::before {
+	background-image: url("/hotel_assets/okayicon.svg");
+	filter: invert(16%) sepia(10%) saturate(5937%) hue-rotate(99deg) brightness(94%) contrast(95%);
+}
+
+#popup-msg-container.fail {
+	transform: scaleY(1);
+
+	opacity: 1;
+	color: #c73c32;
+	background-color: #e8c1becc;
+}
+
+#popup-msg-container.fail:hover {
+	background-color: #e8c1beff;
+}
+
+#popup-msg-container.fail::before {
+	background-image: url("/hotel_assets/erroricon.svg");
+	filter: invert(41%) sepia(19%) saturate(1592%) hue-rotate(315deg) brightness(116%) contrast(92%);
 }
 
 /* WIDE IMAGE WINDOW */
@@ -522,6 +613,25 @@ input:invalid {
 	flex-direction: column;
 }
 
+#contact-particulars-form {
+	display: flex;
+	flex-direction: column;
+}
+
+#contact-particulars-form-header > h1 {
+	padding-top: 10px;
+	padding-bottom: 5px;
+	margin-bottom: 25px;
+
+	color: black;
+
+	font-family: "Times New Roman";
+	font-weight: 700;
+	font-size: 2rem;
+
+	letter-spacing: .6px;
+}
+
 .guest-particulars-form {
 	display: flex;
 	flex-direction: column;
@@ -530,7 +640,7 @@ input:invalid {
 }
 
 .guest-particulars-form-header > h1 {
-	padding-top: 10px;
+	padding-top: 20px;
 	padding-bottom: 5px;
 
 	color: black;
@@ -700,6 +810,16 @@ input:invalid {
 #payment-pform-processpayment:hover {
 	color: #fff;
 	background-color: var(--tertiary-color);
+}
+
+#payment-pform-processpayment.disabled {
+	cursor: not-allowed;
+}
+
+#payment-pform-processpayment.disabled:hover {
+	/* no more focus pseudo-event since button has disabled attribute */
+	color: #fff;
+	background-color: #de7e6f;
 }
 
 /* CONFIRMATION PAGE */
