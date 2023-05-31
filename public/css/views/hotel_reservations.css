@@ -775,11 +775,17 @@ input:invalid {
 }
 
 #payment-pform-cardexp-input-group > input {
-	width: 32px;
-
 	text-align: center;
 
 	margin-top: 0;
+}
+
+#payment-card-expmnth-input {
+	width: 32px;
+}
+
+#payment-card-expyr-input {
+	width: 58px;
 }
 
 #payment-pform-cardexp-input-group > p {
@@ -887,6 +893,11 @@ input:invalid {
 
 .confirmation-invoice-guestspecialremarks {
 	padding-top: 10px;
+}
+
+.confirmation-invoice-guestspecialremarks .guestspecialremarks-content {
+	font-size: .9;
+	color: #757575;
 }
 
 #confirmation-invoice-payment-details > h2 {
