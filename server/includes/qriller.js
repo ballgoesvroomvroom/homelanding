@@ -354,8 +354,8 @@ class PercChange extends BaseQuestion {
 
 			// set fields
 			this.qnReprString = `Find the percentage ${qnMode} when %%0%% is ${mode} to %%1%%.`
-			this.qnLatexEqn.push(first)
-			this.qnLatexEqn.push(second)
+			this.qnLatexEqn.push(first.toString())
+			this.qnLatexEqn.push(second.toString())
 
 			this.answerObj = new BaseAnswer(true)
 			this.answerObj.set("%%0%%\%", [`${answer}`])
