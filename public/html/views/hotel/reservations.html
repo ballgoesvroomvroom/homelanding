@@ -465,7 +465,7 @@
 		receiptionist.resetDateTimeSelection = function() {
 			// reset values and stylings for date and time selection
 			if (this.date.length > 0) {
-				// reset values first
+				// reset values first (both values)
 				this.date = ""
 				this.time = ""
 
@@ -476,8 +476,10 @@
 				this.selectedDateThEle.classList.remove("active")
 				this.selectedDateThEle = null;
 
-				this.selectedTimeEle.classList.remove("active")
-				this.selectedTimeEle = null;
+				if (this.selectedTimeEle) {
+					this.selectedTimeEle = null;
+					this.selectedTimeEle.classList.remove("active")
+				}
 			}
 		}
 
@@ -512,7 +514,7 @@
 
 					// set date property (depending whether its in month) [nim, pcd, ava]
 					th.className = "" // reset classes
-					if (j +i *7 >= availableDateRange[0] && j +i *7 < pastDateRange) {
+					if (j +i *7 >= availableDateRange[0] && j +i *7 < pastDateRange -1) {
 						// pcd (past current date)
 						th.classList.add("pcd")
 
@@ -643,7 +645,7 @@
 					th.innerHTML = tableDates[i][j]
 
 					// set date property (depending whether its in month) [nim, pcd, ava]
-					if (absValue >= availableDateRange[0] && absValue < pastDateRange) {
+					if (absValue >= availableDateRange[0] && absValue < pastDateRange -1) {
 						// pcd (past current date)
 						th.classList.add("pcd")
 					} else if (absValue >= availableDateRange[0] && absValue <= availableDateRange[1]) {
@@ -978,7 +980,7 @@
 		// caller
 		receiptionist.register()
 		pages.register()
-		pages.nextPage()
-		pages.nextPage()
+		// pages.nextPage()
+		// pages.nextPage()
 	</script>
 </html>

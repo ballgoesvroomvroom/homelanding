@@ -565,6 +565,8 @@ a {
 	border-width: 1px;
 	border-color: var(--secondary-color);
 
+	font-size: 13px;
+
 	transition-property: color, background-color;
 	transition-duration: 150ms;
 	transition-timing-function: linear;
