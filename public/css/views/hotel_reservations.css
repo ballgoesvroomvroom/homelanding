@@ -842,6 +842,10 @@ input:invalid {
 	font-family: "Times New Roman", sans-serif;
 }
 
+#confirmation-invoice-slip h2 {
+	color: black;
+}
+
 #confirmation-invoice-slip-header {
 	display: flex;
 	flex-direction: row;
