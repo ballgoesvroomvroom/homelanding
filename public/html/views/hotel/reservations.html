@@ -200,7 +200,6 @@
 			<div id="payment-page-container" class="page-container">
 				<div class="page-header-container">
 					<h1>Payment</h1>
-					<button class="page-header-next-navigbtn">Next</button>
 				</div>
 				<hr>
 				<div id="payment-details-container">
@@ -348,14 +347,18 @@
 					pageContainer: document.getElementById("details-page-container"),
 
 					tabButton: document.getElementById("details-tab-container").getElementsByTagName("button")[0],
-					tabNextArrow: document.getElementById("details-tab-container").getElementsByClassName("progress-tab-next-arrow")[0]
+					tabNextArrow: document.getElementById("details-tab-container").getElementsByClassName("progress-tab-next-arrow")[0],
+
+					nextPageBtn: document.getElementById("details-page-container").getElementsByClassName("page-header-next-navigbtn")[0]
 				},
 				"guests": {
 					tabContainer: document.getElementById("guests-tab-container"),
 					pageContainer: document.getElementById("guests-page-container"),
 
 					tabButton: document.getElementById("guests-tab-container").getElementsByTagName("button")[0],
-					tabNextArrow: document.getElementById("guests-tab-container").getElementsByClassName("progress-tab-next-arrow")[0]
+					tabNextArrow: document.getElementById("guests-tab-container").getElementsByClassName("progress-tab-next-arrow")[0],
+
+					nextPageBtn: document.getElementById("guests-page-container").getElementsByClassName("page-header-next-navigbtn")[0]
 				},
 				"payment": {
 					tabContainer: document.getElementById("payment-tab-container"),
@@ -390,6 +393,8 @@
 			generatedCalenderRange: null, // to be generated
 			calendarYear: null, // to be generated
 			calendarMonth: null, // to be generated
+
+			guestListContainerFormEle: document.getElementById("guests-pform-container"),
 		}
 
 		receiptionist.updateDateTimeDetails = function() {
@@ -887,12 +892,59 @@
 
 				// success return
 				console.log("VALID CARD DETAILS")
+
+				// move on to confirmation
+				this.generateConfirmationReceipt();
+				this.nextPage();
+
 				return true
 			})
+
+			// register pages next button
+			pages.pageElements.details.nextPageBtn.addEventListener("click", e => {
+				// verify date and time filled in
+				if (this.date.length > 0 && this.time.length > 0) {
+					// move on with next page
+					console.log(pages.highestPage)
+					if (pages.highestPage === 0) {
+						pages.nextPage()
+					} else {
+						// switch to next page
+						pages.switchPage(1)
+					}
+				}
+			})
+
+			// register guests next page
+			pages.pageElements.guests.nextPageBtn.addEventListener("click", e => {
+				// verify main guest details are all populated
+				this.fetchGuestList()
+			})
+		}
+
+		receiptionist.fetchGuestList = function() {
+			// returns an array of guests details keyed into form
+
+			var guestList = []; // details to be appended here
+			var mainGuestIdx = -1; // to be pointed to the guest idx who is the main guest
+			
+			var guestsFormElements = this.guestListContainerFormEle.children
+			for (let i = 0; i < guestsFormElements.length; i++) {
+				var guestFormEle = guestsFormElements[i];
+
+				var guestNameFieldContainer = guestFormEle.getElementsByClassName("guest-particulars-name-container")[0]
+				var guestNameFieldLeft, guestNameFieldRight
+				guestNameFieldLeft = guestNameFieldContainer.children[0]
+				guestNameFieldRight = guestNameFieldContainer.children[1]
+
+				var firstName, lastName
+				firstName = guestNameFieldLeft.
+			}
 		}
 
 		receiptionist.generateConfirmationReceipt = function() {
 			// populates the confirmation page with booking details upon successful payment
+			// doesnt show the next page
 		}
 
 		pages.navbarArrowsHighlight = function() {
@@ -912,6 +964,7 @@
 			// returns boolean (whether operation was successful or not)
 			// function should only be used to traverse through completed pages
 			// to progress page, use nextPage method
+			// forced: boolean, to force refresh page (switching to own page causes re-render of details)
 
 			// already on the page
 			if (pageId == this.currentPage && !forced) {
