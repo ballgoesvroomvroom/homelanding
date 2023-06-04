@@ -76,23 +76,23 @@ class BaseQuestion {
 		return BaseQuestion.gcd(b %a, a)
 	}
 
-	static genFloat(min, max, precision, step) {
+	static getDecimalPlace(float) {
+		// returns a number representing the amount of decimal places float has
+
+	}
+
+	static genFloat(min, max, step) {
 		// helpter function
-		// precision: int, places of decimals
-		// step: float, step count, so answeer will usually be a multiple of step count
+		// step: float, step count, so answeer will usually be a multiple of step coun
 		// step is usually presumed to be 0-1 and never greater than 1
 
-		// 10 exponent precision factor
-		var precisionFactor = 10 **(precision)		
-
 		// generate int part first (assume any integers are a multiple of step)
-		var baseInt = rando(min, max) +(rando(19) *5) /100
+		var baseInt = rando(min, max)
 
 		// generate float
-		var floatStep = Math.floor(precisionFactor /step)
-		var float = rando(Math.floor(precisionFactor /floatStep) -1) *floatStep
+		var float = rando(Math.floor(1 /step) -1) *(step)
 
-		return baseInt +(float /precisionFactor)
+		return baseInt +(float)
 	}
 }
 
@@ -383,11 +383,13 @@ class PercChange extends BaseQuestion {
 	}
 }
 
-class RelativePerc extends BaseAnswer {
-	constructor(a) {
+class RelativePerc extends BaseQuestion {
+	constructor() {
+		super();
+
 		// calculate percentage value
-		var percVal = BaseQuestion.genFloat(0, 100, 2, 0.01)
-		var num = BaseQuestion.genFloat(0, 1000, 1, 0.1)
+		var percVal = BaseQuestion.genFloat(0, 100, 0.01)
+		var num = BaseQuestion.genFloat(0, 1000, 0.1)
 
 		// calculate answer and parse it accordingly (may have floating point, so round off to 3sf unless answer is exact)
 		var answer = percVal /100 *num
@@ -420,4 +422,4 @@ class TwoSimQn extends BaseQuestion {
 	}
 }
 
-module.exports = {Qriller, FracToPerc, PercToFrac, PercChange}
+module.exports = {Qriller, FracToPerc, PercToFrac, PercChange, RelativePerc}

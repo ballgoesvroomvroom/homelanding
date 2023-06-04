@@ -190,6 +190,13 @@ presetRouter.get("/percchangerawflip", (req, res) => {
 		null,
 		true)
 })
+presetRouter.get("/relperc", (req, res) => {
+	return Utils.generateQriller(
+		res,
+		"[2.5] Relative Percentage", "Round off your answers to 3 significant figures wherever possible.",
+		qriller.RelativePerc,
+		1000)
+})
 router.use("/presets", presetRouter)
 
 
