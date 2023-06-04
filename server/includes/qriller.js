@@ -69,10 +69,30 @@ class BaseQuestion {
 	}
 
 	static gcd(a, b) {
+		// recursive function to find greatest common divisor
 		if (a == 0) {
 			return b
 		}
 		return BaseQuestion.gcd(b %a, a)
+	}
+
+	static genFloat(min, max, precision, step) {
+		// helpter function
+		// precision: int, places of decimals
+		// step: float, step count, so answeer will usually be a multiple of step count
+		// step is usually presumed to be 0-1 and never greater than 1
+
+		// 10 exponent precision factor
+		var precisionFactor = 10 **(precision)		
+
+		// generate int part first (assume any integers are a multiple of step)
+		var baseInt = rando(min, max) +(rando(19) *5) /100
+
+		// generate float
+		var floatStep = Math.floor(precisionFactor /step)
+		var float = rando(Math.floor(precisionFactor /floatStep) -1) *floatStep
+
+		return baseInt +(float /precisionFactor)
 	}
 }
 
@@ -111,7 +131,7 @@ class FracToPerc extends BaseQuestion {
 		this.qnLatexEqn.push(`\\frac{${numer}}{${denom}}`)
 
 		// generate answer
-		var answer = BaseQuestion.roundOffSf(numer / denom, 3)
+		var answer = (numer /denom).toPrecision(3) // BaseQuestion.roundOffSf(numer / denom, 3)
 
 		this.answerObj = new BaseAnswer(true)
 		this.answerObj.set(answer)
@@ -241,9 +261,9 @@ class PercChange extends BaseQuestion {
 					this.qnLatexEqn.push(`${second.toFixed(2)} ${unit}`)
 
 					// answer
-					var answer = BaseQuestion.roundOffSf((second -first) /first *100, 3)
+					var answer = (second -first) /first *100 //BaseQuestion.roundOffSf((second -first) /first *100, 3)
 					this.answerObj = new BaseAnswer(false)
-					this.answerObj.set("%%0%%\%", [answer.toString()])
+					this.answerObj.set("%%0%%\%", [answer.toPrecision(3)])
 					break
 				case 2:
 					// temperature change
@@ -302,9 +322,9 @@ class PercChange extends BaseQuestion {
 					this.qnLatexEqn.push(second.toFixed(2))
 
 					// answer
-					var answer = BaseQuestion.roundOffSf((second -first) /first *100, 3)
+					var answer = ((second -first) /first *100) // BaseQuestion.roundOffSf((second -first) /first *100, 3)
 					this.answerObj = new BaseAnswer(false)
-					this.answerObj.set("%%0%%\%", [answer.toString()])
+					this.answerObj.set("%%0%%\%", [answer.toPrecision(3)])
 			}
 		} else {
 			var basearg = rando(1, 5000)
@@ -341,7 +361,7 @@ class PercChange extends BaseQuestion {
 				first = small
 				second = big
 
-				var answer = BaseQuestion.roundOffSf((big -small) /small *100, 3)
+				var answer = (big -small) /small *100 // BaseQuestion.roundOffSf((big -small) /small *100, 3)
 			} else if (determineIncrOrder === false || (determineIncrOrder == null && !increasingOrder)) {
 				// decreases
 				// big change to small (-ve % change)
@@ -349,7 +369,7 @@ class PercChange extends BaseQuestion {
 				first = big
 				second = small
 
-				var answer = BaseQuestion.roundOffSf((small -big) /big *100, 3)
+				var answer = (small -big) /big *100 // BaseQuestion.roundOffSf((small -big) /big *100, 3)
 			}
 
 			// set fields
@@ -358,13 +378,40 @@ class PercChange extends BaseQuestion {
 			this.qnLatexEqn.push(second.toString())
 
 			this.answerObj = new BaseAnswer(true)
-			this.answerObj.set("%%0%%\%", [`${answer}`])
+			this.answerObj.set("%%0%%\%", [`${answer.toPrecision(3)}`])
 		}
 	}
 }
 
+class RelativePerc extends BaseAnswer {
+	constructor(a) {
+		// calculate percentage value
+		var percVal = BaseQuestion.genFloat(0, 100, 2, 0.01)
+		var num = BaseQuestion.genFloat(0, 1000, 1, 0.1)
+
+		// calculate answer and parse it accordingly (may have floating point, so round off to 3sf unless answer is exact)
+		var answer = percVal /100 *num
+		var isExact = ((answer /num) - percVal) < .00001 // determine if its exact (support for marginal error)
+		if (!isExact) {
+			// not exact, round off to 3 significant figures
+			answer = answer.toPrecision(3)
+		} else {
+			// exact, convert to string
+			answer = answer.toString() // might have trailing bits (floating point error)
+			// get the number of decimal places this answer has, then run .toFixed(n)
+			// TO DO HERE
+		}
+
+		// set fields
+		this.qnReprString = `Calculate %%0%% of %%1%%.`
+		this.qnLatexEqn.push(`${percVal.toFixed(2)}\\%`)
+		this.qnLatexEqn.push(`${num.toFixed(1)}`)
+		this.answerObj = new BaseAnswer(true)
+		this.answerObj.set(answer)
+	}
+}
+
 class TwoSimQn extends BaseQuestion {
-	isAlgebraic = true
 	constructor(a, toughnessDegree) {
 		// supply values of a, compute value of b
 		// toughnessDegree 1-3 (with 3 being the toughest)
