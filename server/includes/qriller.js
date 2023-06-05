@@ -32,6 +32,80 @@ class Database {
 	static rigidbody = ["car", "bike"]
 }
 
+class Units {
+	// mathematical units
+	units = { // USES SI NOTATION
+		a: 1, // root unit
+		b: 100,
+		c: 1000 // 400 root units
+	}
+
+	constructor(num) {
+		this.num = num
+	}
+
+	convert(from, to) {
+		if (from === to) {
+			// same value, save unncessary operations
+			return this.num
+		}
+
+		var a = this.units[from]
+		var b = this.units[to]
+		var factor = a /b
+
+		return this.num *factor
+	}
+}
+
+class LengthUnit extends Units {
+	units = {
+		"mm": 1,
+		"cm": 10,
+		"m": 1000,
+		"km": 1000000
+	}
+	static unitMap = ["mm", "cm", "m", "km"]
+}
+
+class TimeUnit extends Units {
+	units = {
+		"ms": 1,
+		"s": 1000,
+		"min": 60000,
+		"hr": 360000,
+		"day": 8640000
+	}
+	static unitMap = ["ms", "s", "min", "hr", "day"]
+}
+
+class Mass extends Units {
+	units = {
+		"mg": 1,
+		"g": 1000,
+		"kg": 1000000
+	}
+	static unitMap = ["mg", "g", "kg"]
+}
+
+class LiquidVolume extends Units {
+	units = {
+		"ml": 1,
+		"l": 1000
+	}
+	static unitMap = ["ml", "l"]
+}
+
+class Volume extends Units {
+	units = {
+		"mm3": 1,
+		"cm3": 1000,
+		"m3": 1000000000,
+		"km3": 1e18,
+	}
+	static unitMap = ["mm3", "cm3", "m3", "km3"]
+}
+
 class BaseQuestion {
 	qnReprString = ""
 	qnLatexEqn = []
@@ -78,7 +152,13 @@ class BaseQuestion {
 
 	static getDecimalPlace(float) {
 		// returns a number representing the amount of decimal places float has
+		var dp = 0
+		while ((float *10 **dp) % 1 > 0.0001 && (float *10 **dp) % 1 < 0.99999) {
+			// accept marginal error (floating point error)
+			dp++ // increment decimal places
+		}
 
+		return dp
 	}
 
 	static genFloat(min, max, step) {
@@ -93,6 +173,44 @@ class BaseQuestion {
 		var float = rando(Math.floor(1 /step) -1) *(step)
 
 		return baseInt +(float)
+	}
+
+	static getFactors(int, includeOwnFactor) {
+		// includeOwnFactor: boolean, if true, will return 1 and int as part of the factors
+		// returns an array containing the factors of an integer
+
+		// uses hashmap to store factors
+		var f = {}
+		var divisor = includeOwnFactor ? 1 : 2 // start from 2 if excluding 1 as its own factor
+		var lim = Math.floor(int /2)
+		var max = 0; // store max so can iterate through hashmap
+		while (divisor < lim) {
+			if (int % divisor === 0) {
+				// divisor is a multiple of int, hence can be divided
+				f[divisor] = true
+				f[Math.floor(int /divisor)] = true // int /divisor should be an integer
+
+				// store max
+				if ((int /divisor) > max) {
+					max = Math.floor(int /divisor)
+				} else if (divisor > max) {
+					// usually divisor is smaller than (int /divisor)
+					max = divisor
+				}
+			}
+			divisor++
+		}
+
+		// return mapped array
+		var factorsArray = [];
+		for (let i = 0; i <= max; i++) {
+			// iterate inclusive of i
+			if (f[i]) {
+				factorsArray.push(i)
+			}
+		}
+
+		return factorsArray
 	}
 }
 
@@ -383,30 +501,117 @@ class PercChange extends BaseQuestion {
 	}
 }
 
+class ExpressUnitPerc extends BaseQuestion {
+	// express a km2 as a percentage of b km2
+	constructor(includeUnitsConversion) {
+		super();
+
+		// choose units to use
+		var unitsChoice = rando(1, 1)
+		var aStr, bStr, percAns;
+		var aVal, bVal;
+		var aUnit, bUnit
+		switch (unitsChoice) {
+			case 1:
+				// length
+				var a = BaseQuestion.genFloat(5, 100, .1)
+				var b = BaseQuestion.genFloat(1, a, .1)
+
+				var baseUnit = LengthUnit.unitMap[rando(0, LengthUnit.unitMap.length -1)] // convert a to this unit
+				var targetUnit = LengthUnit.unitMap[rando(0, LengthUnit.unitMap.length -1)] // convert b to this unit
+
+				console.log(baseUnit, targetUnit)
+				// calculate percentage, change percentage 
+				aVal = new LengthUnit(a).convert("mm", baseUnit)
+				bVal = new LengthUnit(b).convert("mm", targetUnit)
+				percAns = (bVal /aVal) *100
+
+				// store fields
+				aUnit = baseUnit
+				bUnit = targetUnit
+
+				break
+			case 2:
+				// mass
+
+		}
+
+		// set fields
+		this.qnReprString = `Express %%0%% as a percentage of %%1%%`
+		this.qnLatexEqn.push(`${b}${bUnit}`)
+		this.qnLatexEqn.push(`${a}${aUnit}`)
+		this.answerObj = new BaseAnswer(false)
+		this.answerObj.set(`Convert %%0%%${bUnit} to ${aUnit}\nThus, %%1%%`, [`${b}`, `\\frac{${bVal}${aUnit}}{${aVal}${aUnit}} \\times 100 = ${percAns}\\%`])
+	}
+}
+
+class ReversePerc extends BaseQuestion {
+	constructor() {
+		super();
+
+		// calculate base number first
+		var num = BaseQuestion.genFloat(0, 100, 1)
+
+		// calculate the relative number then determine percentage
+		var numFactors = BaseQuestion.getFactors(num, false) // get sorted array of factors (excluding 1 and itself)
+		var percVal, relnum;
+		if (numFactors.length === 0) {
+			// prime factor, start from generating a percentage that is a multiple of 2
+			percVal = BaseQuestion.genFloat(0, 100, 2)
+			relnum = percVal /100 *num
+		} else {
+			// generate a percentage value in steps of 10 (used to generate a relnum based on factors)
+			var relperc = BaseQuestion.genFloat(0, 1, .1)
+
+			// get 2 random adjacent factors to be used as a relnum
+			var idx = Math.floor(Math.random() *numFactors.length)
+			var a, b;
+			a = numFactors[idx]
+			if (idx == numFactors.length -1) {
+				// at end of factor array
+				b = num // 100%
+			} else {
+				b = numFactors[idx +1]
+			}
+
+			// use relperc to get the final relnum
+			relnum = a +(b -a) *(relperc /100) // relperc used on difference between adjacent factors
+			percVal = relnum /num *100
+		}
+
+		// set fields
+		this.qnReprString = `%%0%% of a number is %%1%%\nFind the number (ans: %%2%%).`
+		this.qnLatexEqn.push(`${percVal.toFixed(1)}\\%`)
+		this.qnLatexEqn.push(`${relnum.toFixed(BaseQuestion.getDecimalPlace(relnum))}`)
+		this.qnLatexEqn.push(`${num.toFixed(BaseQuestion.getDecimalPlace(num))}`)
+		this.answerObj = new BaseAnswer(true)
+		this.answerObj.set(num)
+	}
+}
+
 class RelativePerc extends BaseQuestion {
 	constructor() {
 		super();
 
 		// calculate percentage value
-		var percVal = BaseQuestion.genFloat(0, 100, 0.01)
+		var percVal = BaseQuestion.genFloat(0, 100, 0.2)
 		var num = BaseQuestion.genFloat(0, 1000, 0.1)
 
 		// calculate answer and parse it accordingly (may have floating point, so round off to 3sf unless answer is exact)
 		var answer = percVal /100 *num
-		var isExact = ((answer /num) - percVal) < .00001 // determine if its exact (support for marginal error)
+		var isExact = ((answer /num) - (percVal /100)) < .00001 // determine if its exact (support for marginal error)
 		if (!isExact) {
 			// not exact, round off to 3 significant figures
 			answer = answer.toPrecision(3)
 		} else {
-			// exact, convert to string
-			answer = answer.toString() // might have trailing bits (floating point error)
-			// get the number of decimal places this answer has, then run .toFixed(n)
-			// TO DO HERE
+			// exact, convert to string, trim off trailing float
+			var n = BaseQuestion.getDecimalPlace(answer)
+			answer = answer.toFixed(n) // might have trailing bits (floating point error)
 		}
 
 		// set fields
-		this.qnReprString = `Calculate %%0%% of %%1%%.`
-		this.qnLatexEqn.push(`${percVal.toFixed(2)}\\%`)
+		this.qnReprString = `Calculate %%0%% of %%1%%`
+		this.qnLatexEqn.push(`${percVal.toFixed(1)}\\%`)
 		this.qnLatexEqn.push(`${num.toFixed(1)}`)
 		this.answerObj = new BaseAnswer(true)
 		this.answerObj.set(answer)
@@ -422,4 +627,4 @@ class TwoSimQn extends BaseQuestion {
 	}
 }
 
-module.exports = {Qriller, FracToPerc, PercToFrac, PercChange, RelativePerc}
+module.exports = {Qriller, FracToPerc, PercToFrac, PercChange, ExpressUnitPerc, ReversePerc, RelativePerc}

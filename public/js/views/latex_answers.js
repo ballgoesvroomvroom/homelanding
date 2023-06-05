@@ -24,8 +24,12 @@ $(document).ready(e => {
 	ANSWERS.forEach(ansData => {
 		// qnData: [ansStr, latexEqnArray]
 
-		// replace inline positions qnStr with built latex expr
-		ansStr = ansData[0]
+		var ansStr = ansData[0]
+
+		// replace new line characters to <br> tags
+		ansStr = ansStr.replaceAll("\n", "<br>")
+
+		// replace inline positions ansStr with built latex expr
 		if (ansData.length > 1) {
 			// there are latex equations
 			for (let i = 0; i < ansData[1].length; i++) {

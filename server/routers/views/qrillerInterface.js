@@ -190,12 +190,26 @@ presetRouter.get("/percchangerawflip", (req, res) => {
 		null,
 		true)
 })
+presetRouter.get("/expunitperc", (req, res) => {
+	return Utils.generateQriller(
+		res,
+		"[2.5] Express Units", "Round off your answers to 3 significant figures wherever possible.",
+		qriller.ExpressUnitPerc,
+		100)
+})
 presetRouter.get("/relperc", (req, res) => {
 	return Utils.generateQriller(
 		res,
-		"[2.5] Relative Percentage", "Round off your answers to 3 significant figures wherever possible.",
+		"[2.6] Relative Percentage", "Round off your answers to 3 significant figures wherever possible.",
 		qriller.RelativePerc,
-		1000)
+		100)
+})
+presetRouter.get("/revperc", (req, res) => {
+	return Utils.generateQriller(
+		res,
+		"[2.7] Reverse Percentage", "Round off your answers to 3 significant figures wherever possible.",
+		qriller.ReversePerc,
+		100)
 })
 router.use("/presets", presetRouter)
 

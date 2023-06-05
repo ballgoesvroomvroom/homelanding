@@ -24,8 +24,12 @@ $(document).ready(e => {
 	QUESTIONS.forEach(qnData => {
 		// qnData: [qnStr, latexEqnArray]
 
-		// replace inline positions qnStr with built latex expr
-		qnStr = qnData[0]
+		var qnStr = qnData[0]
+
+		// replace new line characters to <br> tags
+		qnStr = qnStr.replaceAll("\n", "<br>")
+
+		// replace inline positions qnStr with built latex expr (final step since most sophiscated)
 		for (let i = 0; i < qnData[1].length; i++) {
 			qnStr = qnStr.replace(`%%${i}%%`, katex.renderToString(qnData[1][i], {throwOnError: false}))
 		}
