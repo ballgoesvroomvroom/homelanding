@@ -183,6 +183,16 @@ presetRouter.get("/percchangeraw", (req, res) => {
 presetRouter.get("/percchangerawflip", (req, res) => {
 	return Utils.generateQriller(
 		res,
+		"[2.3.5] Percentage ", "Round off your answer to 3 significant figures wherever possible.",
+		qriller.PercChange,
+		100,
+		false,
+		null,
+		true)
+})
+presetRouter.get("/percchangerawflip", (req, res) => {
+	return Utils.generateQriller(
+		res,
 		"[2.3.5] Percentage Change Part 2", "Round off your answer to 3 significant figures wherever possible.",
 		qriller.PercChange,
 		100,
@@ -190,12 +200,29 @@ presetRouter.get("/percchangerawflip", (req, res) => {
 		null,
 		true)
 })
+presetRouter.get("/relpercincr", (req, res) => {
+	return Utils.generateQriller(
+		res,
+		"[2.4.1] Percentage Increase", "Round off your answers to 3 significant figures wherever possible.",
+		qriller.RelativePercManipulation,
+		100,
+		true)
+})
+presetRouter.get("/relpercdecr", (req, res) => {
+	return Utils.generateQriller(
+		res,
+		"[2.4.2] Percentage Decrease", "Round off your answers to 3 significant figures wherever possible.",
+		qriller.RelativePercManipulation,
+		100,
+		false)
+})
 presetRouter.get("/expunitperc", (req, res) => {
 	return Utils.generateQriller(
 		res,
 		"[2.5] Express Units", "Round off your answers to 3 significant figures wherever possible.",
 		qriller.ExpressUnitPerc,
-		100)
+		100,
+		true)
 })
 presetRouter.get("/relperc", (req, res) => {
 	return Utils.generateQriller(
@@ -211,8 +238,23 @@ presetRouter.get("/revperc", (req, res) => {
 		qriller.ReversePerc,
 		100)
 })
-router.use("/presets", presetRouter)
 
+presetRouter.get("/simplalge", (req, res) => {
+	return Utils.generateQriller(
+		res,
+		"[2.7] Simplifcation of Algebraic Equations", "Simplify each equation to their simplest form.",
+		qriller.SimplifyAlgebraic,
+		100)
+})
+presetRouter.get("/simplalgeparent", (req, res) => {
+	return Utils.generateQriller(
+		res,
+		"[2.7] Simplifcation of Algebraic Equations", "Simplify each equation to their simplest form.",
+		qriller.SimplifyAlgebraic,
+		100)
+})
+
+router.use("/presets", presetRouter)
 
 module.exports = { // export router object and authenticated middleware
 	baseURL, router

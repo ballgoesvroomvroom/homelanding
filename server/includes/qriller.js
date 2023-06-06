@@ -70,30 +70,28 @@ class LengthUnit extends Units {
 
 class TimeUnit extends Units {
 	units = {
-		"ms": 1,
-		"s": 1000,
-		"min": 60000,
-		"hr": 360000,
-		"day": 8640000
+		"s": 1,
+		"min": 60,
+		"hr": 3600,
 	}
-	static unitMap = ["ms", "s", "min", "hr", "day"]
+	static unitMap = ["s", "min", "hr"]
 }
 
 class Mass extends Units {
 	units = {
-		"mg": 1,
-		"g": 1000,
-		"kg": 1000000
+		"g": 1,
+		"kg": 1000
 	}
-	static unitMap = ["mg", "g", "kg"]
+	static unitMap = ["g", "kg"]
 }
 
 class LiquidVolume extends Units {
 	units = {
 		"ml": 1,
+		"cm3": 1,
 		"l": 1000
 	}
-	static unitMap = ["ml", "l"]
+	static unitMap = ["ml", "cm3", "l"]
 }
 
 class Volume extends Units {
@@ -153,7 +151,7 @@ class BaseQuestion {
 	static getDecimalPlace(float) {
 		// returns a number representing the amount of decimal places float has
 		var dp = 0
-		while ((float *10 **dp) % 1 > 0.0001 && (float *10 **dp) % 1 < 0.99999) {
+		while ((float *10 **dp) % 1 > 0.000001 && (float *10 **dp) % 1 < 0.999999) {
 			// accept marginal error (floating point error)
 			dp++ // increment decimal places
 		}
@@ -172,7 +170,13 @@ class BaseQuestion {
 		// generate float
 		var float = rando(Math.floor(1 /step) -1) *(step)
 
-		return baseInt +(float)
+		// clamp result
+		var clamp = baseInt +(float)
+		if (clamp > max) {
+			clamp = max
+		}
+
+		return clamp
 	}
 
 	static getFactors(int, includeOwnFactor) {
@@ -503,27 +507,38 @@ class PercChange extends BaseQuestion {
 
 class ExpressUnitPerc extends BaseQuestion {
 	// express a km2 as a percentage of b km2
-	constructor(includeUnitsConversion) {
+	constructor(adjacentUnitsConversion) {
+		// adjacentUnitsConversion: boolean, if true, will only use adjacent units
 		super();
 
 		// choose units to use
-		var unitsChoice = rando(1, 1)
-		var aStr, bStr, percAns;
-		var aVal, bVal;
+		var unitsChoice = rando(1, 3)
+		var bRepr; // unit form
+		var aVal, bVal, percAns;
 		var aUnit, bUnit
 		switch (unitsChoice) {
 			case 1:
 				// length
-				var a = BaseQuestion.genFloat(5, 100, .1)
-				var b = BaseQuestion.genFloat(1, a, .1)
 
-				var baseUnit = LengthUnit.unitMap[rando(0, LengthUnit.unitMap.length -1)] // convert a to this unit
-				var targetUnit = LengthUnit.unitMap[rando(0, LengthUnit.unitMap.length -1)] // convert b to this unit
+				// generate 2 mnumbers in a unit
+				var baseUnitChoice = rando(0, LengthUnit.unitMap.length -1)
+				var baseUnit = LengthUnit.unitMap[baseUnitChoice] // assume both a and b are this unit
+				aVal = BaseQuestion.genFloat(5, 100, .1)
+				bVal = BaseQuestion.genFloat(1, aVal, .1)
 
-				console.log(baseUnit, targetUnit)
-				// calculate percentage, change percentage 
-				aVal = new LengthUnit(a).convert("mm", baseUnit)
-				bVal = new LengthUnit(b).convert("mm", targetUnit)
+				// generate targetUnit based on adjacentUnitsConversion
+				var targetUnitChoice;
+				if (adjacentUnitsConversion) {
+					targetUnitChoice = rando(baseUnitChoice >= 1 ? baseUnitChoice -1 : baseUnitChoice, baseUnitChoice < LengthUnit.unitMap.length -1 ? baseUnitChoice +1 : baseUnitChoice)
+				} else {
+					targetUnitChoice = rando(0, LengthUnit.unitMap.length -1)
+				}
+				var targetUnit = LengthUnit.unitMap[targetUnitChoice] // convert b to this unit
+
+				// convert b to targetUnit
+				bRepr = new LengthUnit(bVal).convert(baseUnit, targetUnit)
+
+				// calculate percentage
 				percAns = (bVal /aVal) *100
 
 				// store fields
@@ -534,14 +549,84 @@ class ExpressUnitPerc extends BaseQuestion {
 			case 2:
 				// mass
 
+				// generate 2 mnumbers in a unit
+				var baseUnitChoice = rando(0, Mass.unitMap.length -1)
+				var baseUnit = Mass.unitMap[baseUnitChoice] // assume both a and b are this unit
+				aVal = BaseQuestion.genFloat(5, 100, .1)
+				bVal = BaseQuestion.genFloat(1, aVal, .1)
+
+				// generate targetUnit based on adjacentUnitsConversion
+				var targetUnitChoice;
+				if (adjacentUnitsConversion) {
+					targetUnitChoice = rando(baseUnitChoice >= 1 ? baseUnitChoice -1 : baseUnitChoice, baseUnitChoice < Mass.unitMap.length -1 ? baseUnitChoice +1 : baseUnitChoice)
+				} else {
+					targetUnitChoice = rando(0, Mass.unitMap.length -1)
+				}
+				var targetUnit = Mass.unitMap[targetUnitChoice] // convert b to this unit
+
+				// convert b to targetUnit
+				bRepr = new Mass(bVal).convert(baseUnit, targetUnit)
+
+				// calculate percentage
+				percAns = (bVal /aVal) *100
+
+				// store fields
+				aUnit = baseUnit
+				bUnit = targetUnit
+
+				break
+			case 3:
+				// liquid volume
+
+				// generate 2 mnumbers in a unit
+				var baseUnitChoice = rando(0, LiquidVolume.unitMap.length -1)
+				var baseUnit = LiquidVolume.unitMap[baseUnitChoice] // assume both a and b are this unit
+				aVal = BaseQuestion.genFloat(5, 100, .1)
+				bVal = BaseQuestion.genFloat(1, aVal, .1)
+
+				// generate targetUnit based on adjacentUnitsConversion
+				var targetUnitChoice;
+				if (adjacentUnitsConversion) {
+					targetUnitChoice = rando(baseUnitChoice >= 1 ? baseUnitChoice -1 : baseUnitChoice, baseUnitChoice < LiquidVolume.unitMap.length -1 ? baseUnitChoice +1 : baseUnitChoice)
+				} else {
+					targetUnitChoice = rando(0, LiquidVolume.unitMap.length -1)
+				}
+				var targetUnit = LiquidVolume.unitMap[targetUnitChoice] // convert b to this unit
+
+				// convert b to targetUnit
+				bRepr = new LiquidVolume(bVal).convert(baseUnit, targetUnit)
+
+				// calculate percentage
+				percAns = (bVal /aVal) *100
+
+				// store fields
+				aUnit = baseUnit
+				bUnit = targetUnit
+
+				break
 		}
+
+		// round off answer to 3sf if not fixed (determine by if it has >= 13 dp)
+		var n = BaseQuestion.getDecimalPlace(percAns);
+		if (n >= 13) {
+			// round off to 3 dp
+			percAns = percAns.toPrecision(3)
+		} else {
+			// exact answer (trim off any precision point floating error)
+			percAns = percAns.toFixed(n)
+		}
+
+		// parse values
+		aVal = aVal.toFixed(BaseQuestion.getDecimalPlace(aVal))
+		bVal = bVal.toFixed(BaseQuestion.getDecimalPlace(bVal))
+		bRepr = bRepr.toFixed(BaseQuestion.getDecimalPlace(bRepr))
 
 		// set fields
 		this.qnReprString = `Express %%0%% as a percentage of %%1%%`
-		this.qnLatexEqn.push(`${b}${bUnit}`)
-		this.qnLatexEqn.push(`${a}${aUnit}`)
+		this.qnLatexEqn.push(`${bRepr}${bUnit}`)
+		this.qnLatexEqn.push(`${aVal}${aUnit}`)
 		this.answerObj = new BaseAnswer(false)
-		this.answerObj.set(`Convert %%0%%${bUnit} to ${aUnit}\nThus, %%1%%`, [`${b}`, `\\frac{${bVal}${aUnit}}{${aVal}${aUnit}} \\times 100 = ${percAns}\\%`])
+		this.answerObj.set(`Convert %%0%%${bUnit} to ${aUnit}\nThus, %%1%%`, [`${bRepr}`, `\\frac{${bVal}${aUnit}}{${aVal}${aUnit}} \\times 100 = ${percAns}\\%`])
 	}
 }
 
@@ -595,7 +680,7 @@ class RelativePerc extends BaseQuestion {
 
 		// calculate percentage value
 		var percVal = BaseQuestion.genFloat(0, 100, 0.2)
-		var num = BaseQuestion.genFloat(0, 1000, 0.1)
+		var num = BaseQuestion.genFloat(1, 1000, 0.1)
 
 		// calculate answer and parse it accordingly (may have floating point, so round off to 3sf unless answer is exact)
 		var answer = percVal /100 *num
@@ -618,13 +703,169 @@ class RelativePerc extends BaseQuestion {
 	}
 }
 
+class RelativePercManipulation extends BaseQuestion {
+	constructor(increasingQn) {
+		// increasingQn: boolean, if true, will generate increasing questions, if false, will generate decreasing questions
+		super();
+
+		// generate a percentage value and a number (question preference 0-1999)
+		var percVal = BaseQuestion.genFloat(0, 100, 0.2)
+		var num = BaseQuestion.genFloat(1, 1999, 1)
+
+		// calculate answer bsed on increasingQn
+		var answer;
+		var mode = "Increase"
+		if (increasingQn) {
+			answer = (100 +percVal) /100 *num
+		} else {
+			answer = (100 -percVal) /100 *num			
+			mode = "Decrease"
+		}
+
+		// round off generated numbers
+		percVal = percVal.toFixed(BaseQuestion.getDecimalPlace(percVal))
+		num = num.toFixed(BaseQuestion.getDecimalPlace(num))
+
+		// round off answer (if not exact, >= 13 decimal places)
+		var n = BaseQuestion.getDecimalPlace(answer)
+		if (n >= 13) {
+			// round off to 3 sf
+			answer = answer.toPrecision(3)
+		} else {
+			// exact answer (trim off any precision point floating error)
+			answer = answer.toFixed(n)
+		}
+
+		// set fields
+		this.qnReprString = `${mode} %%0%% by %%1%%`
+		this.qnLatexEqn.push(`${num}`)
+		this.qnLatexEqn.push(`${percVal}\\%`)
+		this.answerObj = new BaseAnswer(true)
+		this.answerObj.set(answer)
+	}
+}
+
+class SimplifyAlgebraic extends BaseQuestion {
+	constructor() {
+		// double variable equation generation
+		super();
+
+		// determine variable styles
+		var varStyleChoice = rando(1, 2)
+		var variables
+		switch (varStyleChoice) {
+			case 1:
+				// x and y
+				variables = ["x", "y"]
+			case 2:
+				variables = ["a", "b"]
+		}
+
+		// generate a list of coefficients for each variable, and generate answer at the same time
+		var factors = []
+		var totalFactors = 0
+		var answer = ""
+		for (let i = 0; i < 2; i++) {
+			var termFactors = [] // to store all the coefficients for this term, and to be pushed into factors
+			var termSum = 0
+			var termsLength = rando(1, 3)
+			for (let j = 0; j < termsLength; j++) {
+				var coeff = rando(1, 6)
+				var isNeg = rando(0, 1)
+				if (isNeg === 1) {
+					// coeff is negative
+					coeff *= -1
+				}
+
+				// add to sum
+				termSum += coeff
+
+				if (termSum === 0) {
+					// make sure sum is at least > 0 or < 0
+					termSum += coeff // add it to sum again
+					coeff *= 2 // multiply AFTER, since value was used above
+				}
+
+				// push to factors (final)
+				termFactors.push(coeff)
+			}
+
+			// push coefficients data
+			factors.push(termFactors)
+			totalFactors += termsLength
+
+			// generate answer
+			var coefficient = termSum
+
+			// format prefix
+			var prefix = "";
+			if (coefficient < 0) {
+				prefix = "-"
+			} else if (coefficient > 0 && i > 0) {
+				prefix = "+"
+			}
+
+			// parse coefficient
+			if (Math.abs(coefficient) === 1) {
+				coefficient = "" // either 1 or negative 1, no need to show coeff value
+			} else {
+				coefficient = Math.abs(coefficient)
+			}
+
+			// concat answer
+			answer += `${prefix}${coefficient}${variables[i]}` 
+		}
+
+		// spread them out
+		var q = ""
+		for (let i = 0; i < totalFactors; i++) {
+			// determine to use either x or y
+			var variableChoice = rando(0, 1)
+			if (factors[variableChoice].length === 0) {
+				// no more, switch to the other one
+				variableChoice = 1 - variableChoice
+			}
+
+
+			// format prefix
+			var coeff = factors[variableChoice].pop()
+			var prefix = "";
+			if (coeff < 0) {
+				prefix = "-"
+			} else if (coeff > 0 && i > 0) {
+				prefix = "+"
+			}
+
+			// format coefficient
+			if (Math.abs(coeff) === 1) {
+				// no need to write coefficient
+				coeff = ""
+			} else {
+				// remove operation that preceeds it, negative operation is already captured
+				coeff = Math.abs(coeff)
+			}
+
+			// concat question string
+			q += `${prefix}${coeff}${variables[variableChoice]} ` // add a trailing space for the next operation
+		}
+		// trim out trailing space
+		q = q.slice(0, -1)
+
+		// set fields
+		this.qnReprString = "Rearrange %%0%%"
+		this.qnLatexEqn.push(q)
+		this.answerObj = new BaseAnswer(false)
+		this.answerObj.set("%%0%%", [answer])
+	}
+}
+
 class TwoSimQn extends BaseQuestion {
 	constructor(a, toughnessDegree) {
 		// supply values of a, compute value of b
 		// toughnessDegree 1-3 (with 3 being the toughest)
 
-		// form random equations with relations to a and b
+		// form random equations with relations to a and b\
 	}
 }
 
-module.exports = {Qriller, FracToPerc, PercToFrac, PercChange, ExpressUnitPerc, ReversePerc, RelativePerc}
+module.exports = {Qriller, FracToPerc, PercToFrac, PercChange, ExpressUnitPerc, ReversePerc, RelativePerc, RelativePercManipulation, SimplifyAlgebraic}
