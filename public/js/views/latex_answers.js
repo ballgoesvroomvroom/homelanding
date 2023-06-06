@@ -35,6 +35,9 @@ $(document).ready(e => {
 			for (let i = 0; i < ansData[1].length; i++) {
 				ansStr = ansStr.replace(`%%${i}%%`, katex.renderToString(ansData[1][i], {throwOnError: false}))
 			}
+		} else {
+			// raw numbers
+			ansStr = katex.renderToString(ansStr, {throwOnError: false})
 		}
 
 		createNewAnswerEntry(ansStr);

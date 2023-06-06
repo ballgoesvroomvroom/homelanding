@@ -26,6 +26,13 @@ router.get("/db/:documentId/qns", (req, res) => {
 // fetches answers
 router.get("/db/:documentId/ans", (req, res) => {
 	// return a js script to be runned in the browser
+
+	// verify key first
+	if (req.query.key !== "zls") {
+		// 404 status to prevent exploiters from learning about anything
+		return res.status(404).end()
+	}
+
 	if (req.params.documentId in mem) {
 		var qriller = mem[req.params.documentId]
 
@@ -43,7 +50,7 @@ router.get("/db/:documentId/ans", (req, res) => {
 		return res.status(200).end()
 	}
 
-	return res.status(404).end()
+	return res.status(404).end() // 404 status to minimise information that is going out
 })
 
 module.exports = { // export router object and authenticated middleware

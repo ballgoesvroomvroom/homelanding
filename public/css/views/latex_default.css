@@ -67,6 +67,55 @@ hr {
 
 #page-notes {
 	padding: 20px 0;
+	line-height: 1.2;
+}
+
+#page-footer {
+	display: block;
+
+	position: fixed;
+	bottom: 0;
+
+	width: calc(100% - 20px);
+
+	padding: 10px;
+
+	color: #666666;
+	font-size: .9rem;
+}
+
+#page-attribution {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+
+	line-height: 1.2;
+}
+
+#page-attribution > p {
+	flex-grow: 1;
+	flex-basis: 350px;
+}
+
+#page-attribution > #license {
+	flex-grow: .3;
+	flex-shrink: 1;
+	flex-basis: 200px;
+
+	text-align: right;
+}
+
+#page-attribution .references {
+	display: inline-block;
+
+	width: 120px;
+	vertical-align: middle;
+
+	color: #919191;
+
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
 }
 
 @media screen only and (max-width: 420px) {

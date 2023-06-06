@@ -104,6 +104,12 @@ class Volume extends Units {
 	static unitMap = ["mm3", "cm3", "m3", "km3"]
 }
 
+class AlgebraicEqn {
+	constructor(variables) {
+
+	}
+}
+
 class BaseQuestion {
 	qnReprString = ""
 	qnLatexEqn = []
@@ -165,7 +171,7 @@ class BaseQuestion {
 		// step is usually presumed to be 0-1 and never greater than 1
 
 		// generate int part first (assume any integers are a multiple of step)
-		var baseInt = rando(min, max)
+		var baseInt = rando(Math.floor(min), Math.floor(max))
 
 		// generate float
 		var float = rando(Math.floor(1 /step) -1) *(step)
@@ -174,6 +180,8 @@ class BaseQuestion {
 		var clamp = baseInt +(float)
 		if (clamp > max) {
 			clamp = max
+		} else if (clamp < min) {
+			clamp = min
 		}
 
 		return clamp
@@ -253,10 +261,10 @@ class FracToPerc extends BaseQuestion {
 		this.qnLatexEqn.push(`\\frac{${numer}}{${denom}}`)
 
 		// generate answer
-		var answer = (numer /denom).toPrecision(3) // BaseQuestion.roundOffSf(numer / denom, 3)
+		var answer = parseFloat((numer /denom).toPrecision(3)) // BaseQuestion.roundOffSf(numer / denom, 3)
 
 		this.answerObj = new BaseAnswer(true)
-		this.answerObj.set(answer)
+		this.answerObj.set(`${answer}`)
 	}
 }
 
@@ -385,7 +393,7 @@ class PercChange extends BaseQuestion {
 					// answer
 					var answer = (second -first) /first *100 //BaseQuestion.roundOffSf((second -first) /first *100, 3)
 					this.answerObj = new BaseAnswer(false)
-					this.answerObj.set("%%0%%\%", [answer.toPrecision(3)])
+					this.answerObj.set("%%0%%\%", [`${parseFloat(answer.toPrecision(3))}`])
 					break
 				case 2:
 					// temperature change
@@ -408,7 +416,7 @@ class PercChange extends BaseQuestion {
 						case 3:
 							// freezer
 							small = rando(0, 5) +(rando(1, 9) /10) // temp up to 1 d.p. (at least 0.1)
-							big = small +rando(5) +(rando(9) /10)
+							big = small +rando(1, 5) +(rando(9) /10)
 
 							noun = "freezer"
 					}
@@ -446,7 +454,7 @@ class PercChange extends BaseQuestion {
 					// answer
 					var answer = ((second -first) /first *100) // BaseQuestion.roundOffSf((second -first) /first *100, 3)
 					this.answerObj = new BaseAnswer(false)
-					this.answerObj.set("%%0%%\%", [answer.toPrecision(3)])
+					this.answerObj.set("%%0%%\%", [`${parseFloat(answer.toPrecision(3))}`])
 			}
 		} else {
 			var basearg = rando(1, 5000)
@@ -499,8 +507,8 @@ class PercChange extends BaseQuestion {
 			this.qnLatexEqn.push(first.toString())
 			this.qnLatexEqn.push(second.toString())
 
-			this.answerObj = new BaseAnswer(true)
-			this.answerObj.set("%%0%%\%", [`${answer.toPrecision(3)}`])
+			this.answerObj = new BaseAnswer(false)
+			this.answerObj.set("%%0%%\%", [`${parseFloat(answer.toPrecision(3))}`])
 		}
 	}
 }
@@ -610,7 +618,7 @@ class ExpressUnitPerc extends BaseQuestion {
 		var n = BaseQuestion.getDecimalPlace(percAns);
 		if (n >= 13) {
 			// round off to 3 dp
-			percAns = percAns.toPrecision(3)
+			percAns = parseFloat(percAns.toPrecision(3))
 		} else {
 			// exact answer (trim off any precision point floating error)
 			percAns = percAns.toFixed(n)
@@ -632,43 +640,52 @@ class ExpressUnitPerc extends BaseQuestion {
 
 class ReversePerc extends BaseQuestion {
 	constructor() {
+		// take a look at https://en.wikipedia.org/wiki/Miller%E2%80%93Rabin_primality_test#Example to generate factors
 		super();
 
 		// calculate base number first
-		var num = BaseQuestion.genFloat(0, 100, 1)
+		var num = BaseQuestion.genFloat(1, 399, 1)
 
-		// calculate the relative number then determine percentage
-		var numFactors = BaseQuestion.getFactors(num, false) // get sorted array of factors (excluding 1 and itself)
-		var percVal, relnum;
-		if (numFactors.length === 0) {
-			// prime factor, start from generating a percentage that is a multiple of 2
-			percVal = BaseQuestion.genFloat(0, 100, 2)
-			relnum = percVal /100 *num
-		} else {
-			// generate a percentage value in steps of 10 (used to generate a relnum based on factors)
-			var relperc = BaseQuestion.genFloat(0, 1, .1)
+		// calculate percentage value
+		var percVal = BaseQuestion.genFloat(0.1, 100, .1)
+		var relnum = percVal /100 *num
 
-			// get 2 random adjacent factors to be used as a relnum
-			var idx = Math.floor(Math.random() *numFactors.length)
-			var a, b;
-			a = numFactors[idx]
-			if (idx == numFactors.length -1) {
-				// at end of factor array
-				b = num // 100%
-			} else {
-				b = numFactors[idx +1]
-			}
+		// // calculate the relative number then determine percentage
+		// var numFactors = BaseQuestion.getFactors(num, false) // get sorted array of factors (excluding 1 and itself)
+		// if (numFactors.indexOf(3)) {
+		// 	numFactors.pop(numFactors.indexOf(3))
+		// 	numFactors.pop(numFactors.indexOf(Math.floor(num /3)))
+		// }
 
-			// use relperc to get the final relnum
-			relnum = a +(b -a) *(relperc /100) // relperc used on difference between adjacent factors
-			percVal = relnum /num *100
-		}
+		// var percVal, relnum;
+		// if (numFactors.length === 0) {
+		// 	// prime factor, start from generating a percentage that is a multiple of 2
+		// 	percVal = BaseQuestion.genFloat(0, 100, 2)
+		// 	relnum = percVal /100 *num
+		// } else {
+		// 	// generate a percentage value in steps of 10 (used to generate a relnum based on factors)
+		// 	var relperc = BaseQuestion.genFloat(.25, 1, .25)
+
+		// 	// get 2 random adjacent factors to be used as a relnum
+		// 	var idx = Math.floor(Math.random() *numFactors.length)
+		// 	var a, b;
+		// 	a = numFactors[idx]
+		// 	if (idx == numFactors.length -1) {
+		// 		// at end of factor array
+		// 		b = num // 100%
+		// 	} else {
+		// 		b = numFactors[idx +1]
+		// 	}
+
+		// 	// use relperc to get the final relnum
+		// 	relnum = a +(b -a) *(relperc) // relperc used on difference between adjacent factors
+		// 	percVal = relnum /num *100
+		// }
 
 		// set fields
-		this.qnReprString = `%%0%% of a number is %%1%%\nFind the number (ans: %%2%%).`
-		this.qnLatexEqn.push(`${percVal.toFixed(1)}\\%`)
+		this.qnReprString = `%%0%% of a number is %%1%%\nCalculate the number.`
+		this.qnLatexEqn.push(`${percVal.toFixed(BaseQuestion.getDecimalPlace(percVal))}\\%`)
 		this.qnLatexEqn.push(`${relnum.toFixed(BaseQuestion.getDecimalPlace(relnum))}`)
-		this.qnLatexEqn.push(`${num.toFixed(BaseQuestion.getDecimalPlace(num))}`)
 		this.answerObj = new BaseAnswer(true)
 		this.answerObj.set(num)
 	}
@@ -687,7 +704,7 @@ class RelativePerc extends BaseQuestion {
 		var isExact = ((answer /num) - (percVal /100)) < .00001 // determine if its exact (support for marginal error)
 		if (!isExact) {
 			// not exact, round off to 3 significant figures
-			answer = answer.toPrecision(3)
+			answer = parseFloat(answer.toPrecision(3))
 		} else {
 			// exact, convert to string, trim off trailing float
 			var n = BaseQuestion.getDecimalPlace(answer)
@@ -699,7 +716,7 @@ class RelativePerc extends BaseQuestion {
 		this.qnLatexEqn.push(`${percVal.toFixed(1)}\\%`)
 		this.qnLatexEqn.push(`${num.toFixed(1)}`)
 		this.answerObj = new BaseAnswer(true)
-		this.answerObj.set(answer)
+		this.answerObj.set(`${answer}`)
 	}
 }
 
@@ -718,7 +735,7 @@ class RelativePercManipulation extends BaseQuestion {
 		if (increasingQn) {
 			answer = (100 +percVal) /100 *num
 		} else {
-			answer = (100 -percVal) /100 *num			
+			answer = (100 -percVal) /100 *num           
 			mode = "Decrease"
 		}
 
@@ -730,7 +747,7 @@ class RelativePercManipulation extends BaseQuestion {
 		var n = BaseQuestion.getDecimalPlace(answer)
 		if (n >= 13) {
 			// round off to 3 sf
-			answer = answer.toPrecision(3)
+			answer = parseFloat(answer.toPrecision(3))
 		} else {
 			// exact answer (trim off any precision point floating error)
 			answer = answer.toFixed(n)
@@ -741,13 +758,14 @@ class RelativePercManipulation extends BaseQuestion {
 		this.qnLatexEqn.push(`${num}`)
 		this.qnLatexEqn.push(`${percVal}\\%`)
 		this.answerObj = new BaseAnswer(true)
-		this.answerObj.set(answer)
+		this.answerObj.set(`${answer}`)
 	}
 }
 
 class SimplifyAlgebraic extends BaseQuestion {
-	constructor() {
+	constructor(parenthesis) {
 		// double variable equation generation
+		// includeParenthesis: boolean, if true, will include qns to test on order of operations, if false, no terms will be added
 		super();
 
 		// determine variable styles
@@ -768,9 +786,10 @@ class SimplifyAlgebraic extends BaseQuestion {
 		for (let i = 0; i < 2; i++) {
 			var termFactors = [] // to store all the coefficients for this term, and to be pushed into factors
 			var termSum = 0
-			var termsLength = rando(1, 3)
+			var termsLength = 1 +rando(1, 3)
+			var termsCoeffFactor = rando(2, 6) // to multiple all coeffs by a range of factor
 			for (let j = 0; j < termsLength; j++) {
-				var coeff = rando(1, 6)
+				var coeff = rando(1, 12) *rando(termsCoeffFactor -1, termsCoeffFactor +1)
 				var isNeg = rando(0, 1)
 				if (isNeg === 1) {
 					// coeff is negative
@@ -852,7 +871,7 @@ class SimplifyAlgebraic extends BaseQuestion {
 		q = q.slice(0, -1)
 
 		// set fields
-		this.qnReprString = "Rearrange %%0%%"
+		this.qnReprString = "Simplify %%0%%"
 		this.qnLatexEqn.push(q)
 		this.answerObj = new BaseAnswer(false)
 		this.answerObj.set("%%0%%", [answer])

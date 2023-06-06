@@ -2,12 +2,14 @@
 	display: flex;
 	flex-direction: column;
 
+	height: calc(100vh - 500px);
+
 	counter-reset: question;
 }
 
 .answer-element {
 	min-width: 0;
-	min-height: 0;
+	min-height: min-content;
 
 	padding: 5px;
 	margin-top: -1px;
@@ -17,18 +19,22 @@
 	border-color: #d9d9d9;
 }
 
-.answer-element:first-child {
-	margin-top: 0;
+.answer-element:nth-child(12n) {
+	break-after: page;
 }
 
-.answer-element:nth-child(22n) {
-	break-after: page;
+.answer-element:nth-child(12n + 1) {
+	margin-top: 1px;
+}
+
+.answer-element:first-child {
+	margin-top: 0;
 }
 
 .answer-header {
 	display: flex;
 	flex-direction: row;
-	align-items: center;
+	align-items: flex-start;
 
 	padding-bottom: 5px;
 
@@ -41,5 +47,6 @@
 
 	position: relative;
 
+	padding-top: 5px;
 	padding-right: 5px;
 }

@@ -36,7 +36,7 @@ class Utils {
 
 		var hydrated = Skeleton.document.replaceAll("%QRILLER-ID%", qrillerObj.id)
 		hydrated = hydrated.replaceAll("%DOCUMENT-TITLE%", qrillerObj.title)
-		hydrated = hydrated.replaceAll("%DOCUMENT-NOTE%", qrillerObj.note)
+		hydrated = hydrated.replaceAll("%DOCUMENT-NOTE%", qrillerObj.note.replaceAll("\n", "<br>"))
 
 		res.write(hydrated)
 		res.status(200).end()
@@ -47,7 +47,7 @@ class Utils {
 			var qrillerObj = mem[documentId]
 			var hydrated = Skeleton.document.replaceAll("%QRILLER-ID%", qrillerObj.id)
 			hydrated = hydrated.replaceAll("%DOCUMENT-TITLE%", qrillerObj.title)
-			hydrated = hydrated.replaceAll("%DOCUMENT-NOTE%", qrillerObj.note)
+			hydrated = hydrated.replaceAll("%DOCUMENT-NOTE%", qrillerObj.note.replaceAll("\n", "<br>"))
 
 			return hydrated
 		}
@@ -58,7 +58,8 @@ class Utils {
 			var qrillerObj = mem[documentId]
 			var hydrated = Skeleton.answerSheet.replaceAll("%QRILLER-ID%", qrillerObj.id)
 			hydrated = hydrated.replaceAll("%DOCUMENT-TITLE%", qrillerObj.title)
-			hydrated = hydrated.replaceAll("%DOCUMENT-NOTE%", qrillerObj.note)
+			hydrated = hydrated.replaceAll("%DOCUMENT-NOTE%", qrillerObj.note.replaceAll("\n", "<br>"))
+			hydrated = hydrated.replaceAll("%DOCUMENT-ANSWERSHEET-KEY%", "zls")
 
 			return hydrated
 		}
@@ -86,6 +87,11 @@ router.get("/", (req, res) => {
 
 	res.write(hydrated)
 	res.status(200).end()
+})
+
+router.get("/status", (req, res) => {
+	res.type("html")
+	res.sendFile(views.qriller.worksheetDirectory)
 })
 
 // load a specific document
@@ -166,7 +172,7 @@ presetRouter.get("/percdecr", (req, res) => {
 presetRouter.get("/percchangeraw", (req, res) => {
 	return Utils.generateQriller(
 		res,
-		"[2.3.3] Percentage Change", "Calculate percentage change between 2 numbers.\nRound off your answer to 3 significant figures wherever possible.",
+		"[2.3.3] Percentage Change", "Calculate percentage change between 2 numbers.\nRound off all your answers to 3 significant figures wherever possible.",
 		qriller.PercChange,
 		100,
 		false)
@@ -227,16 +233,18 @@ presetRouter.get("/revperc", (req, res) => {
 presetRouter.get("/simplalge", (req, res) => {
 	return Utils.generateQriller(
 		res,
-		"[2.7] Simplifcation of Algebraic Equations", "Simplify each equation to their simplest form.",
+		"[3.1] Simplifcation of Algebraic Equations", "Manipulate algebraic terms and simplify each expression to their simplest form.",
 		qriller.SimplifyAlgebraic,
-		100)
+		100,
+		false)
 })
 presetRouter.get("/simplalgeparent", (req, res) => {
 	return Utils.generateQriller(
 		res,
-		"[2.7] Simplifcation of Algebraic Equations", "Simplify each equation to their simplest form.",
+		"[2.7] Simplifcation of Algebraic Equations Part II", "Manipulate algebraic terms and simplify each expression to their simplest form.",
 		qriller.SimplifyAlgebraic,
-		100)
+		100,
+		true)
 })
 
 router.use("/presets", presetRouter)
