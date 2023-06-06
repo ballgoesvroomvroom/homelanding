@@ -5,7 +5,7 @@ $(document).ready(e => {
 		"page-share-link": $("#page-share-link")
 	}
 
-	function createNewQuestionEntry(content) {
+	function createNewQuestionEntry(content, $pageContainer) {
 		const $container = $("<div>", {
 			"class": "question-element"
 		})
@@ -18,8 +18,15 @@ $(document).ready(e => {
 		$qnHeaderText.appendTo($headerContainer)
 
 		$headerContainer.appendTo($container)
-		$container.appendTo($selectors["questions-container"])
+		$container.appendTo($pageContainer)
 	}
+
+	var qnCount = 0;
+	var firstPageFilled = false; // will be true when qnCount is 10
+	var $container = $("<div>", {
+		"class": "question-page-container"
+	})
+	$container.appendTo($selectors["questions-container"])
 
 	QUESTIONS.forEach(qnData => {
 		// qnData: [qnStr, latexEqnArray]
@@ -34,7 +41,22 @@ $(document).ready(e => {
 			qnStr = qnStr.replace(`%%${i}%%`, katex.renderToString(qnData[1][i], {throwOnError: false}))
 		}
 
-		createNewQuestionEntry(qnStr);
+
+		createNewQuestionEntry(qnStr, $container);
+		qnCount++; // increment question count
+
+		if ((qnCount >= 8 && !firstPageFilled) || qnCount >= 10) {
+			firstPageFilled = true // set this so upper limit is now 10
+
+			// reset counter
+			qnCount = 0
+
+			// create new container
+			$container = $("<div>", {
+				"class": "question-page-container"
+			})
+			$container.appendTo($selectors["questions-container"])
+		}
 	})
 
 	// click event for link button
