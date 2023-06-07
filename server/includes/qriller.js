@@ -106,7 +106,115 @@ class Volume extends Units {
 
 class AlgebraicEqn {
 	constructor(variables) {
+		// variables: array of characters to be used as variables
+		this.variables = variables // this.variables will only remain read-only in this scope
 
+		// generate simplified version (coefficient sum)
+		this.coefficients = []
+		for (let i = 0; i < this.variables.length; i++) {
+			this.coefficients.push({
+				"sum": rando(2, 199) *(rando() >= .6 ? -1 : 1) // can be a negative coefficient
+			})
+		}
+	}
+
+	cleanRepr() {
+		// returns a string representation of every variables
+		var r = ""
+		for (let i = 0; i < this.variables.length; i++) {
+			// determine prefix
+			var prefix = "";
+			if (this.coefficients[i].sum < 0) {
+				prefix = "-"
+			} else if (i > 0) {
+				prefix = "+" // signs needed for second term onwards
+			}
+
+			// determine coefficient
+			var coeffRepr = ""
+			if (Math.abs(this.coefficients[i].sum) > 1) {
+				// coefficient is more than 1 (either neg or pos)
+				coeffRepr = Math.abs(this.coefficients[i].sum)
+			}
+
+			// build string
+			r += `${prefix}${coeffRepr}${this.variables[i]}`
+		}
+
+		return r
+	}
+
+	jumble(minTerms, maxTerms) {
+		// jumble the terms, returns a string representing the terms
+		// minTerm: integer, minimum number of terms per variable (has to be >= minTerms)
+		// maxTerm: integer, maximum number of terms per variable (has to be >= 1)
+		if (minTerms < 1) {
+			minTerms = 1 // clamp value
+		}
+
+		var r = ""
+
+		// generate terms
+		var jumbledTerms = []
+		var totalTermsCount = 0
+		for (let i = 0; i < this.variables.length; i++) {
+			// generate a number from 2-3 deteremines number
+			var termCount = minTerms +rando(maxTerms -minTerms)
+
+			// create coefficients count
+			var coeffSumRemaining = this.coefficients[i].sum; // will be subtracted to generate coefficients
+
+			// generate the coefficents for every term
+			var terms = []
+			for (let j = 0; j < termCount; j++) {
+				var coeff; // calculate coefficient for this specific term
+				if (j >= termCount -1) {
+					coeff = coeffSumRemaining
+				} else {
+					coeff = rando(1, Math.abs(coeffSumRemaining)) *(rando() >= .6 ? -1 : 1)
+				}
+
+				coeffSumRemaining -= coeff // subtract from remaining
+				terms.push(coeff)
+			}
+
+			// push to jumbledTerms
+			jumbledTerms.push(terms)
+
+			// ensure totalTermsCount is tallied
+			totalTermsCount += terms.length
+		}
+
+		// stream terms together
+		for (let i = 0; i < totalTermsCount; i++) {
+			var variableChoice = rando(0, 1)
+			if (jumbledTerms[variableChoice].length === 0) {
+				variableChoice = 1 -variableChoice
+			}
+
+			// pop out last elements
+			var coeff = jumbledTerms[variableChoice].pop();
+
+			// determine prefix
+			var prefix = "";
+			if (coeff < 0) {
+				prefix = "-"
+			} else if (i > 0) {
+				prefix = "+"
+			}
+
+			// determine coeff
+			var coeffRepr = ""
+			if (Math.abs(coeff) > 1) {
+				// coeff is more than 1
+				coeffRepr = Math.abs(coeff)
+			}
+
+			// build string
+			r += `${prefix}${coeffRepr}${this.variables[variableChoice]}`
+		}
+
+		return r
 	}
 }
 
@@ -762,6 +870,31 @@ class RelativePercManipulation extends BaseQuestion {
 	}
 }
 
+class ModernAlgebra extends BaseQuestion {
+	constructor() {
+		super();
+
+		// determine variable styles
+		var varStyleChoice = rando(1, 2)
+		var variables
+		switch (varStyleChoice) {
+			case 1:
+				// x and y
+				variables = ["x", "y"]
+			case 2:
+				variables = ["a", "b"]
+		}
+
+		var eqn = new AlgebraicEqn(variables)
+
+		// set fields
+		this.qnReprString = "Simplify %%0%%"
+		this.qnLatexEqn.push(eqn.jumble(2, 4))
+		this.answerObj = new BaseAnswer(false)
+		this.answerObj.set("%%0%%", [eqn.cleanRepr()])
+	}
+}
+
 class SimplifyAlgebraic extends BaseQuestion {
 	constructor(parenthesis) {
 		// double variable equation generation
@@ -887,4 +1020,15 @@ class TwoSimQn extends BaseQuestion {
 	}
 }
 
-module.exports = {Qriller, FracToPerc, PercToFrac, PercChange, ExpressUnitPerc, ReversePerc, RelativePerc, RelativePercManipulation, SimplifyAlgebraic}
+module.exports = {
+	Qriller,
+	FracToPerc,
+	PercToFrac,
+	PercChange,
+	ExpressUnitPerc,
+	ReversePerc,
+	RelativePerc,
+	RelativePercManipulation,
+	SimplifyAlgebraic,
+	ModernAlgebra
+}

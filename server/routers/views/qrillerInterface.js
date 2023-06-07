@@ -242,9 +242,8 @@ presetRouter.get("/simplalgeparent", (req, res) => {
 	return Utils.generateQriller(
 		res,
 		"[2.7] Simplifcation of Algebraic Equations Part II", "Manipulate algebraic terms and simplify each expression to their simplest form.",
-		qriller.SimplifyAlgebraic,
-		100,
-		true)
+		qriller.ModernAlgebra,
+		100)
 })
 
 router.use("/presets", presetRouter)
