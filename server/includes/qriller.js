@@ -105,16 +105,51 @@ class Volume extends Units {
 }
 
 class AlgebraicEqn {
+	// container class for algebraicexpr
 	constructor(variables) {
-		// variables: array of characters to be used as variables
-		this.variables = variables // this.variables will only remain read-only in this scope
+		this.variables = variables
 
-		// generate simplified version (coefficient sum)
+		// build coefficient object
 		this.coefficients = []
 		for (let i = 0; i < this.variables.length; i++) {
 			this.coefficients.push({
-				"sum": rando(2, 199) *(rando() >= .6 ? -1 : 1) // can be a negative coefficient
+				"sum": 0,
+				degree: [],
 			})
+		}
+
+		// build string
+		this.r = ""
+
+		// generate 2 parenthesis section
+		for (let i = 0; i < 2; i++) {
+			// generate a factor for parenthesis group
+			var factor = rando(1, 7) *(rando() >= .6 ? -1 : 1) // can be negative coefficient for parenthesis group
+
+			// expression content
+			var newExpr = new AlgebraicExpr(this.variables, 1)
+
+			// determine prefix
+			var prefix = "";
+			if (factor < 0) {
+				prefix = "-"
+			} else if (this.r.length > 0) {
+				prefix = "+"
+			}
+
+			// determine coefficient
+			var factorCoeff = ""
+			if (Math.abs(factor) > 1) {
+				factorCoeff = Math.abs(factor)
+			}
+
+			// build string
+			this.r += `${prefix}${factorCoeff}(${newExpr.jumble(1, 4)})`
+
+			// modify this.coefficients object
+			for (let j = 0; j < this.variables.length; j++) {
+				this.coefficients[j].sum += newExpr.coefficients[j].sum *factor
+			}
 		}
 	}
 
@@ -131,14 +166,96 @@ class AlgebraicEqn {
 			}
 
 			// determine coefficient
-			var coeffRepr = ""
+			var coeffRepr = "";
 			if (Math.abs(this.coefficients[i].sum) > 1) {
 				// coefficient is more than 1 (either neg or pos)
 				coeffRepr = Math.abs(this.coefficients[i].sum)
 			}
 
+			// determine exponent
+			var expo = "";
+			if ()
+
 			// build string
 			r += `${prefix}${coeffRepr}${this.variables[i]}`
+		}
+
+		return r
+	}
+}
+
+class AlgebraicExpr {
+	constructor(variables, polynomialDegree) {
+		// variables: array of characters to be used as variables
+		// polynomialDegree: integer, denoting degree of the polynomial generated (1 for a simple linear expression)
+		this.variables = variables // this.variables will only remain read-only in this scope
+		this.polynomialDegree = polynomialDegree
+
+		// generate simplified version (coefficient sum)
+		this.coefficients = []
+		for (let i = 0; i < this.variables.length; i++) {
+			// generate a coefficient sum
+			var sum = rando(2, 199) *(rando() >= .6 ? -1 : 1) // can be a negative coefficient
+
+			// assign a coefficient to every degree variable
+			var remainingSum = sum // to be subtracted
+			var degree = []
+
+			for (let j = 0; j < this.polynomialDegree; j++) {
+				if (j >= this.polynomialDegree -1) {
+					// last degree
+					degree.push(remainingSum)
+				} else {
+					var degreeCoeffSum = rando(1, remainingSum) *(rando() >= .6 ? -1 : 1)
+
+					degree.push(degreeCoeffSum)
+					remainingSum -= degreeCoeffSum
+				}
+			}
+
+
+			this.coefficients.push({
+				"sum": sum,
+				degree: degree
+			})
+		}
+	}
+
+	factorise() {
+		this.coefficients.push({
+
+		})
+	}
+
+	cleanRepr() {
+		// returns a string representation of every variables
+		var r = ""
+		for (let i = 0; i < this.variables.length; i++) {
+			for (let j = 0; j < this.coefficients[i].degree.length; j++) {
+				// determine prefix
+				var prefix = "";
+				if (this.coefficients[i].degree[j] < 0) {
+					prefix = "-"
+				} else if (i > 0) {
+					prefix = "+" // signs needed for second term onwards
+				}
+
+				// determine coefficient
+				var coeffRepr = "";
+				if (Math.abs(this.coefficients[i].degree[j]) > 1) {
+					// coefficient is more than 1 (either neg or pos)
+					coeffRepr = Math.abs(this.coefficients[i].degree[j])
+				}
+
+				// determine exponent value
+				var expo = "";
+				if (j >= 1) {
+					expo = `^${j +1}`
+				}
+
+				// build string
+				r += `${prefix}${coeffRepr}${this.variables[i]}${expo}`
+			}
 		}
 
 		return r
@@ -155,45 +272,51 @@ class AlgebraicEqn {
 		var r = ""
 
 		// generate terms
-		var jumbledTerms = []
+		var generatedTerms = [] // 1d array containing terms that have been generated
 		var totalTermsCount = 0
 		for (let i = 0; i < this.variables.length; i++) {
-			// generate a number from 2-3 deteremines number
-			var termCount = minTerms +rando(maxTerms -minTerms)
+			// scramble the coefficient sum for every degree term
+			for (let j = 0; j < this.coefficients[i].degree.length; j++) {
+				// generate a number from 2-3 deteremined by minTerms and maxTerms
+				var termCount = minTerms +rando(maxTerms -minTerms)
 
-			// create coefficients count
-			var coeffSumRemaining = this.coefficients[i].sum; // will be subtracted to generate coefficients
+				// create coefficients count
+				var coeffSumRemaining = this.coefficients[i].degree[j]; // will be subtracted to generate coefficients
 
-			// generate the coefficents for every term
-			var terms = []
-			for (let j = 0; j < termCount; j++) {
-				var coeff; // calculate coefficient for this specific term
-				if (j >= termCount -1) {
-					coeff = coeffSumRemaining
-				} else {
-					coeff = rando(1, Math.abs(coeffSumRemaining)) *(rando() >= .6 ? -1 : 1)
+				// generate the coefficents for every term
+				var degreeTerms = []
+				for (let k = 0; k < termCount; k++) {
+					var coeff; // calculate coefficient for this specific term
+					if (k >= termCount -1) {
+						coeff = coeffSumRemaining
+					} else {
+						coeff = rando(1, Math.abs(coeffSumRemaining)) *(rando() >= .6 ? -1 : 1)
+					}
+
+					// subtract from remaining
+					coeffSumRemaining -= coeff
+
+					// push it to result array
+					generatedTerms.push([coeff, i, j]) // push [coefficient value, variableChoiceIdx, degreeIdx (0 for root term, 1 for square terms)]
 				}
-
-				coeffSumRemaining -= coeff // subtract from remaining
-				terms.push(coeff)
 			}
+		}
 
-			// push to jumbledTerms
-			jumbledTerms.push(terms)
+		// shuffle generatedTerms (Fisher-Yates shuffle)
+		for (let i = generatedTerms.length -1; i > 0; i--) {
+			var j = Math.floor(Math.random() *(i +1))
 
-			// ensure totalTermsCount is tallied
-			totalTermsCount += terms.length
+			// destructuring assignment
+			var a = generatedTerms[j]
+			generatedTerms[j] = generatedTerms[i]
+			generatedTerms[i] = a
+			// [generatedTerms[i], generatedTerms[j]] = [generatedTerms[j], generatedTerms[i]]
 		}
 
 		// stream terms together
-		for (let i = 0; i < totalTermsCount; i++) {
-			var variableChoice = rando(0, 1)
-			if (jumbledTerms[variableChoice].length === 0) {
-				variableChoice = 1 -variableChoice
-			}
-
-			// pop out last elements
-			var coeff = jumbledTerms[variableChoice].pop();
+		var totalTermCount = generatedTerms.length
+		for (let i = 0; i < totalTermCount; i++) {
+			var [coeff, variableChoice, degree] = generatedTerms.pop()
 
 			// determine prefix
 			var prefix = "";
@@ -210,8 +333,14 @@ class AlgebraicEqn {
 				coeffRepr = Math.abs(coeff)
 			}
 
+			// determine exponent
+			var expo = "";
+			if (degree >= 1) {
+				expo = `^${degree +1}`
+			}
+
 			// build string
-			r += `${prefix}${coeffRepr}${this.variables[variableChoice]}`
+			r += `${prefix}${coeffRepr}${this.variables[variableChoice]}${expo}`
 		}
 
 		return r
@@ -889,7 +1018,7 @@ class ModernAlgebra extends BaseQuestion {
 
 		// set fields
 		this.qnReprString = "Simplify %%0%%"
-		this.qnLatexEqn.push(eqn.jumble(2, 4))
+		this.qnLatexEqn.push(eqn.r)
 		this.answerObj = new BaseAnswer(false)
 		this.answerObj.set("%%0%%", [eqn.cleanRepr()])
 	}
