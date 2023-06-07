@@ -106,7 +106,9 @@ class Volume extends Units {
 
 class AlgebraicEqn {
 	// container class for algebraicexpr
-	constructor(variables) {
+	constructor(variables, polynomialDegree) {
+		// variables: array of characters to be used as variables
+		// polynomialDegree: integer, denoting degree of the polynomial generated (1 for a simple linear expression, has to be >= 1)
 		this.variables = variables
 
 		// build coefficient object
@@ -127,7 +129,7 @@ class AlgebraicEqn {
 			var factor = rando(1, 7) *(rando() >= .6 ? -1 : 1) // can be negative coefficient for parenthesis group
 
 			// expression content
-			var newExpr = new AlgebraicExpr(this.variables, 1)
+			var newExpr = new AlgebraicExpr(this.variables, polynomialDegree)
 
 			// determine prefix
 			var prefix = "";
@@ -148,7 +150,10 @@ class AlgebraicEqn {
 
 			// modify this.coefficients object
 			for (let j = 0; j < this.variables.length; j++) {
-				this.coefficients[j].sum += newExpr.coefficients[j].sum *factor
+				this.coefficients[j].sum = newExpr.coefficients[j].sum
+				for (let k = 0; k < newExpr.coefficients[j].degree.length; k++) {
+					this.coefficients[j].degree[k] = newExpr.coefficients[j].degree[k] *factor
+				}
 			}
 		}
 	}
@@ -157,27 +162,32 @@ class AlgebraicEqn {
 		// returns a string representation of every variables
 		var r = ""
 		for (let i = 0; i < this.variables.length; i++) {
-			// determine prefix
-			var prefix = "";
-			if (this.coefficients[i].sum < 0) {
-				prefix = "-"
-			} else if (i > 0) {
-				prefix = "+" // signs needed for second term onwards
+			for (let j = 0; j < this.coefficients[i].degree.length; j++) {
+				// determine prefix
+				var prefix = "";
+				if (this.coefficients[i].degree[j] < 0) {
+					prefix = "-"
+				} else if (r.length > 0) {
+					prefix = "+" // signs needed for second term onwards
+				}
+
+				// determine coefficient
+				var coeffRepr = "";
+				if (Math.abs(this.coefficients[i].degree[j]) > 1) {
+					// coefficient is more than 1 (either neg or pos)
+					coeffRepr = Math.abs(this.coefficients[i].degree[j])
+				}
+
+				// determine exponent
+				var expo = "";
+				if (j >= 1) {
+					// j = 1, square term, j = 2, cubic term
+					expo = `^${j +1}`
+				}
+
+				// build string
+				r += `${prefix}${coeffRepr}${this.variables[i]}${expo}`
 			}
-
-			// determine coefficient
-			var coeffRepr = "";
-			if (Math.abs(this.coefficients[i].sum) > 1) {
-				// coefficient is more than 1 (either neg or pos)
-				coeffRepr = Math.abs(this.coefficients[i].sum)
-			}
-
-			// determine exponent
-			var expo = "";
-			if ()
-
-			// build string
-			r += `${prefix}${coeffRepr}${this.variables[i]}`
 		}
 
 		return r
@@ -236,7 +246,7 @@ class AlgebraicExpr {
 				var prefix = "";
 				if (this.coefficients[i].degree[j] < 0) {
 					prefix = "-"
-				} else if (i > 0) {
+				} else if (r.length > 0) {
 					prefix = "+" // signs needed for second term onwards
 				}
 
@@ -1014,7 +1024,7 @@ class ModernAlgebra extends BaseQuestion {
 				variables = ["a", "b"]
 		}
 
-		var eqn = new AlgebraicEqn(variables)
+		var eqn = new AlgebraicEqn(variables, 3)
 
 		// set fields
 		this.qnReprString = "Simplify %%0%%"
