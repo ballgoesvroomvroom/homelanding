@@ -116,7 +116,7 @@ class AlgebraicEqn {
 		for (let i = 0; i < this.variables.length; i++) {
 			this.coefficients.push({
 				"sum": 0,
-				degree: [],
+				degree: [...Array(polynomialDegree)],
 			})
 		}
 
@@ -271,10 +271,11 @@ class AlgebraicExpr {
 		return r
 	}
 
-	jumble(minTerms, maxTerms) {
+	jumble(minTerms, maxTerms, multiplication) {
 		// jumble the terms, returns a string representing the terms
 		// minTerm: integer, minimum number of terms per variable (has to be >= minTerms)
 		// maxTerm: integer, maximum number of terms per variable (has to be >= 1)
+		// multiplication: boolean, if true will break up higher degree terms into multiple smaller terms via multiplication
 		if (minTerms < 1) {
 			minTerms = 1 // clamp value
 		}
