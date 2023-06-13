@@ -18,6 +18,11 @@ h2 {
 	padding: 20px;
 }
 
+#testcases-container {
+	font-size: 1.3rem;
+	font-family: monospace;
+}
+
 #user-input-test {
 	padding: 10px;
 
