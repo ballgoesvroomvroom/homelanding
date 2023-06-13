@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=.5, maximum-scale=10.0, minimum-scale=.25, user-scalable=yes"/>
+		<meta name="description" content="page description here"/>
+
+		<link rel="stylesheet" href="/css/includes/reset.css">
+		<link rel="stylesheet" href="/css/views/latex_engine_test.css">
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="" rel="stylesheet">
+
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+		<script src="/js/views/latex_engine.js"></script>
+
+		<title>Qriller | Engine Tests</title>
+	</head>
+	<body>
+		<div id="container">
+			<div id="caveats">
+				<h2>Caveats</h2>
+				<ul>
+					<li>No adjacent parenthesis, i.e. (a + b)(c + d)</li>
+					<li>Complex exponents will not be simplified, e.g. 10^(x + 2)</li>
+					<li>Despite being same base, machine is unable to mash them together, e.g. 10^x * 10^x = 10^2x (engine cannot do this)</li>
+				</ul>
+			</div>
+			<input id="user-input-test" type="text">
+			<div id="display">
+				<hr>
+				<h2>Display</h2>
+				<h3>Perceived input:</h3>
+				<p id="display-pp">&nbsp;</p>
+
+				<h3>Computed output:</h3>
+				<p id="display-cp">&nbsp;</p>
+			</div>
+		</div>
+	</body>
+</html>

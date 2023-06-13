@@ -21,6 +21,8 @@ class Qriller {
 	static answerSheet = path.join(html, "views/qriller/answer_page.html")
 
 	static worksheetDirectory = path.join(html, "views/qriller/worksheet_directory.html")
+
+	static engineTestInterface = path.join(html, "views/qriller/engine_test.html")	
 }
 
 class Views {

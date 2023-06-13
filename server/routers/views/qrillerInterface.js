@@ -94,6 +94,11 @@ router.get("/status", (req, res) => {
 	res.sendFile(views.qriller.worksheetDirectory)
 })
 
+router.get("/engine/test", (req, res) => {
+	res.type("html")
+	res.sendFile(views.qriller.engineTestInterface)
+})
+
 // load a specific document
 router.get("/:documentId", (req, res) => {
 	// hydrate html document with qriller properties (fields)

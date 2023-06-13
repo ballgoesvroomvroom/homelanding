@@ -1,0 +1,867 @@
+class ArraySort {
+	static quickSort = function(arr, s, e) {
+		// in place sorting algo
+		if (s < e) {
+			// valid call
+
+			// choose pivot
+			var pivot = arr[e]
+
+			// partition
+			let i = s -1; // pointer to point at element where it marks the parition (greater elements)
+			for (let j = s; j < e; j++) {
+				if (arr[j] < pivot) {
+					i++ // increment pointer
+
+					// swap elements (using stray variables is much faster than destructuring assignment)
+					var b = arr[j]
+					arr[j] = arr[i]
+					arr[i] = b
+				}
+			}
+
+			// swap pivot for pointer (the next element, to properly section the data) stored at i
+			var b = arr[e]
+			arr[e] = arr[i +1]
+			arr[i +1] = b
+
+			// quick sort the two partitions
+			ArraySort.quickSort(arr, s, i)
+			ArraySort.quickSort(arr, i +2, e) // plus 2 to exclude pivot element
+		}
+	}
+}
+
+class ParserError extends Error {
+	name = "ParserError"
+}
+
+class AlgebraicParser {
+	static operations = {
+		"+": 1,
+		"-": 1,
+		"*": 3,
+		"/": 4
+	}
+	static variableRegex = /[A-Za-z\u0391-\u03C9]+/ // a-z, A-Z, all the greek symbols
+	static coeffRegex = /[\d.-]+/ // include the minus symbol to capture negative coefficients
+
+	constructor(eqnStr) {
+		this.raw = eqnStr.replaceAll(" ", "") // remove ALL whitespace
+		this.tokens = [] // store tokens in order
+		this.units = [] // parsed tokens goes here
+	}
+
+	tokenise() {
+		// tokenise this.raw into this.tokens
+
+		// checks
+		var oCount = 0;
+		var cCount = 0;
+		for (let charIdx = 0; charIdx < this.raw.length; charIdx++) {
+			if (this.raw[charIdx] === "(") {
+				oCount++;
+			} else if (this.raw[charIdx] === ")") {
+				cCount++;
+			}
+		}
+
+		if (oCount != cCount) {
+			// unmatching number of parenthesis
+			throw new ParserError(`Miscount of opening & closing parenthesis`)
+		}
+
+
+		var tokenStream = [] // stream tokens here to be parsed into units
+		var partialToken = "" // build tokens character by character
+		var partialTokenOnlyConsistsOfToken = false
+		var variableStore = {} // sniff out for variables
+		var skipCounter = 0 // amt of chars to skip
+		for (let charIdx = 0; charIdx < this.raw.length; charIdx++) {
+			if (skipCounter >= 1) {
+				skipCounter--
+				continue
+			}
+
+			var char = this.raw[charIdx]
+
+			// sniff out for variable
+			if (AlgebraicParser.variableRegex.test(char)) {
+				if (variableStore[char] == null) {
+					variableStore[char] = new RegExp(char)
+				}
+			}
+
+			// resume build token
+			if ((!partialTokenOnlyConsistsOfToken && AlgebraicParser.operations[char] != null && partialToken.length > 0) || char === ")") {
+				// push token into stream (unless token consists of operations)
+				tokenStream.push(partialToken) // trim out all whitespaces
+
+				// include operation in new partialToken
+				partialToken = char
+
+				// set partialTokenOnlyConsistsOfToken value to true
+				partialTokenOnlyConsistsOfToken = char !== ")"
+			} else if (char === "(") {
+				// parenthesis demarcations (start)
+
+				// determine if partialToken contains any operation, if does, simply use that operation on this parenthesis
+				if (partialTokenOnlyConsistsOfToken) {
+					partialToken += "("
+				} else if (partialToken.length > 0) {
+					// has coefficient infront, automatically becomes a * parenthesis
+					// ensure is not simply a captured operation (one char), although can be simply a constant factor, e.g. n(a + b)
+
+					// push token
+					tokenStream.push(partialToken)
+
+					// multiplication operator
+					partialToken = "*("
+				} else if (tokenStream.length >= 1) {
+					// use previous token to determine what operation to apply on this parenthesis
+					var prevToken = tokenStream[tokenStream.length -1]
+					if ((prevToken.length >= 1) && (prevToken[prevToken.length -1] === "^" || prevToken[prevToken.length -1] === "(")) {
+						// exponent  parenthesis or previous token was an adjacent parenthesis opening
+						partialToken = "("
+					}
+				} else {
+					// first character met is an open parenthesis
+					partialToken = "("
+				}
+
+				// push token into stream
+				tokenStream.push(partialToken)
+
+				// reset token
+				partialToken = ""
+			} else if (char === "^") {
+				// exponent operation
+				// look forward to see if its a algberaic value or a cosntant exponent
+				var toPushCurrentToken = false;
+				var addParenthesis = false;
+				var parenthesisContent = "";
+				if (charIdx < this.raw.length -1) {
+					for (let j = charIdx +1; j < this.raw.length; j++) {
+						if (this.raw[j] === "(") {
+							// already grouped
+							// push current token
+							toPushCurrentToken = true
+							break
+						} else if (AlgebraicParser.operations[this.raw[j]] != null) {
+							break; // stop loop (operation encountered)
+						} else if (AlgebraicParser.variableRegex.test(this.raw[j])) {
+							// variable, need to add parenthesis
+							toPushCurrentToken = true
+							addParenthesis = true
+
+							// set content
+							parenthesisContent = this.raw.slice(charIdx +1, j +1)
+
+							// set skip counter
+							skipCounter = j -charIdx
+
+							// add variable to store if haven't yet
+							if (variableStore[this.raw[j]] == null) {
+								variableStore[this.raw[j]] = new RegExp(this.raw[j])
+							}
+
+							break
+						}
+					}
+				}
+
+				// push current token
+				if (toPushCurrentToken) {
+					tokenStream.push(partialToken +"^")
+
+					// reset token
+					partialToken = ""
+
+					if (addParenthesis && parenthesisContent.length > 0) {
+						tokenStream.push("(")
+						tokenStream.push(parenthesisContent)
+						tokenStream.push(")")
+					}
+				} else {
+					// continue capturing
+					partialToken += "^"
+				}
+			} else {
+				// continue building token
+				partialToken += char
+
+				if (partialTokenOnlyConsistsOfToken) {
+					// determine if new char is an operation
+					if (AlgebraicParser.operations[char] == null) {
+						partialTokenOnlyConsistsOfToken = false
+					}
+				}
+			}
+		}
+
+		// trailing token
+		if (partialToken.length > 0) {
+			tokenStream.push(partialToken)
+		}
+		console.log(this.raw, tokenStream, variableStore)
+
+		// build units based on tokens in tokenStream
+		var units = []
+		var localScopeIdx = 0; // will increment as long as is within same scope
+		var expectingParenthesis = false; // will be toggled true when exponent has no value
+		for (let tokenIdx = 0; tokenIdx < tokenStream.length; tokenIdx++) {
+			var token = tokenStream[tokenIdx]
+
+			if (token.length === 0) {
+				throw new ParserError(`Empty token with idx: ${tokenIdx}\n${JSON.stringify(tokenStream)}`)
+			}
+
+			// determine operation
+			var operation;
+			if (token[0] === ")") {
+				// end of parenthesis
+
+				// check if there is any operation
+				if (token.length > 1) {
+					operation = AlgebraicParser.operations[token[1]]
+					if (operation == null) {
+						throw new ParserError(`Token [${token}] does not contain any operation preceeding the close parenthesis`)
+					}
+				}
+			} else if (expectingParenthesis) {
+				if (token[token.length -1] === "(") {
+					expectingParenthesis = false; // reset value
+					operation = 5 // exponents
+				} else {
+					// expected open parenthesis from previous token but no parenthesis
+				}
+			} else {
+				operation = AlgebraicParser.operations[token[0]] // first char
+				if (operation == null && localScopeIdx === 0) {
+					// first time, no operation declared, take it as an addition
+					operation = AlgebraicParser.operations["+"]
+				} else if ((operation === 3 || operation === 4) && localScopeIdx === 0) {
+					// multiplication & division operations at the first term is illegal
+					throw new ParserError(`Token [${token}] cannot be parsed, illegal operation on the first term`)
+				} else if (operation == null && localScopeIdx >= 1) {
+					// no operation captured
+					throw new ParserError(`Token [${token}] cannot be parsed, missing an operation`)
+				}
+			}
+
+			// identify base and exponent
+			var base, exponent;
+			var caretIdx = token.indexOf("^");
+			if (caretIdx !== -1) {
+				// has an exponent
+				var exponentSection = token.slice(caretIdx +1)
+				if (exponentSection.length === 0) {
+					expectingParenthesis = true
+					exponent = null; // set to null pointer in unit
+				} else {
+					// should be a constant, as variable exponents have been enclosed with parenthesis demarcations during lexing
+					exponent = parseFloat(exponentSection)
+				}
+
+				base = token.slice(0, caretIdx)
+			} else {
+				// no exponents
+				exponent = 1 // SET TO 1 SINCE evaluating coefficient with an exponent of 0 leads to a multiplication factor of 1 || OLD COMMENT: constant (if variables are present, exponent will be increased to 1 later)
+
+				base = token // entire token is the base
+			}
+
+			// coefficient
+			var coeffMatch = AlgebraicParser.coeffRegex.exec(base)
+			var coeff;
+			if (coeffMatch == null) {
+				coeff = 1 // by default is a 1
+			} else {
+				var match = coeffMatch[0]
+				if (match === "-") {
+					// single minus sign
+					coeff = -1 // minus 1
+				} else {
+					coeff = parseFloat(coeffMatch[0])
+				}
+			}
+
+			// test for algebraic variables within base
+			var variable = -1; // -1 for constants
+			for (let [variableChar, variableRegExp] of Object.entries(variableStore)) {
+				var match = variableRegExp.exec(token)
+				if (match) {
+					// has a variable
+					variable = match[0]
+
+					// EXPONENT HAS ALREADY BEEN SET TO 1 BY DEFAULT, NO LONGER 0
+					// BELOW IS OLD COMMENT
+					// // if exponent is 0, change it to 1 (0 is a falsy value)
+					// if (exponent != null && exponent == 0) {
+					// 	exponent = 1 // linear term
+					// }
+
+					break
+				}
+			}
+
+			// identify type
+			var type = 1
+			if (token[token.length -1] === "(") {
+				type = 2 // open parenthesis demarcation
+			} else if (token[0] === ")") {
+				type = 3 // close parenthesis demarcation
+			}
+
+			// identify scope
+			if (token[token.length -1] === "(") {
+				// start of new scope
+
+				localScopeIdx = 0 // reset scope idx
+			} else {
+				// continue in this scope
+				localScopeIdx++ // increment locally based idx
+			}
+
+			// push built unit into units stream
+			units.push([
+				operation, coeff, variable, exponent, type
+				])
+		}
+
+		console.log(this.raw)
+		console.log(tokenStream)
+		console.log(["operation_mode", "coefficient", "variable_choice", "exponent", "frame type"])
+		console.log(units, units.length)
+
+		this.units = units
+
+		return this // for chaining purposes
+	}
+
+	swap(a, b) {
+		// swaps unit at the specified index (a and b)
+	}
+
+	clean() {
+		// to clean up built units
+		// caries out some trimming works, preserves parenthesis group
+
+		console.log("BEF C", this.units)
+		for (let [startIdx, endIdx] of this.parenthesisGroup()) {
+			// clean up multiplication after parenthesis, forward it as a coefficient
+			if (this.units[startIdx][0] === 5) {
+				// start parenthesis denotes an exponent group (i.e. parenthesis group represents a complex exponent)
+				// move on to the next group
+				continue
+			}
+
+			var closeParenthesis = this.units[endIdx]
+			if (endIdx < this.units.length -1) {
+				// not last unit, has units preceeding close parenthesis
+				var alreadyHasFactorInfront = this.units[startIdx][0] === 3 // start parenthesis has a multiplication
+				for (let unitIdx = endIdx +1; unitIdx < this.units.length; unitIdx++) {
+					var superseedingUnit = this.units[endIdx +1]
+
+					if (superseedingUnit[0] === 3 ) {
+						// multiplication, move it forward to start of parenthesis
+						this.units.splice(endIdx +1, 1) // splice from last index
+						this.units.splice(startIdx, 0, superseedingUnit)
+
+						// change type of previously preceeding unit (if none, will chage start parenthesis demarcation)
+						if (this.units[startIdx +1][0] !== 3) {
+							this.units[startIdx +1][0] = 3
+						}
+
+						if (!alreadyHasFactorInfront) {
+							// drop the multiplication operation
+							this.units[startIdx][0] = 1 // shifted to startIdx pos
+						}
+					} else {
+						break // no more multiplication after close parenthesis
+					}
+				}
+			}
+		}
+		console.log("AFT C", this.units)
+	}
+
+	_copyUnits() {
+		// returns a copy of the current this.units
+		var copy = []
+		for (let unitIdx = 0; unitIdx < this.units.length; unitIdx++) {
+			copy.push([...this.units[unitIdx]])
+		}
+		return copy
+	}
+
+	_addAdjacent(loIdx, roIdx, discardOperand) {
+		// performs arithmetic add on units (left operand & right operand as defined by loIdx & roIdx)
+		var leftoperand = this.units[loIdx];
+		var rightoperand = this.units[roIdx];
+
+		if (leftoperand[3] == null || rightoperand[3] == null) {
+			// cannot evaluate
+			return false
+		}
+
+		var sameTerm = leftoperand[2] === rightoperand[2];
+		if (sameTerm) {
+			// DONT include any different bases albeit algebraic term
+			// apply exponents first if any
+			if (leftoperand[2] === -1 && leftoperand[3] != null) {
+				// a constant with a constant exponent, evaluate raised coefficient
+				leftoperand[1] **= leftoperand[3];
+				leftoperand[3] = 1; // reset exponent to 1
+			}
+			if (rightoperand[2] === -1 && rightoperand[3] != null) {
+				// a constant with a constant exponent, evaluate raised coefficient
+				rightoperand[1] **= rightoperand[3];
+				rightoperand[3] = 1; // reset exponent to 1
+			}
+
+			if (typeof leftoperand[2] === "string" && leftoperand[3] != rightoperand[3]) {
+				// leftoperand[3] and rightoperand[3] cannot be null (have checked at the top of the function)
+				// only need to check if leftoperand is an algebraic term since it has the same base as rightoperand
+				// different powers, cannot evaluate
+				return false
+			}
+
+			leftoperand[1] += rightoperand[1]; // exponents already dealed with
+		} else {
+			return false;
+		}
+
+		// splice out right operand
+		if (discardOperand) {
+			this.units.splice(roIdx, 1)
+		}
+		return true
+	}
+
+	_multAdajcent(loIdx, roIdx, discardOperand) {
+		// multiply operation between units (leftoperand index & right operand index)
+		// discardOperand: boolean, if true will splice away right operand, otherwise will not discard any operands
+		var leftoperand = this.units[loIdx];
+		var rightoperand = this.units[roIdx];
+		console.log('MULT', leftoperand, rightoperand);
+
+		if (leftoperand[2] === -1 && leftoperand[3] != null) {
+			// constants
+			// evaluate number with exponents, reset it to 1
+			leftoperand[1] **= leftoperand[3];
+			leftoperand[3] = 1;
+		} else if (leftoperand[3] == null) {
+			// exponents are in brackets
+			return false;
+		}
+		if (rightoperand[2] === -1 && rightoperand[3] != null) {
+			// constants
+			rightoperand[1] **= rightoperand[3];
+			rightoperand[3] = 1;
+		} else if (rightoperand[3] == null) {
+			// exponents are in brackets
+			return false;
+		}
+
+		// discard right term
+		// exponents have been factored into their coefficients value (index 1)
+		var sameTerm = leftoperand[2] === rightoperand[2];
+		if (sameTerm && leftoperand[2] != -1) {
+			// algebraic terms
+			leftoperand[1] *= rightoperand[1];
+			leftoperand[3] += rightoperand[3]; // sum the powers
+		} else if (sameTerm) {
+			// constants
+			leftoperand[1] *= rightoperand[1];
+		} else if (!sameTerm && (leftoperand[2] === -1 || rightoperand[2] === -1)) {
+			// one is a algebraic term and the other is the constant
+			console.log('B');
+			var varUnit = rightoperand; // assume variable unit is right operand
+			if (rightoperand[2] === -1) {
+				// left operand is the variable instead
+				varUnit = leftoperand;
+			}
+
+			this.units[loIdx] = [
+				leftoperand[0],
+				leftoperand[1] * rightoperand[1],
+				varUnit[2],
+				varUnit[3],
+				leftoperand[4],
+			];
+		} else {
+			// both are algebraic terms but different bases
+			return false;
+		}
+
+		// discard right operand
+		if (discardOperand) {
+			this.units.splice(roIdx, 1);
+		}
+		console.log('MULT AFTER', this.units);
+		return true;
+	}
+
+	_simplifyParenthesis(startContentIdx, endContentIdx) {
+		// does not remove any units but deservice them instead using this._deserviceUnit()
+		// startContentIdx: number, inclusive of parenthesis content
+		// endContentIdx: number, inclusive of parenthesis content, but not parenthesis demarcation
+		for (let i = startContentIdx +1; i <= endContentIdx; i++) {
+			var loIdx = this._findLeftOperand(i)
+			if (loIdx == null) {
+				// no left operand for this unit
+				continue // move on to the next right operand
+			}
+
+			if (this.units[i][0] === 3) {
+				// multiplication first
+				var success = this._multAdajcent(loIdx, i, false)
+				if (success) {
+					this._deserviceUnit(i)
+				}
+			}
+		}
+
+		// second iteration for addition and subtraction
+		for (let i = startContentIdx +1; i <= endContentIdx; i++) {
+			var loIdx = this._findLeftOperand(i)
+			if (loIdx == null) {
+				// no left operand for this unit
+				continue // move on to the next right operand
+			}
+
+			if (this.units[i][0] === 1) {
+				// addition and subtraction
+				var success = this._addAdjacent(loIdx, i, false)
+				if (success) {
+					this._deserviceUnit(i)
+				}
+			}
+		}
+	}
+
+	_findLeftOperand(unitIdx) {
+		// unitIdx: number, denotes index of right operand
+		// backtrack to find unit that is NOT deserviced (empty)
+		for (let i = unitIdx -1; i >= 0; i--) {
+			if (this.units[i][4] !== 4) {
+				return i
+			}
+		}
+	}
+
+	_deserviceUnit(unitIdx) {
+		// renders unit at unitIdx (index) empty
+		// empty (or deserviced) units are present as junk, but serve no purpose to the representation of work
+		this.units[unitIdx][4] = 4 // 4 for deserviced units
+	}
+
+	_cleanupDeserviceUnits() {
+		console.log("BEF S", this.units)
+		var initLen = this.units.length;
+		for (let unitIdx = initLen -1; unitIdx >= 0; unitIdx--) {
+			// start slicing from the back to minimise shifting operations
+			console.log(unitIdx)
+			if (this.units[unitIdx][4] === 4 || this.units[unitIdx][1] === 0) {
+				// coefficients 0 also considered deserviced units
+				this.units.splice(unitIdx, 1)
+			}
+		}
+		console.log("AFT S", this.units)
+	}
+
+	simplify() {
+		// sniff out all the multiplication operations, including within parenthesis
+		// important to carry out the operations from left to right, ignores for parenthesis for now
+		var initLen = this.units.length;
+		var removalOffset = 0; // units removed will contribute to this count
+		for (let i = 0; i < initLen; i++) {
+			var unitIdx = i - removalOffset;
+			var unit = this.units[unitIdx];
+
+			if (unitIdx > 0 && unit[4] === 1 && unit[0] === 3) {
+				// only operate on units who represent values and not parenthesis demarcations
+				// AND whose unit is a multiplication operation
+				// right operand
+				var success = this._multAdajcent(unitIdx - 1, unitIdx, true);
+				if (success) {
+					removalOffset++;
+				}
+			}
+		}
+
+		console.log("FLAG A", this.units, this.buildRepr());
+
+		// start expanding from the innermost parenthesis group
+		// left to right order does not matter, should proceed from right to left
+		var lftFindOpenPtr = null; // will be null when parenthesis groups are escaped (for nested findings)
+		var unitsToPurge = []; // array of unit indices to purge (contains units for parenthesis demarcation)
+		for (let unitIdx = 0; unitIdx < this.units.length; unitIdx++) {
+			var unit = this.units[unitIdx];
+			if (unit[4] === 3) {
+				// close parenthesis, back track to find the open parenthesis
+				var backTrackPtr = lftFindOpenPtr ?? unitIdx; // if no pointer reference stored, use unitIdx (current indication of where close parenthesis is)
+				for (let j = backTrackPtr - 1; j >= 0; j--) {
+					if (this.units[j][4] === 2 && this.units[j][0] <= 4) {
+						// matching open parenthesis, DONT execute on exponents parenthesis groups
+						lftFindOpenPtr = j;
+
+						// carry out operation here
+						var openParenthesis = this.units[j];
+
+						// simplify contents of parenthesis
+						this._simplifyParenthesis(j +1, unitIdx -1)
+
+						// expand parenthesis
+						var factor = openParenthesis[1]; // coefficient (e.g. -1 if raw input was '-(x + 1)')
+						var hasComplexFactor = false
+						if (openParenthesis[0] === 3) {
+							// multiply with previous unit (should have been simplified to one multiplication term in front by .clean())
+							hasComplexFactor = true
+							unitsToPurge.push(j -1) // remove factor
+						}
+
+						// expand factors into contents of parenthesis group
+						for (let k = j +1; k < unitIdx; k++) {
+							// +1 to exclude open parenthesis and < unitIdx to exclude close parenthesis
+							this.units[k][1] *= factor
+
+							// multiply complex factor
+							if (hasComplexFactor) {
+								this._multAdajcent(k, j -1, false) // reverse order since we want to modify right operand (contents of whats inside the parenthesis)
+							}
+						}
+
+						// remove brackets
+						unitsToPurge.push(j)
+						unitsToPurge.push(unitIdx)
+
+						console.log("AFT D", this.units, this.buildRepr())
+						break
+					}
+				}
+			} else if (unit[4] === 2) {
+				// met a open parenthesis, do nothing but reset leftPointer reference in order to reach this open parenthesis later on
+				lftFindOpenPtr = null; // reset pointer (discard reference to previously stored open parenthesis)
+			}
+		}
+
+		// process units to be purged (parenthesis demarcations)
+		// sort them first
+		console.log("BEF P", this.buildRepr())
+		ArraySort.quickSort(unitsToPurge, 0, unitsToPurge.length -1) // sort units first, so greatest indices are removed without any shifting for indices that come before
+		for (let i = unitsToPurge.length -1; i >= 0; i--) {
+			this.units.splice(unitsToPurge[i], 1) // include removalOffset
+		}
+
+		// there should be no brackets now
+		// and no more multiplication units
+		console.log("AFT P", this.buildRepr())
+
+		// start doing addition and subtraction
+		var initLen = this.units.length
+		var removalOffset = 0; // counter for units removed
+		var isFirstUnitOfScope = true;
+		for (let unitIdx = 0; unitIdx < initLen; unitIdx++) {
+			var unit = this.units[unitIdx -removalOffset]
+			console.log(unit, unit[4] !== 4)
+			if (unit[4] === 2 || unit[4] === 3 || unit[4] === 4) {
+				// parenthesis demarcation OR deserviced unit
+				// check for this first, if true, continuing skiping next unit
+				isFirstUnitOfScope = true
+				continue // move on to next next unit
+			} else if (isFirstUnitOfScope && unit[4] !== 4) {
+				// no operations on this unit (unit is IN service)
+				isFirstUnitOfScope = false; // toggle it false
+			}
+
+			if (unitIdx > 0 && unit[0] === 1) {
+				var loIdx = this._findLeftOperand(unitIdx -removalOffset)
+				console.log(loIdx)
+				if (loIdx == null) {
+					// no valid left operand, CANT !loIdx since 0 is a falsey value
+					continue; // continue with next token
+				}
+
+				var success = this._addAdjacent(loIdx, unitIdx -removalOffset, true)
+
+				if (success) {
+					removalOffset++;
+				}
+			}
+		}
+
+		// ensure all exponents have been factored in
+		for (let i = 0; i < this.units.length; i++) {
+			var unit = this.units[i]
+
+			if (unit[4] === 1 && unit[2] === -1 && unit[3] > 1) {
+				// is a constant, ad has a greater than 1 exponent value
+				unit[1] **= unit[3]
+				unit[3] = 1 // reset exponent
+			}
+		}
+
+		// clean up all the deserviced units
+		this._cleanupDeserviceUnits()
+	}
+
+	factorise() {
+
+	}
+
+	solveForRoots() {
+
+	}
+
+	*parenthesisGroup() {
+		// generator function, returns [startIdx, endIdx] of parenthesis groups, inclusive of parenthesis demarcation units
+
+		// start from innermost parenthesis group
+		// proceeds from inner-most left operator
+		var lftFindOpenPtr = null; // will be null when parenthesis groups are escaped (for nested findings)
+		for (let unitIdx = 0; unitIdx < this.units.length; unitIdx++) {
+			var unit = this.units[unitIdx]
+			if (unit[4] === 3) {
+				// close parenthesis, back track to find the open parenthesis
+				var backTrackPtr = lftFindOpenPtr ?? unitIdx // if no pointer reference stored, use unitIdx (current indication of where close parenthesis is)
+				for (let j = backTrackPtr -1; j >= 0; j--) {
+					if (this.units[j][4] === 2) {
+						// matching open parenthesis
+						lftFindOpenPtr = j
+
+						// carry out operation here
+						yield [j, unitIdx]
+						break
+					}
+				}
+			} else if (unit[4] === 2) {
+				// met a open parenthesis, do nothing but reset leftPointer reference in order to reach this open parenthesis later on
+				lftFindOpenPtr = null; // reset pointer (discard reference to previously stored open parenthesis)
+			}
+		}
+	}
+
+	buildRepr() {
+		// build a string representation based on this.units
+		console.log("FINAL", this.units)
+		var r = ""
+		var scopeIdx = 0; // scopeIdx to globally uniquely idenitify scope within equation
+		for (let unitIdx = 0; unitIdx < this.units.length; unitIdx++) {
+			var unit = this.units[unitIdx]
+
+			if (unit[4] === 4) {
+				// deserviced unit, aka empty unit, ignore
+				continue
+			}
+
+			// determine prefix
+			var prefix = "";
+			var resetScopeIdx = false; // if true, will reset scopeIdx
+			if (unit[1] < 0) {
+				prefix = "-"
+			} else if (scopeIdx === 0 && unit[4] === 2) {
+				// parenthesis start demarcation
+				prefix = "("
+				resetScopeIdx = true
+			} else if (scopeIdx > 0) {
+				// if not, prefix remain empty
+				switch (unit[0]) {
+					case 1:
+						prefix = "+"
+						if (unit[4] === 2) {
+							// if type (4th index of unit] === 2, is an open parenthesis demarcation
+							// includes open parenthesis
+							prefix += "("
+
+							// reset scopeIdx
+							resetScopeIdx = true
+						} else if (unit[4] === 3) {
+							// close parenthesis
+							prefix = ")"
+						}
+
+						break
+					case 3:
+						if (unit[4] == 2) {
+							// no need for asterisk operation
+							prefix = "("
+
+							// reset scopeIdx
+							resetScopeIdx = true
+						} else if (unit[4] === 3) {
+							// close parenthesis
+							prefix = ")"
+						} else {
+							prefix = "*"
+						}
+						break
+					case 4:
+						prefix = "/"
+						break
+					case 5:
+						prefix = "^("
+
+						// reset scopeIdx
+						resetScopeIdx = true;
+						break
+				}
+			}
+
+			// determine coeff
+			var coeff = ""
+			if (unit[4] === 1 && (unit[2] === -1 || Math.abs(unit[1]) > 1)) {
+				// unit type is a value, not parenthesis (2 & 3)
+				// constant, coeff is important OR has coefficient for an algebraic term
+				coeff = Math.abs(unit[1])
+			}
+
+			// determine base
+			var variableChoice = "" // empty by default as constant is already represented by the 'coefficient'
+			if (typeof unit[2] === "string") {
+				variableChoice = unit[2]
+			} else {
+				// function names
+			}
+
+			// determine exponent
+			var exponent = "";
+			if (unit[3] && unit[3] > 1) {
+				// unit[3] may be null or 0, both are false values and would not pass the if statement
+				exponent = `^${unit[3]}`
+			}
+
+			// handle scope idx
+			if (resetScopeIdx) {
+				scopeIdx = 0;
+			} else {
+				scopeIdx++
+			}
+
+			r += `${prefix}${coeff}${variableChoice}${exponent}`
+		}
+
+		return r.length === 0 ? 0 : r
+	}
+}
+
+$(document).ready(e => {
+	$("#user-input-test").on("input", e => {
+		try {
+			var d = new AlgebraicParser(e.target.value)
+
+			d.tokenise().clean()
+
+			var id = d.buildRepr()
+			d.simplify()
+			var ad = d.buildRepr()
+
+			$("#display-pp").html(id.length === 0 ? '&nbsp;' : id)
+			$("#display-cp").html(ad.length === 0 ? '&nbsp;' : ad)
+		} catch (e) {
+			console.log(e)
+			$("#display-pp").html(e.message)
+		}
+	})
+})

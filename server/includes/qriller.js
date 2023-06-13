@@ -174,7 +174,6 @@ class AlgebraicEqn {
 
 			// determine exponent
 			var expo = "";
-			if ()
 
 			// build string
 			r += `${prefix}${coeffRepr}${this.variables[i]}`
