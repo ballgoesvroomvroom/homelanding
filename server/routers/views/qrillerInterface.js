@@ -42,6 +42,34 @@ class Utils {
 		res.status(200).end()
 	}
 
+	static generateQrillerDynamic(res, title, note, qnObject) {
+		// wrapper for res object, generates qriller
+		// qnObject is an array which contains objects to generate qns
+		// objects schema: [qnClass, qnAmt, [..constructorArgs]]
+		res.type("html")
+
+		// generate qriller object
+		var qrillerObj = new qriller.Qriller()
+		qrillerObj.title = title
+		qrillerObj.note = note
+
+		// attach new questions
+		for (let i = 0; i < qnObject.length; i++) {
+			var qnO = qnObject[i]
+			qrillerObj.createQuestions(qnO[0], qnO[1], ...qnO[2])
+		}
+
+		// push reference
+		qrillerObj.updateRefsToMem()
+
+		var hydrated = Skeleton.document.replaceAll("%QRILLER-ID%", qrillerObj.id)
+		hydrated = hydrated.replaceAll("%DOCUMENT-TITLE%", qrillerObj.title)
+		hydrated = hydrated.replaceAll("%DOCUMENT-NOTE%", qrillerObj.note.replaceAll("\n", "<br>"))
+
+		res.write(hydrated)
+		res.status(200).end()
+	}
+
 	static hydrateDocument(documentId) {
 		if (documentId in mem) {
 			var qrillerObj = mem[documentId]
@@ -236,19 +264,18 @@ presetRouter.get("/revperc", (req, res) => {
 })
 
 presetRouter.get("/simplalge", (req, res) => {
-	return Utils.generateQriller(
+	return Utils.generateQrillerDynamic(
 		res,
-		"[3.1] Simplifcation of Algebraic Equations", "Manipulate algebraic terms and simplify each expression to their simplest form.",
-		qriller.SimplifyAlgebraic,
-		100,
-		false)
+		"[3.1] Simplification of Algebraic Equations", "Manipulate algebraic terms and simplify each expression to their simplest form.",
+		[[qriller.SimplifyAlgebraic, 40, [1]], [qriller.SimplifyAlgebraic, 60, [2]]])
 })
 presetRouter.get("/simplalgeparent", (req, res) => {
 	return Utils.generateQriller(
 		res,
-		"[2.7] Simplifcation of Algebraic Equations Part II", "Manipulate algebraic terms and simplify each expression to their simplest form.",
-		qriller.ModernAlgebra,
-		100)
+		"[3.1.1] Simplification of Algebraic Equations Part II", "Manipulate algebraic terms and simplify each expression to their simplest form.",
+		qriller.SimplifyAlgebraic,
+		100,
+		3)
 })
 
 router.use("/presets", presetRouter)
