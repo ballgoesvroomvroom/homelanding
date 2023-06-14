@@ -96,25 +96,9 @@ class Utils {
 
 // landing page (generate a new qrilerObj)
 router.get("/", (req, res) => {
+	// home page
 	res.type("html")
-
-	// generate qriller object
-	var qrillerObj = new qriller.Qriller()
-	qrillerObj.title = "[2.1] Fractions to Percentage"
-	qrillerObj.note = "Round off your answer to 3 significant figures."
-
-	// attach new questions
-	qrillerObj.createQuestions(qriller.FracToPerc, 50)
-
-	// push reference
-	qrillerObj.updateRefsToMem()
-
-	var hydrated = Skeleton.document.replaceAll("%QRILLER-ID%", qrillerObj.id)
-	hydrated = hydrated.replaceAll("%DOCUMENT-TITLE%", qrillerObj.title)
-	hydrated = hydrated.replaceAll("%DOCUMENT-NOTE%", qrillerObj.note)
-
-	res.write(hydrated)
-	res.status(200).end()
+	res.sendFile(views.qriller.homePage)
 })
 
 router.get("/status", (req, res) => {
@@ -131,7 +115,6 @@ router.get("/coverpage", (req, res) => {
 	res.type("html")
 	res.sendFile(views.qriller.worksheetCoverPage)
 })
-
 // load a specific document
 router.get("/:documentId", (req, res) => {
 	// hydrate html document with qriller properties (fields)
