@@ -1,6 +1,7 @@
 const crypto = require("crypto")
 const {rando, randoSequence} = require('@nastyox/rando.js');
-const mem = require("./qrillerMemory.js")
+const mem = require("./qrillerMemory.js");
+const algEngine = require("./qrillerAlgebraEngine.js");
 
 class Qriller {
 	constructor() {
@@ -1036,6 +1037,128 @@ class ModernAlgebra extends BaseQuestion {
 }
 
 class SimplifyAlgebraic extends BaseQuestion {
+	constructor(difficultyLevel) {
+		// difficultLevel: number, 1 - 3 inclusive
+		// 1 for raw arithmetic
+		// 2 for slighty longer expressions and with multiplication
+		// 3 to include single level parenthesis
+		super();
+
+		// determine variable styles
+		var variableStyle = [["x", "y"], ["a", "b"]][rando(0, 1)]
+
+		var termsLength = rando(3, 4) +(difficultyLevel === 2 ? rando(1, 2) : 0)
+		var coeffUpperBound = 20 +(difficultyLevel >= 2 ? 30 : 0)
+		if (difficultyLevel === 3) {
+			coeffUpperBound = 15 // parenthesis already acts as a tough option
+		}
+		var qnStr = ""
+		var containsParenthesisAlready = false
+		for (let i = 0; i < termsLength; i++) {
+			// generate parenthesis if valid
+			if ((difficultyLevel >= 3 && i === termsLength -1 && !containsParenthesisAlready) || (!containsParenthesisAlready && difficultyLevel >= 3 && rando() >= .8)) {
+				// parenthesis
+				containsParenthesisAlready = true
+
+				let factor = rando(1, 6)
+				if (rando() >= .8) {
+					factor *= -1
+				}
+
+				let prefix = "";
+				if (factor < 0) {
+					prefix = "-"
+				} else if (qnStr.length > 0) {
+					prefix = "+"
+				}
+
+				if (Math.abs(factor) === 1) {
+					factor = "" // no need to show
+				} else {
+					factor = Math.abs(factor) // trim out oepration
+				}
+
+				var pgContentStr = ""
+				var pgContentTermLen = rando(1, 2)
+				for (let i = 0; i < pgContentTermLen; i++) {
+					// generate a coefficient
+					let coeff = rando(1, coeffUpperBound)
+
+					let isNegChance = rando()
+					if (isNegChance >= .8) {
+						coeff *= -1
+					}
+
+					// prefix
+					let prefix = "";
+					if (coeff < 0) {
+						prefix = "-"
+					} else if (pgContentStr.length > 0) {
+						prefix = "+"
+					}
+
+					// cast coeff to string
+					if (Math.abs(coeff) === 1) {
+						coeff = ""; // no need for coeff
+					} else {
+						coeff = Math.abs(coeff); // no need to show sign
+					}
+
+					// variable style choice
+					let variableChoice = variableStyle[rando(0, 1)]
+
+					pgContentStr += `${prefix}${coeff}${variableChoice}`
+				}
+
+				qnStr += `${prefix}${factor}(${pgContentStr})`
+				continue;
+			}
+
+			// generate a coefficient instead
+			let coeff = rando(1, coeffUpperBound)
+
+			let isNegChance = rando()
+			if ((difficultyLevel === 1 && isNegChance >= 0.9) || (difficultyLevel >= 2 && isNegChance >= 0.8)) {
+				// more possiblities of negative numbers for tougher difficulty
+				coeff *= -1
+			}
+
+			// prefix
+			let prefix = "";
+			if (coeff < 0) {
+				prefix = "-"
+			} else if (qnStr.length > 0) {
+				prefix = "+"
+			}
+
+			// cast coeff to string
+			if (Math.abs(coeff) === 1) {
+				coeff = ""; // no need for coeff
+			} else {
+				coeff = Math.abs(coeff); // no need to show sign, trim out operation prefix
+			}
+
+			// variable style choice
+			let variableChoice = variableStyle[rando(0, 1)]
+
+			qnStr += `${prefix}${coeff}${variableChoice}`
+		}
+
+		var answer = new algEngine.AlgebraicParser(qnStr)
+		answer.tokenise().clean()
+		answer.simplify()
+
+		var answerRepr = answer.buildRepr(); // build once
+
+		// set fields
+		this.qnReprString = "Simplify %%0%%"
+		this.qnLatexEqn.push(qnStr)
+		this.answerObj = new BaseAnswer(false)
+		this.answerObj.set("%%0%%", [answerRepr])
+	}
+}
+
+class SimplifyAlgebraicLegacy extends BaseQuestion {
 	constructor(parenthesis) {
 		// double variable equation generation
 		// includeParenthesis: boolean, if true, will include qns to test on order of operations, if false, no terms will be added

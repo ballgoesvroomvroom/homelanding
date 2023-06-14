@@ -852,22 +852,4 @@ class AlgebraicParser {
 	}
 }
 
-$(document).ready(e => {
-	$("#user-input-test").on("input", e => {
-		try {
-			var d = new AlgebraicParser(e.target.value)
-
-			d.tokenise().clean()
-
-			var id = d.buildRepr()
-			d.simplify()
-			var ad = d.buildRepr()
-
-			$("#display-pp").html(id.length === 0 ? '&nbsp;' : id)
-			$("#display-cp").html(ad.length === 0 ? '&nbsp;' : ad)
-		} catch (e) {
-			console.log(e)
-			$("#display-pp").html(e.message)
-		}
-	})
-})
+module.exports = {AlgebraicParser}
