@@ -99,6 +99,11 @@ router.get("/engine/test", (req, res) => {
 	res.sendFile(views.qriller.engineTestInterface)
 })
 
+router.get("/coverpage", (req, res) => {
+	res.type("html")
+	res.sendFile(views.qriller.worksheetCoverPage)
+})
+
 // load a specific document
 router.get("/:documentId", (req, res) => {
 	// hydrate html document with qriller properties (fields)
