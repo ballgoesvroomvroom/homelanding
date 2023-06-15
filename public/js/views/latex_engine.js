@@ -330,6 +330,7 @@ class AlgebraicParser {
 
 
 		this.units = units
+		this.variables = Object.keys(variableStore) // store the characters that are variables here
 
 		return this // for chaining purposes
 	}
@@ -585,6 +586,99 @@ class AlgebraicParser {
 		}
 	}
 
+	_solveLinearRoots() {
+		// solve linear equation
+		// equation should only contain at most two items (.simplify() should have been called, no exponents > 1 for constants)
+		if (this.units.length > 2) {
+			// call .simplify() before calling ._solveLinearRoots()
+			return false
+		}
+
+		var coefficient = 1
+		var constant = 0
+
+		for (let unitIdx = 0; unitIdx < this.units.length; unitIdx++) {
+			var unit = this.units[unitIdx]
+			if (unit[4] === 1 && unit[2] !== -1) {
+				// variable term
+				coefficient = unit[1]
+			} else if (unit[4] === 1 && unit[2] === -1) {
+				// constant term
+				constant = unit[1] **unit[3] // exponent for constant should be one since .simplify() was called
+			}
+		}
+
+		return -constant /coefficient
+	}
+
+	_solveQuadRoots() {
+		// solve quadratic equation
+		// equation should only contain at most three items (.simplify() should have been called, no exponents > 1 for constants)
+		if (this.units.length > 3) {
+			// call .simplify() before calling ._solveQUadRoots()
+			return false
+		}
+
+		var a = 0
+		var b = 0
+		var c = 0
+
+		for (let unitIdx = 0; unitIdx < this.units.length; unitIdx++) {
+			var unit = this.units[unitIdx]
+			if (unit[4] === 1 && unit[2] !== -1 && unit[3] === 2) {
+				// quad variable term
+				a = unit[1]
+			} else if (unit[4] === 1 && unit[2] !== -1 && unit[3] === 1) {
+				// linear variable term
+				b = unit[1]
+			} else if (unit[4] === 1 && unit[2] === -1) {
+				// constant term
+				c = unit[1] **unit[3] // exponent for constant should be one since .simplify() was called
+			}
+		}
+
+		var discriminantSq = Math.sqrt(b **2 -(4 *a *c))
+		return [(-b +discriminantSq) /(2 *a), (-b -discriminantSq) /(2 *a)]
+	}
+
+	_solveCubicRoots() {
+		return [0, 0, 0]
+	}
+
+	solveForRoots() {
+		// solve for roots, determine highest polynomial degree first
+		if (this.variables.length !== 1) {
+			// ONLY solve the roots for ONE variable
+			return false
+		}
+
+		var polynomialDegree = 0 // should not be zero since there are variables present
+		for (let unitIdx = 0; unitIdx < this.units.length; unitIdx++) {
+			// iterate through units, sniff out highest polynomial degree
+			var unit = this.units[unitIdx]
+			if (unit[2] === this.variables[0] && unit[3] > polynomialDegree) {
+				// only targetting one variable
+				polynomialDegree = unit[3]
+			}
+		}
+
+		if (polynomialDegree <= 0) {
+			// no variables present
+			return false
+		}
+
+		// see what degree it is
+		console.log("DEGREE:", polynomialDegree)
+		switch (polynomialDegree) {
+			case 1:
+				return this._solveLinearRoots()
+			case 2:
+				return this._solveQuadRoots()
+			case 3:
+				return this._solveCubicRoots()
+		}
+	}
+
 	simplify() {
 		// sniff out all the multiplication operations, including within parenthesis
 		// important to carry out the operations from left to right, ignores for parenthesis for now
@@ -704,9 +798,12 @@ class AlgebraicParser {
 			var unit = this.units[i]
 
 			if (unit[4] === 1 && unit[2] === -1 && unit[3] > 1) {
-				// is a constant, ad has a greater than 1 exponent value
+				// is a constant, and has a greater than 1 exponent value
 				unit[1] **= unit[3]
 				unit[3] = 1 // reset exponent
+			} else if (unit[4] === 1 && unit[2] !== -1 && unit[3] === 0) {
+				// unit stills representing a constant, remove variable terms
+				unit[2] = -1 // unit now represent constant term
 			}
 		}
 
@@ -715,10 +812,6 @@ class AlgebraicParser {
 	}
 
 	factorise() {
-
-	}
-
-	solveForRoots() {
 
 	}
 
@@ -862,8 +955,9 @@ $(document).ready(e => {
 			var id = d.buildRepr()
 			d.simplify()
 			var ad = d.buildRepr()
+			var roots = d.solveForRoots()
 
-			$("#display-pp").html(id.length === 0 ? '&nbsp;' : id)
+			$("#display-pp").html(id.length === 0 ? '&nbsp;' : id +", " +roots)
 			$("#display-cp").html(ad.length === 0 ? '&nbsp;' : ad)
 		} catch (e) {
 			console.log(e)
