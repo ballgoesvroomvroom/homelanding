@@ -254,13 +254,13 @@ presetRouter.get("/revperc", (req, res) => {
 presetRouter.get("/simplalge", (req, res) => {
 	return Utils.generateQrillerDynamic(
 		res,
-		"[3.1] Simplification of Algebraic Equations", "Manipulate algebraic terms and simplify each expression to their simplest form.",
+		"[3.1] Simplification of Algebraic Expressions", "Manipulate algebraic terms and simplify each expression to their simplest form.",
 		[[qriller.SimplifyAlgebraic, 40, [1]], [qriller.SimplifyAlgebraic, 60, [2]]])
 })
 presetRouter.get("/simplalgeparent", (req, res) => {
 	return Utils.generateQriller(
 		res,
-		"[3.1.1] Simplification of Algebraic Equations Part II", "Manipulate algebraic terms and simplify each expression to their simplest form.",
+		"[3.1.1] Simplification of Algebraic Expressions Part II", "Manipulate algebraic terms and simplify each expression to their simplest form.",
 		qriller.SimplifyAlgebraic,
 		100,
 		3)

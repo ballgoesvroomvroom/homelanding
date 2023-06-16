@@ -32,6 +32,24 @@ class ArraySort {
 	}
 }
 
+class BaseQuestion {
+	static getCommonBase = function(a, b) {
+		// get quotient, should have no remainder, if remainder present, not a perfect root
+		var a, b = Math.min(a, b), Math.max(a, b) // b should represent the bigger value
+		var diff = b /a
+		if (diff -math.floor(diff) > 0) {
+			return; // return null
+		}
+
+		print(diff)
+		if (Math.abs(diff -a) <= .00001) {
+			return a // base
+		} else {
+			return BaseQuestion.getCommonBase(a, diff) // order does not matter
+		}
+	}
+}
+
 class ParserError extends Error {
 	name = "ParserError"
 }
@@ -330,7 +348,7 @@ class AlgebraicParser {
 
 
 		this.units = units
-		this.variables = Object.keys(variableStore) // store the characters that are variables here
+		console.log("UNITS", JSON.stringify(this.units))
 
 		return this // for chaining purposes
 	}
@@ -351,7 +369,7 @@ class AlgebraicParser {
 			// clean up multiplication PRECEEDING parenthesis, forward it as a coefficient
 			if (this.units[startIdx][0] === 5) {
 				// start parenthesis denotes an exponent group (i.e. parenthesis group represents a complex exponent)
-				// move on to the next group
+				// move on to the next group; no need to re-order multiplication order on exponent groups
 				continue
 			}
 
@@ -362,7 +380,7 @@ class AlgebraicParser {
 				for (let unitIdx = endIdx +1; unitIdx < this.units.length; unitIdx++) {
 					var superseedingUnit = this.units[unitIdx]
 
-					if (superseedingUnit[0] === 3 ) {
+					if (superseedingUnit[0] === 3) {
 						// multiplication, move it forward to start of parenthesis
 						this.units.splice(unitIdx, 1) // splice from last index
 						this.units.splice(startIdx, 0, superseedingUnit)
@@ -443,32 +461,56 @@ class AlgebraicParser {
 		var leftoperand = this.units[loIdx];
 		var rightoperand = this.units[roIdx];
 
+		var leftComplexExpo, rightComplexExpo;
+
 		if (leftoperand[2] === -1 && leftoperand[3] != null) {
 			// constants
 			// evaluate number with exponents, reset it to 1
 			leftoperand[1] **= leftoperand[3];
 			leftoperand[3] = 1;
 		} else if (leftoperand[3] == null) {
-			// exponents are in brackets
-			return false;
+			// complex exponents
+			var complexExpo = this._getComplexExponent(loIdx)
+			if (complexExpo === null) {
+				return; // failed to grab exponent
+			} else if (complexExpo.length === 1)
+
+			// determine right operand exponent
+			var rightExpo = [rightoperand[3]]; // wrap it in an iterable
+			if (rightoperand[3] == null) {
+				rightExpo = this._getComplexExponent(roIdx)
+				if (rightExpo == null) {
+					// failed to grab complex exponent
+					return false;
+				}
+			}
+
+			if (leftoperand[2] !== -1 && leftoperand[2] === rightoperand[2]) {
+				// algebraic term, same base
+				complexExpo.splice(complexExpo.length, 0, ...rightoperand[3])
+			} else if (leftoperand[2] === -1 && leftoperand[1] === rightoperand[1]) {
+				// constant term, same base
+			} else {
+				return false;
+			}
 		}
 		if (rightoperand[2] === -1 && rightoperand[3] != null) {
 			// constants
 			rightoperand[1] **= rightoperand[3];
 			rightoperand[3] = 1;
 		} else if (rightoperand[3] == null) {
-			// exponents are in brackets
+			// complex exponents
 			return false;
 		}
 
 		// discard right term
 		// exponents have been factored into their coefficients value (index 1)
 		var sameTerm = leftoperand[2] === rightoperand[2];
-		if (sameTerm && leftoperand[2] != -1) {
+		if (sameTerm && leftoperand[2] !== -1) {
 			// algebraic terms
 			leftoperand[1] *= rightoperand[1];
 			leftoperand[3] += rightoperand[3]; // sum the powers
-		} else if (sameTerm) {
+		} else if (sameTerm && leftoperand[2] === 1) {
 			// constants
 			leftoperand[1] *= rightoperand[1];
 		} else if (!sameTerm && (leftoperand[2] === -1 || rightoperand[2] === -1)) {
@@ -496,6 +538,108 @@ class AlgebraicParser {
 			this.units.splice(roIdx, 1);
 		}
 		return true;
+	}
+
+	_getComplexExponent(unitIdx) {
+		// returns an array of units representing the complex exponent of base, unitIdx, exclusive of the exponents demarcation
+		// not in-place, which also means no modifications will apply to this.units
+		if (this.units[unitIdx +1][0] !== 5) {
+			// not an exponent-parenthesis dermacation
+			return; // return null
+		} else if (this.units[unitIdx +2][4] === 3) {
+			// close parenthesis dermacation, no content within parenthesis group
+			return; // return null
+		}
+
+		var startIdx = unitIdx +1; // plus one to exclude demarcation units
+		var endIdx = -1;
+		var scope = 1; // to detect when parenthesis have been exitted
+		for (let i = unitIdx +3; i < this.units.length; i++) {
+			// plus 3 to skip the parenthesis demarcation and the element right after opening the parenthesis
+			if (this.unit[i][4] === 3) {
+				// close parenthesis, decrease scope
+				scope--
+			} else if (this.unit[i][4] === 2) {
+				// open parenthesis, increase scope
+				scope++
+			}
+
+			if (scope === 0) {
+				// exitted initial exponent parenthesis group
+				endIdx = unitIdx -1 // minus one to exclude demarcation units
+				break
+			}
+		}
+
+		return this.units.slice(startIdx +1, endIdx)
+	}
+
+	_multUnit(leftoperand, rightoperand, leftComplexExpoGroup, rightComplexExpoGroup) {
+		// multiply both units together, returns null if cannot be simplified further than the multiplication operation
+		// else, returns a new unit representing the multiplication of leftoperand and rightoperand
+		// leftoperand: unit data
+		// rightoperand: unit data
+		// leftComplexExpoGroup: unit[], array of units representing the complex expo group
+
+		// evaluate exponents if any
+		var leftComplexExpo, rightComplexExpo;
+		if 4 {
+			leftoperand[1] **= leftoperand[3]
+			leftoperand[3] = 1; // reset exponent
+		} else if (leftoperand[3] == null) {
+			// complex exponent
+			leftComplexExpo = this._getComplexExponent(loIdx)
+		}
+
+		if (rightoperand[4] === -1 && rightoperand[3] > 1) {
+			rightoperand[1] **= rightoperand[3]
+			rightoperand[3] = 1; // reset exponent
+		} else if (rightoperand[3] == null) {
+			// complex exponent
+
+		}
+
+		var sameTerm = leftoperand[2] === rightoperand[2];
+		if (sameTerm && leftoperand[2] !== -1) {
+			// algebraic terms
+			leftoperand[1] *= rightoperand[1];
+			leftoperand[3] += rightoperand[3]; // sum the powers
+		} else if (sameTerm && leftoperand[2] === 1) {
+			// constants
+			leftoperand[1] *= rightoperand[1];
+		} else if (!sameTerm && (leftoperand[2] === -1 || rightoperand[2] === -1)) {
+			// one is a algebraic term and the other is the constant
+			var varUnit = rightoperand; // assume variable unit is right operand
+			if (rightoperand[2] === -1) {
+				// left operand is the variable instead
+				varUnit = leftoperand;
+			}
+
+			this.units[loIdx] = [
+				leftoperand[0],
+				leftoperand[1] * rightoperand[1],
+				varUnit[2],
+				varUnit[3],
+				leftoperand[4],
+			];
+		} else {
+			// both are algebraic terms but different bases
+			return false;
+		}
+	}
+
+	_multUnits(...units) {
+		// chain multiply units supplied here
+		var result = [unit[0]]
+		for (let i = 1; i < units.length; i++) {
+			// start by multiplying the second unit with the first unit
+			var unit = units[i]
+			for (let j = j; j < result.length; j++) {
+				// list of candidates if they cannot be simplified farther
+
+				var leftoperand = result[j]
+			}
+		}
 	}
 
 	_simplifyParenthesis(startContentIdx, endContentIdx) {
@@ -536,6 +680,90 @@ class AlgebraicParser {
 		}
 	}
 
+	_multAdjacentParenthesis(firstPgIdx, firstPgCloseIdx, secondPgIdx, secondClosePgIdx) {
+		// expands out the adjacent parenthesis group with multiplication
+		// inner parenthesis group should have been reduced to minimal by .simplify()
+		// firstPgIdx: integer, index of the first parenthesis group demarcation (inclusive)
+		// secondPgIdx: integer, index of the second parenthesis group demarcation (inclusive)
+
+		// extract out all the terms to be used as factors (in both groups)
+		var groupFactors = [];
+		for (let g = 0; g < 2; g++) {
+			var currentFactor = [] // build factors here
+			var factorList = []
+
+			var startIdx = firstPgIdx *(1 -g) +secondPgIdx *g // firstPgIdx during first iteration
+			var endIdx = firstPgCloseIdx *(1 -g) +secondClosePgIdx *g
+
+			var exponentScope = 0; // if >= 1, will ignore all units, will be decremented by close parenthesis
+			var exponentBuild = []; // build complex exponents here
+			for (let i = startIdx +1; i < endIdx; i++) {
+				var unit = this.units[i]
+				if (unit[0] === 5 && unit[4] === 2) {
+					// exponent open parenthesis group
+					exponentScope = 1; // start scope so iteration knows to ignore it
+					
+					// push current base (unit) into factorList
+					if (currentFactor.length >= 1) {
+						// SHOULD BE >= 1, SINCE EXPONENTS NEED BASES
+						factorList.push(currentFactor)
+					}
+				} else if (exponentScope >= 1 && unit[4] === 3) {
+					// close parenthesis, and exponentScope >= 1, need to decrement
+
+					// exponent scope
+					if (exponentScope >= 1) {
+						exponentScope--
+					}
+
+					if (exponentScope === 0) {
+						// reached the end, closed exponent scope
+						// push whatever was in exponent build into factorList
+						factorList.push(exponentBuild)
+					}
+
+					// ignore this unit, continue
+					continue
+				} else if (exponentScope === 0 && unit[4] === 1) {
+					if (unit[0] === 1) {
+						// addition operation, a whole new factor by itself
+						// push current factor (if any)
+						if (currentFactor.length >= 1) {
+							factorList.push(currentFactor);
+						}
+
+						currentFactor = [unit]; // new factor
+					} else if (unit[0] === 3) {
+						// multiplication
+						// add to current factor
+						currentFactor.push(unit)
+					}
+				} else if (exponentScope >= 1) {
+					// exponent content, push into exponentBuild, including parenthesis demarcations
+					exponentBuild.push(unit)
+				}
+			}
+
+			groupFactors.push(factorList)
+		}
+
+		// construct the new parenthesis group
+		var group = [] // stream new units into here
+		for (let i = 0; i < groupFactors[0].length; i++) {
+			var unit = groupFactors[0][i];
+
+			// multiply every term in the second pg by unit
+			for (let j = 0; j < groupFactors[1].length; j++) {
+				// chain all the terms together, operation does not matter since ._multUnits assume multiplication operation & hence does not check for operation mode value
+				var result = this._multUnits(...unit.splice(unit.length, 0, groupFactors[1][j])) // result would be an array
+
+				group.slice(group.length, 0, ...result) // spread out array container
+			}
+		}
+
+		return group
+	}
+
 	_findLeftOperand(unitIdx) {
 		// unitIdx: number, denotes index of right operand
 		// backtrack to find unit that is NOT deserviced (empty)
@@ -546,33 +774,36 @@ class AlgebraicParser {
 		}
 	}
 
-	_findLeftOperandWithSameBaseAndExpo(unitIdx) {
+	_findLeftOperandWithSameBaseAndExpoWithinSameScope(unitIdx) {
 		// unitIdx: number, denotes index of right operand
-		// backtrack to find unit that has the same base AND is NOT deserviced (empty)
+		// backtrack to find unit that has the same base AND is NOT deserviced (empty) AND is able to be add
 		var unit = this.units[unitIdx];
 		var scope = 0; // denotes scope level
 		for (let i = unitIdx -1; i >= 0; i--) {
-			if (unit[4] === 3) {
+			var btUnit = this.units[i]
+			if (btUnit[4] === 3) {
 				scope++
-			} else if (unit[4] === 2 && scope === 0) {
+			} else if (btUnit[4] === 2 && scope === 0) {
 				// already reached boundary of parenthesis group, no more match
 				return; // empty object
-			} else if (unit[4] === 2) {
+			} else if (btUnit[4] === 2) {
 				// decrement scope
 				scope--
 			} else if (scope > 0) {
 				// not within scope
 				continue; // do nothing
-			} else if (unit[2] === this.units[i][2] && unit[3] === this.units[i][3] && this.units[i][4] !== 4) {
+			} else if (unit[2] === btUnit[2] && unit[3] === btUnit[3] && btUnit[4] !== 4) {
 				return i
 			}
 		}
 	}
 
-	_deserviceUnit(unitIdx) {
+	_deserviceUnit(...unitIdx) {
 		// renders unit at unitIdx (index) empty
 		// empty (or deserviced) units are present as junk, but serve no purpose to the representation of work
-		this.units[unitIdx][4] = 4 // 4 for deserviced units
+		for (let i of unitIdx) {
+			this.units[i][4] = 4 // 4 for deserviced units
+		}
 	}
 
 	_cleanupDeserviceUnits() {
@@ -582,6 +813,29 @@ class AlgebraicParser {
 			if (this.units[unitIdx][4] === 4 || this.units[unitIdx][1] === 0) {
 				// coefficients 0 also considered deserviced units
 				this.units.splice(unitIdx, 1)
+			}
+		}
+	}
+
+	_countUnits(unitsArr) {
+		// count the number of non-deserviced units there are
+		var dsUnits = 0; // generally lesser increment operations if counting deserviced units
+		for (let i = 0; i < unitsArr.length; i++) {
+			if (unitsArr[i][4] === 4) {
+				// deserviced unit
+				dsUnits++
+			}
+		}
+
+		return unitsArr.length -dsUnits
+	}
+
+	_applyExponents() {
+		for (let i = 0; i < this.units.length; i++) {
+			if (this.units[i][4] === 1 && this.units[i][2] === -1 && this.units[i][3] > 1) {
+				// constant with an exponent of greater than 1
+				this.units[i][1] **= this.units[i][3] // apply exponent
+				this.units[i][3] = 1; // reset exponent;
 			}
 		}
 	}
@@ -679,7 +933,104 @@ class AlgebraicParser {
 		}
 	}
 
+	simplifyTest() {
+		this._applyExponents();
+		for (let [startIdx, endIdx] of this.parenthesisGroup()) {
+			for (let j = startIdx +2; j < endIdx; j++) {
+				// plus 2 to skip the adjacent element right after starting the parenthesis group since that unit has no operations
+				var unit = this.units[j]
+				if (unit[4] === 1 && unit[0] === 3) {
+					// only acknowledge constants and variables, not parenthesis demarcations
+					// multiplication
+					var loIdx = this._findLeftOperand(j) // find left operand that is not de-serviced
+					if (loIdx == null) {
+						continue; // no left operand found
+					}
+
+					var success = this._multAdajcent(loIdx, j, false) // pass in false so no operands will be deleted
+					if (success) {
+						this._deserviceUnit(j)
+					}
+				}
+			}
+
+			// addition now
+			for (let j = startIdx +2; j < endIdx; j++) {
+				var unit = this.units[j]
+				if (unit[4] === 1 && unit[0] === 1) {
+					// only acknowledge constants and variables, not parenthesis demarcations
+					// addition
+					var loIdx = this._findLeftOperandWithSameBaseAndExpoWithinSameScope(j) // find left operand that has the same base and exponent (suitable for multiplication)
+					if (loIdx == null) {
+						continue; // no left operand found
+					}
+					var success = this._addAdjacent(loIdx, j, false)
+					if (success) {
+						this._deserviceUnit(j)
+					}
+				}
+			}
+		}
+
+		// try to break non-exponent parenthesis groups (including expansion)
+		// CODE HERE
+		var closePgIdxMapping = {}; // create a mapping of parenthesis endings idx to their opening counterparts
+		for (let [startIdx, endIdx] of this.parenthesisGroup()) {
+			// create mapping entry
+			closePgIdxMapping[endIdx] = startIdx;
+
+			var openParenthesis = this.units[startIdx]
+			if (openParenthesis[0] === 3) {
+				// multiplication
+				var factor = this.units[startIdx -1]
+				if (factor[4] === 3) {
+					// close parenthesis
+					var previousOpenPgIdx = closePgIdxMapping[startIdx -1] // mapping works cause of how this.parenthisGroup behaves, it start the inner-most PG with left to right fashion
+					var expandedGroup = this._multAdjacentParenthesis(previousOpenPgIdx, startIdx -1, startIdx, endIdx)
+					this.units.splice(previousOpenPgIdx, endIdx -previousOpenPgIdx +1, expandedGroup)
+				}
+			}
+		}
+
+		// try to simplify complex exponents after simplifying contents of parenthesis
+		// i.e. bring down 10^(2) [4 units] to 10^2 [1 unit]
+		// should have minimal nested parenthesis by now
+		for (let [startIdx, endIdx] of this.parenthesisGroup()) {
+				var base = this.units[startIdx -1] // base with null pointer as exponent value represents complex exponents
+			if (this.units[startIdx][0] === 5 && base[4] === 1 && base == null) {
+				// exponent open parenthesis demarcation, only work with bases who have exponents set to null and aren't close parenthesis (e.g. (x + 1)^2)
+				if (this._countUnits(this.units.slice(startIdx +1, endIdx)) === 1) {
+					// exactly one element
+					var soleExponent = this.units[startIdx +1]
+					if (soleExponent[2] === -1 && soleExponent[3] != null) {
+						// constant, yay can be brought down
+						// also, consider the exponent of the exponent, e.g. (10^(5^2)); the code should start expanding from inner-most parenthesis group
+						// so last step would immediately look like 10^25
+						
+						// base has no exponent (null value) hence safe to just assume this will be the exact exponent
+						base[3] = (soleExponent[1] **soleExponent[3])
+
+						// flatten if possible
+						if (base[2] === -1) {
+							// constant base
+							// apply exponent value directly to coefficient
+
+							base[1] **= base[3]
+							base[3] = 1; // reset exponent value
+						}
+
+						// deservice the both parenthesis demarcation
+						this._deserviceUnit(startIdx, startIdx +1, endIdx)
+					}
+				}
+			}
+		}
+	}
+
 	simplify() {
+		// simplify what is going on in parethesis first
+
+
 		// sniff out all the multiplication operations, including within parenthesis
 		// important to carry out the operations from left to right, ignores for parenthesis for now
 		var initLen = this.units.length;
@@ -779,7 +1130,7 @@ class AlgebraicParser {
 			}
 
 			if (unitIdx > 0 && unit[0] === 1) {
-				var loIdx = this._findLeftOperandWithSameBaseAndExpo(unitIdx -removalOffset)
+				var loIdx = this._findLeftOperandWithSameBaseAndExpoWithinSameScope(unitIdx -removalOffset)
 				if (loIdx == null) {
 					// no valid left operand, CANT !loIdx since 0 is a falsey value
 					continue; // continue with next token
@@ -798,12 +1149,9 @@ class AlgebraicParser {
 			var unit = this.units[i]
 
 			if (unit[4] === 1 && unit[2] === -1 && unit[3] > 1) {
-				// is a constant, and has a greater than 1 exponent value
+				// is a constant, ad has a greater than 1 exponent value
 				unit[1] **= unit[3]
 				unit[3] = 1 // reset exponent
-			} else if (unit[4] === 1 && unit[2] !== -1 && unit[3] === 0) {
-				// unit stills representing a constant, remove variable terms
-				unit[2] = -1 // unit now represent constant term
 			}
 		}
 
@@ -953,11 +1301,11 @@ $(document).ready(e => {
 			d.tokenise().clean()
 
 			var id = d.buildRepr()
-			d.simplify()
+			d.simplifyTest()
 			var ad = d.buildRepr()
-			var roots = d.solveForRoots()
+			// var roots = d.solveForRoots()
 
-			$("#display-pp").html(id.length === 0 ? '&nbsp;' : id +", " +roots)
+			$("#display-pp").html(id.length === 0 ? '&nbsp;' : id)
 			$("#display-cp").html(ad.length === 0 ? '&nbsp;' : ad)
 		} catch (e) {
 			console.log(e)
