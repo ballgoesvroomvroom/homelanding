@@ -646,9 +646,22 @@ class AlgebraicParser {
 			newComplexExpoGroup = leftHasComplexExpo ? leftComplexExpoGroup : rightComplexExpoGroup
 			if (leftoperand[2] === -1) {
 				// constant
-				if (leftoperandp[1] === rightoperand[1]) {
+				if (leftoperand[1] === rightoperand[1]) {
 					// same base, can simply add complex expo
 					newComplexExpoGroup = leftComplexExpoGroup.splice(leftComplexExpoGroup.length, 0, rightComplexExpoGroup)
+				} else {
+					// not same base
+					// try to find a common base
+					var commonbase = BaseQuestion.getCommonBase(leftoperand[1], leftoperand[2])
+					if (commonbase) {
+						// there is a common base present
+						var lnRoot = Math.log(commonbase)
+						var leftoperandIncrPower = Math.log(leftoperand[1]) /lnRoot
+						var rightoperandIncrPower = Math.log(rightoperand[2]) /lnRoot
+						if (leftoperandIncrPower > 1) {
+
+						}
+					}
 				}
 			}
 		}
