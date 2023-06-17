@@ -637,9 +637,20 @@ class AlgebraicParser {
 			rightHasComplexExpo = false
 		}
 
+		var newComplexExpoGroup = []
 		if ((leftHasComplexExpo && rightHasComplexExpo) || leftoperand[2] === rightoperand[2]) {
 			// same bases type, yay can multiply
-			
+			leftComplexExpoGroup = leftComplexExpoGroup ?? []; // default value of empty
+			rightComplexExpoGroup = rightComplexExpoGroup ?? [];
+
+			newComplexExpoGroup = leftHasComplexExpo ? leftComplexExpoGroup : rightComplexExpoGroup
+			if (leftoperand[2] === -1) {
+				// constant
+				if (leftoperandp[1] === rightoperand[1]) {
+					// same base, can simply add complex expo
+					newComplexExpoGroup = leftComplexExpoGroup.splice(leftComplexExpoGroup.length, 0, rightComplexExpoGroup)
+				}
+			}
 		}
 
 		var sameTerm = leftoperand[2] === rightoperand[2];
