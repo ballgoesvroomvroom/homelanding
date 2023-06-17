@@ -581,8 +581,24 @@ class AlgebraicParser {
 		// rightoperand: unit data
 		// leftComplexExpoGroup: unit[], array of units representing the complex expo group
 
+		// work with cloned copies
+		var leftoperand = [...leftoperand]
+		var rightoperand = [...rightoperand]
+		var leftComplexExpoGroupClone = []
+		leftComplexExpoGroup.each(expoUnit => {
+			leftComplexExpoGroupClone.push([...expoUnit])
+		})
+		var rightComplexExpoGroupClone = []
+		rightComplexExpoGroup.each(expoUnit => {
+			rightComplexExpoGroupClone.push([...expoUnit])
+		})
+
+		// re-assigned clones
+		leftComplexExpoGroup = leftComplexExpoGroupClone
+		rightComplexExpoGroup = rightComplexExpoGroupClone
+		
 		// evaluate exponents if any
-		if 4 {
+		if (leftoperand[4] === -1 && leftoperand[3] > 1) {
 			leftoperand[1] **= leftoperand[3]
 			leftoperand[3] = 1; // reset exponent
 		} else if (leftoperand[3] == null && leftComplexExpoGroup == null) {
@@ -600,8 +616,30 @@ class AlgebraicParser {
 
 		var leftHasComplexExpo = leftoperand[3] == null // leftComplexExpoGroup should be present (above checked)
 		var rightHasComplexExpo = rightoperand[3] == null // rightComplexExpoGroup should be present (above checked)
-		if (leftHasComplexExpo && rightHasComplexExpo) {
-			// check for same base
+		
+		// see if the complex exponents can be simplified
+		if (leftoperand[2] === -1 && leftComplexExpoGroup.length === 1 && leftComplexExpoGroup[0][2] === -1) {
+			// both exponents and base are a constant
+			// base has no exponents to apply, exponent value is a null pointer
+			leftoperand[1] **= leftComplexExpoGroup[0][1] **leftComplexExpoGroup[0][3] // take into consideration the exponent of the exponent, e.g. 10^(2^2)
+			leftoperand[3] = 1 // reset exponent (from null)
+
+			// toggle leftHasComplexExpo value
+			leftHasComplexExpo = false
+		}
+		if (rightoperand[2] === -1 && rightComplexExpoGroup.length === 1 && rightComplexExpoGroup[0][2] === -1) {
+			// both exponents and base are a constant
+			// base has no exponents to apply, exponent value is a null pointer
+			rightoperand[1] **= rightComplexExpoGroup[0][1] **rightComplexExpoGroup[0][3] // take into consideration the exponent of the exponent, e.g. 10^(2^2)
+			rightoperand[3] = 1 // reset exponent (from null)
+
+			// toggle leftHasComplexExpo value
+			rightHasComplexExpo = false
+		}
+
+		if ((leftHasComplexExpo && rightHasComplexExpo) || leftoperand[2] === rightoperand[2]) {
+			// same bases type, yay can multiply
+			
 		}
 
 		var sameTerm = leftoperand[2] === rightoperand[2];
