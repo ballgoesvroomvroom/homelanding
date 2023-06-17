@@ -582,21 +582,26 @@ class AlgebraicParser {
 		// leftComplexExpoGroup: unit[], array of units representing the complex expo group
 
 		// evaluate exponents if any
-		var leftComplexExpo, rightComplexExpo;
 		if 4 {
 			leftoperand[1] **= leftoperand[3]
 			leftoperand[3] = 1; // reset exponent
-		} else if (leftoperand[3] == null) {
+		} else if (leftoperand[3] == null && leftComplexExpoGroup == null) {
 			// complex exponent
-			leftComplexExpo = this._getComplexExponent(loIdx)
+			return
 		}
 
 		if (rightoperand[4] === -1 && rightoperand[3] > 1) {
 			rightoperand[1] **= rightoperand[3]
 			rightoperand[3] = 1; // reset exponent
-		} else if (rightoperand[3] == null) {
+		} else if (rightoperand[3] == null && rightComplexExpoGroup == null) {
 			// complex exponent
+			return
+		}
 
+		var leftHasComplexExpo = leftoperand[3] == null // leftComplexExpoGroup should be present (above checked)
+		var rightHasComplexExpo = rightoperand[3] == null // rightComplexExpoGroup should be present (above checked)
+		if (leftHasComplexExpo && rightHasComplexExpo) {
+			// check for same base
 		}
 
 		var sameTerm = leftoperand[2] === rightoperand[2];
@@ -630,14 +635,16 @@ class AlgebraicParser {
 
 	_multUnits(...units) {
 		// chain multiply units supplied here
+		// units are wrapped by an array, with the second element (also an array element at index 1) representing the power if base has an exponent of null
 		var result = [unit[0]]
 		for (let i = 1; i < units.length; i++) {
 			// start by multiplying the second unit with the first unit
-			var unit = units[i]
+			var rightoperand = units[i]
 			for (let j = j; j < result.length; j++) {
 				// list of candidates if they cannot be simplified farther
 
 				var leftoperand = result[j]
+				var result = this._multUnit(leftoperand[0], rightoperand[0], leftoperand[1], rightoperand[1]) // supply the exponent groups if any
 			}
 		}
 	}
@@ -703,11 +710,7 @@ class AlgebraicParser {
 					// exponent open parenthesis group
 					exponentScope = 1; // start scope so iteration knows to ignore it
 					
-					// push current base (unit) into factorList
-					if (currentFactor.length >= 1) {
-						// SHOULD BE >= 1, SINCE EXPONENTS NEED BASES
-						factorList.push(currentFactor)
-					}
+					// push current base (unit) into factorList after retrieving the exponent group
 				} else if (exponentScope >= 1 && unit[4] === 3) {
 					// close parenthesis, and exponentScope >= 1, need to decrement
 
@@ -719,7 +722,8 @@ class AlgebraicParser {
 					if (exponentScope === 0) {
 						// reached the end, closed exponent scope
 						// push whatever was in exponent build into factorList
-						factorList.push(exponentBuild)
+						// also push the unit representing the base
+						factorList.push([currentFactor, exponentBuild])
 					}
 
 					// ignore this unit, continue
@@ -729,7 +733,7 @@ class AlgebraicParser {
 						// addition operation, a whole new factor by itself
 						// push current factor (if any)
 						if (currentFactor.length >= 1) {
-							factorList.push(currentFactor);
+							factorList.push([currentFactor]);
 						}
 
 						currentFactor = [unit]; // new factor
