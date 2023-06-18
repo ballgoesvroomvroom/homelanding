@@ -659,10 +659,20 @@ class AlgebraicParser {
 						var leftoperandIncrPower = Math.log(leftoperand[1]) /lnRoot
 						var rightoperandIncrPower = Math.log(rightoperand[2]) /lnRoot
 						if (leftoperandIncrPower > 1) {
-
+							// multiply left expo by leftoperandIncrPower
+							// change base to root base
+							leftoperand[1] = commonbase
+						}
+						if (rightoperandIncrPower > 1) {
+							// multiply right expo by rightoperandIncrPower
+							// change base to root base
+							rightoperand[1] = commonbase
 						}
 					}
 				}
+			} else if (typeof leftoperand[2] === "string") {
+				// variable term
+				
 			}
 		}
 
