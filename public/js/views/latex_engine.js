@@ -35,7 +35,8 @@ class ArraySort {
 class BaseQuestion {
 	static getCommonBase = function(a, b) {
 		// get quotient, should have no remainder, if remainder present, not a perfect root
-		var a, b = Math.min(a, b), Math.max(a, b) // b should represent the bigger value
+		var a = Math.min(a, b) // a should represent the smaller value
+		var b = Math.max(a, b) // b should represent the bigger value
 		var diff = b /a
 		if (diff -math.floor(diff) > 0) {
 			return; // return null
@@ -574,7 +575,61 @@ class AlgebraicParser {
 		return this.units.slice(startIdx +1, endIdx)
 	}
 
-	_multUnit(leftoperand, rightoperand, leftComplexExpoGroup, rightComplexExpoGroup) {
+	_multUnit(leftoperand, rightoperand) {
+		// multiply both units together, returns null if cannoot be simplified further than the multiplication representation
+		// else, returns a new unit representing the multiplication of leftoperand & rightoperand
+		// leftoperand: unit data
+		// rightoperand: unit data
+		// evaluate exponents if any
+
+		if (leftoperand[4] === -1 && leftoperand[3] > 1) {
+			leftoperand[1] **= leftoperand[3]
+			leftoperand[3] = 1; // reset exponent
+		} else if (leftoperand[3] == null) {
+			// complex exponent
+			return
+		}
+
+		if (rightoperand[4] === -1 && rightoperand[3] > 1) {
+			rightoperand[1] **= rightoperand[3]
+			rightoperand[3] = 1; // reset exponent
+		} else if (rightoperand[3] == null) {
+			// complex exponent
+			return
+		}
+
+		// build new term
+		var newTerm = [...leftoperand] // copy of leftoperand
+
+		// compare scenarios
+		var sameTerm = leftoperand[2] === rightoperand[2];
+		if (sameTerm && leftoperand[2] !== -1) {
+			// algebraic terms
+			newTerm[1] *= rightoperand[1];
+			newTerm[3] += rightoperand[3]; // sum the powers
+		} else if (sameTerm && leftoperand[2] === 1) {
+			// constants
+			newTerm[1] *= rightoperand[1]; // exponents should be 1
+		} else if (!sameTerm && (leftoperand[2] === -1 || rightoperand[2] === -1)) {
+			// one is a algebraic term and the other is the constant
+			var varUnit = rightoperand; // assume variable unit is right operand
+			if (rightoperand[2] === -1) {
+				// left operand is the variable instead
+				varUnit = leftoperand;
+			}
+
+			newTerm[1] *= rightoperand[1] // exponent has already been applied
+			newTerm[2] = varUnit[2]
+			newTerm[3] = varUnit[3] // take exponent of algebraic term since it cannot be factored in
+		} else {
+			// both are algebraic terms but different bases
+			return;
+		}
+
+		return newTerm
+	}
+
+	_multUnitPower(leftoperand, rightoperand, leftComplexExpoGroup, rightComplexExpoGroup) {
 		// multiply both units together, returns null if cannot be simplified further than the multiplication operation
 		// else, returns a new unit representing the multiplication of leftoperand and rightoperand
 		// leftoperand: unit data
@@ -716,7 +771,7 @@ class AlgebraicParser {
 				// list of candidates if they cannot be simplified farther
 
 				var leftoperand = result[j]
-				var result = this._multUnit(leftoperand[0], rightoperand[0], leftoperand[1], rightoperand[1]) // supply the exponent groups if any
+				var result = this._multUnit(leftoperand[0], rightoperand[0]) // supply the exponent groups if any
 			}
 		}
 	}
@@ -1042,6 +1097,7 @@ class AlgebraicParser {
 					}
 					var success = this._addAdjacent(loIdx, j, false)
 					if (success) {
+						console.log("DESERVICING")
 						this._deserviceUnit(j)
 					}
 				}
@@ -1101,6 +1157,8 @@ class AlgebraicParser {
 				}
 			}
 		}
+
+		// carry out any expansion 
 	}
 
 	simplify() {
