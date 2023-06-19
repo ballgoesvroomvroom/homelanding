@@ -10,6 +10,7 @@
 		<link rel="stylesheet" href="/css/views/qriller_homepage.css">
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap" rel="stylesheet">
 
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
@@ -24,58 +25,59 @@
 		<title>Qriller</title>
 	</head>
 	<body>
-		<div id="window-container">
-			<div id="thumbnail-container">
-				<img id="logo-thumbnail" src="/qriller_assets/icon.svg">
+		<div id="topbar-container">
+			<h1>Qriller</h1>
+			<div id="topbar-action-container">
+				<button id="contactus-btn" class="topbar-action-btn">
+					Support
+				</button>
+				<button id="contactus-btn" class="topbar-action-btn">
+					Contact Us
+				</button>
+				<button id="buy-btn" class="topbar-action-btn">
+					BUY
+				</button>
 			</div>
+		</div>
+		<div id="topbar-bottom-container">
+			<p>Conceptual learning | worksheets grandmaster</p>
+		</div>
 
-			<div id="details-container">
-				<section id="introduction">
-					<h2>Worksheets Grandmaster</h2>
-					<div class="divider"></div>
-					<p id="details">An automated framework that generates worksheets based on question templates, hence the worksheets grandmaster.<br>Semi-intelligent with extended algebra engine that provides computational awareness.<br>Worksheets are intended to drill core concepts which are the building blocks of all math knowledge.</p>
-				</section>
-				<section id="purchase">
-					<h2>Purchase</h2>
-					<div class="divider"></div>
+		<div id="series-selector-container">
+			<div id="series-selector-btn-container">
+				<button class="series-selector-btn active">
+					MONO
+				</button>
+				<button class="series-selector-btn inactive">
+					STANDARD
+				</button>
+			</div>
+			<h1>SERIES</h1>
+		</div>
 
-					<p>Worksheets generated are uniquely yours.<br>After purchase has been made, you will receive a unique link to the worksheet and the answer sheet.<br>You are then able to save it as a PDF document and/or print it out.<br></p>
-					<p>&nbsp;</p>
-					<p>Reach out to me via Carousell <span style="font-family: monospace;">[@shop_id]</span> or IG <span style="font-family: monospace;">[@ig_handle]</span>.</p>
-				</section>
-				<section id="chapters">
-					<h2>Chapters</h2>
-					<div class="divider"></div>
-
-					<p>All the chapters here listed have their own individual worksheets and each worksheet contains 100 questions.<br>Each worksheet is priced at <span class="price">SGD $3</span>.</p>
-
-					<ul>
-						<li><span class="bold">[2.1]</span> Fractions to Percentage</li>
-						<li><span class="bold">[2.2]</span> Percentage to Fractions</li>
-						<li><span class="bold">[2.3.1]</span> Percentage Increase</li>
-						<li><span class="bold">[2.3.2]</span> Percentage Decrease</li>
-						<li><span class="bold">[2.3.3]</span> Percentage Change</li>
-						<li><span class="bold">[2.3.4]</span> Percentage Change Word Problems</li>
-						<li><span class="bold">[2.4.1]</span> Percentage Manipulation [Increase]</li>
-						<li><span class="bold">[2.4.2]</span> Percentage Manipulation [Decrease]</li>
-						<li><span class="bold">[2.5]</span> Percentage Express Relative Units</li>
-						<li><span class="bold">[2.6]</span> Percentage Of</li>
-						<li><span class="bold">[2.7]</span> Reverse Percentage</li>
-						<li><span class="bold">[3.1]</span> Simplifcation of Algebraic Equations</li>
-						<li><span class="bold">[3.1.1]</span> Simplifcation of Algebraic Equations Part II</li>
-					</ul>
-				</section>
-				<section id="volumes">
-					<h2>Volumes</h2>
-					<div class="divider"></div>
-
-					<p>Each volumes contains 10 topics, focused around a core topic, with a total of 50 questions each.<br>Hence, each volume has 500 questions in total and is priced at <span class="price">$9</span>.</p>
-
-					<ul>
-						<li><span class="bold">Volume A001</span> - Percentages & Fractions Fundamentals<br>Includes: 2.1, 2.2, 2.3.1, 2.3.2, 2.3.3</li>
-						<li><span class="bold">Volume A002</span> - Comprehensive Percentages<br>Includes: 2.3.3, 2.3.4, 2.4.1</li>
-					</ul>
-				</section>
+		<div id="product-showcase-container">
+			<div id="mono-series-first" class="product-showcase-section">
+				<div class="product-showcase-section-description">
+					<h3>Elusive series for great practice</h3>
+					<h2>For core fundamentals before sophiscated math concepts</h2>
+					<p>Get back to basics with fundamental questions drilling on core concepts before extending to application of such concepts.</p>
+					<p>Save the generated worksheet as a PDF for the infinite zoom and also to do it on the go. OR feel free to print it out.</p>
+				</div>
+			</div>
+			<div id="mono-series-second" class="product-showcase-section">
+				<div class="product-showcase-section-description">
+					<h2>200 questions to DRILL</h2>
+					<p>Non-stop drilling of 200 automated generated questions & answers by the Qriller Engine with extended Algebra Engine to power its computational awareness.</p>
+					<p>10 questions a day, a month to complete.</p>
+					<p>Upon purchase, a new worksheet will be populated with 200 highly-procedural randomly generated questions; guaranteeing absolute minimal reuse of questions.</p>
+				</div>
+			</div>
+			<div id="mono-series-third" class="product-showcase-section">
+				<div class="product-showcase-section-description">
+					<h3>Complements.</h3>
+					<h2>Paired with an answer sheet</h2>
+					<p>Answer sheet generated from the same exact unique worksheet upon purchase. This allows you to self grade your own work to spot mistakes early on.</p>
+				</div>
 			</div>
 		</div>
 	</body>
