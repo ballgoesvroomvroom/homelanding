@@ -161,18 +161,18 @@ body {
 .series-comparison-unit {
 	position: relative;
 	width: calc(45% - 8px);
-	min-height: 230px;
+	min-height: 250px;
 
 	padding: 15px;
 
-	background-color: #ff7e7e;
+	background-color: #c3c2e7;
 	border-style: solid;
 	border-width: 1px;
 	border-color: black;
 }
 
 .series-comparison-unit:last-child {
-	background-color: #c6a9fd;
+	background-color: #a6c5ff;
 }
 
 .series-comparison-unit > ul {
@@ -229,6 +229,10 @@ body {
 @media (max-width: 640px) {
 	body {
 		--horizontal-padding: 15px;
+	}
+
+	.topbar-action-btn {
+		padding: 8px 10px;
 	}
 
 	#homepage-banner {
