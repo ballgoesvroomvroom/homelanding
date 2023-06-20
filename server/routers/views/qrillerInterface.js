@@ -101,6 +101,18 @@ router.get("/", (req, res) => {
 	res.sendFile(views.qriller.homePage)
 })
 
+router.get("/series", (req, res) => {
+	// series page
+	res.type("html")
+	res.sendFile(views.qriller.seriesPage)
+})
+
+router.get("/topic-list", (req, res) => {
+	// topic listing page
+	res.type("html")
+	res.sendFile(views.qriller.listingPage)
+})
+
 router.get("/status", (req, res) => {
 	res.type("html")
 	res.sendFile(views.qriller.worksheetDirectory)
