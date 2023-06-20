@@ -231,6 +231,10 @@ body {
 		--horizontal-padding: 15px;
 	}
 
+	#homepage-banner {
+		height: 250px;
+	}
+
 	#homepage-series-comparision-container {
 		flex-direction: column;
 	}
