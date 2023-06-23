@@ -94,7 +94,6 @@ class AlgebraicParser {
 		var tokenStream = [] // stream tokens here to be parsed into units
 		var partialToken = "" // build tokens character by character
 		var partialTokenOnlyConsistsOfToken = false
-		var toPush = false // force push for current built token
 		var variableStore = {} // sniff out for variables
 		var skipCounter = 0 // amt of chars to skip
 		for (let charIdx = 0; charIdx < this.raw.length; charIdx++) {
@@ -110,7 +109,6 @@ class AlgebraicParser {
 				if (variableStore[char] == null) {
 					variableStore[char] = new RegExp(char)
 				}
-				toPush = true
 			}
 
 			// resume build token
@@ -164,6 +162,9 @@ class AlgebraicParser {
 
 				// reset token
 				partialToken = ""
+
+				// set value
+				notExpectingMultiplicationString = true
 			} else if (char === "^") {
 				// exponent operation
 				// look forward to see if its a algberaic value or a cosntant exponent
@@ -216,16 +217,6 @@ class AlgebraicParser {
 					// continue capturing
 					partialToken += "^"
 				}
-			} else if (toPush && partialToken.length === 0 && tokenStream.length >= 1) {
-				// empty tokens bout to be pushed, ffollow up with a multiplication operation
-				partialToken += `*${char}`
-
-				tokenStream.push(partialToken) // push built token
-				partialToken = "" // reset token
-				partialTokenOnlyConsistsOfToken = false // reset value
-
-				// reset value
-				toPush = false
 			} else {
 				// continue building token
 				partialToken += char
@@ -235,16 +226,6 @@ class AlgebraicParser {
 					if (AlgebraicParser.operations[char] == null) {
 						partialTokenOnlyConsistsOfToken = false
 					}
-				}
-
-				if (toPush) {
-					tokenStream.push(partialToken)
-					partialToken = ""
-					partialTokenOnlyConsistsOfToken = false
-
-					// reset value
-					toPush = false
-					console.log([...tokenStream])
 				}
 			}
 		}
@@ -797,6 +778,7 @@ class AlgebraicParser {
 		// chain multiply units supplied here
 		// units are wrapped by an array, with the second element (also an array element at index 1) representing the power if base has an exponent of null
 		// WILL MODIFY contents within units, use .toSpliced() if you still want to preserve the previous units
+		console.log("RAW", JSON.parse(JSON.stringify(units)))
 		var result = [units[0]]
 		console.log("INITIAL RESULT", JSON.parse(JSON.stringify(result)))
 		for (let i = 1; i < units.length; i++) {
@@ -1132,6 +1114,38 @@ class AlgebraicParser {
 		}
 	}
 
+	_sameLikeTerms(termA, termB) {
+		// returns true if termA === termB
+		// should only contain multiplication operation other than the root term
+		var variables = [] // extract out all the variables in termA
+		for (let i = 0; i < termA.length; i++) {
+			var unit = termA[i]
+			if (unit[4] === 1 && unit[2] !== -1) {
+				if (variables.indexOf(unit[2]) !== -1) {
+					variables.push(unit[2])
+				}
+			}
+			if (variables.indexOf(termA[]))
+			variables.push(termA[i])
+		}
+
+		// spot for missing terms in termA that are present in termB
+		// if not spot for excess terms in termA that are absent in termB
+		for (let i = 0; i < termB.length; i++) {
+			var unit = termA[i]
+			if (unit[4] === 1 && unit[2] !== -1) {
+				var idx = variables.indexOf(unit[2])
+				if (idx === -1) {
+					return false
+				} else {
+					variables.splice(idx, 1) // remove that element
+				}
+			}
+		}
+
+		return variables.length === 0
+	}
+
 	simplifyTest() {
 		this._applyExponents();
 		for (let [startIdx, endIdx] of this.parenthesisGroup()) {
@@ -1206,9 +1220,33 @@ class AlgebraicParser {
 			}
 		}
 
+		// expand adjacent parenthesis groups FIRST
+		console.log("V", JSON.parse(JSON.stringify(this.units)))
+		var closePgIdxMapping = {}; // create a mapping of parenthesis endings idx to their opening counterparts
+		for (let [startIdx, endIdx] of this.parenthesisGroup()) {
+			// create mapping entry
+			closePgIdxMapping[endIdx] = startIdx;
+
+			var openParenthesis = this.units[startIdx]
+			if (openParenthesis[0] === 3) {
+				// multiplication
+				var factor = this.units[startIdx -1]
+				console.log("FACTOR", factor, startIdx)
+				if (factor[4] === 3) {
+					// close parenthesis
+					var previousOpenPgIdx = closePgIdxMapping[startIdx -1] // mapping works cause of how this.parenthisGroup behaves, it start the inner-most PG with left to right fashion
+					console.log("PASSED PARAMS", previousOpenPgIdx, startIdx -1, startIdx, endIdx)
+					var expandedGroup = this._multAdjacentParenthesis(previousOpenPgIdx, startIdx -1, startIdx, endIdx)
+					console.log("MODIFICATION", expandedGroup, "\n", this.units, previousOpenPgIdx, endIdx -previousOpenPgIdx +1)
+					this.units.splice(previousOpenPgIdx, endIdx -previousOpenPgIdx +1, ...expandedGroup)
+				}
+			}
+		}
+
 		// expand ALL parenthesis groups, start from inner-most
+		var closePgIdxMapping = {}; // create a mapping of parenthesis endings idx to their opening counterparts
 		for (let [startIdx, endIdx] of this.hardLookupParenthesisGroup()) {
-			// start extracting all the group-units in the parenthesis group to be expanded on
+			// extracting all the group-units in the parenthesis group to be expanded on
 			var groupUnits = [[this.units[startIdx +1]]]; // stream all the tokens here
 			for (let j = startIdx +2; j < endIdx; j++) {
 				// start with a 2 offset since the unit directly adjacent to the open parenthesis is already included
@@ -1223,7 +1261,7 @@ class AlgebraicParser {
 				} else if (this.units[j] === 1) {
 					// new group
 					groupUnits.push([this.units[j]])
-				}
+					}
 			}
 
 			if (true) {
@@ -1253,13 +1291,16 @@ class AlgebraicParser {
 					// apply factors to all the terms inside the group
 					var result = [] // stream results here
 					for (let units of groupUnits) {
-						var multOpResult = this._multUnits(factor.toSpliced(factor.length, 0, ...units))
+						console.log("PARAMS", factor.toSpliced(factor.length, 0, ...units))
+						var multOpResult = this._multUnits(...factor.toSpliced(factor.length, 0, ...units))
+						console.log("MULT RESULT", multOpResult)
 						result.splice(result.length, 0, ...multOpResult)
 					}
 
 					// build into this.units
-					console.log("OVERWRITE", result)
-					this.units.splice(startIdx, endIdx -startIdx +1, ...result)
+					console.log("OVERWRITE", result, startIdx, endIdx -startIdx +1)
+					this.units.splice(startIdx -factor.length, endIdx -startIdx +factor.length +1, ...result)
+					console.log("FINAL", this.units)
 				} else {
 					// constant factor
 					for (let units of groupUnits) {
@@ -1273,31 +1314,59 @@ class AlgebraicParser {
 			}
 		}
 
-		// try to break non-exponent parenthesis groups (including expansion)
-		// CODE HERE
-		console.log("V", JSON.parse(JSON.stringify(this.units)))
-		var closePgIdxMapping = {}; // create a mapping of parenthesis endings idx to their opening counterparts
-		for (let [startIdx, endIdx] of this.parenthesisGroup()) {
-			// create mapping entry
-			closePgIdxMapping[endIdx] = startIdx;
+		// carry out root level addition by sniffing out the like terms first
+		// there should be no more parenthesis
+		var likeTerms = []; // stream like terms here
+		var currentTermBuild = []; // build like terms here
+		for (let i = 0; i < this.units.length; i++) {
+			var unit = this.units[i]
+			if (unit[4] !== 1) {
+				// de-serviced
+				continue
+			}
 
-			var openParenthesis = this.units[startIdx]
-			if (openParenthesis[0] === 3) {
+			if (unit[0] === 1) {
+				if (currentTermBuild.length >= 1) {
+					// stream into likeTerms array
+					likeTerms.push(currentTermBuild)
+
+					// reset build array
+					currentTermBuild = [unit];
+
+					// flatten unit
+					if (unit[2] === -1 && unit[3] != null && unit[3] !== 1) {
+						unit[1] **= unit[3];
+						unit[3] = 1 // reset
+					}
+				}
+			} else if (unit[0] === 3) {
 				// multiplication
-				var factor = this.units[startIdx -1]
-				console.log("FACTOR", factor, startIdx)
-				if (factor[4] === 3) {
-					// close parenthesis
-					var previousOpenPgIdx = closePgIdxMapping[startIdx -1] // mapping works cause of how this.parenthisGroup behaves, it start the inner-most PG with left to right fashion
-					console.log("PASSED PARAMS", previousOpenPgIdx, startIdx -1, startIdx, endIdx)
-					var expandedGroup = this._multAdjacentParenthesis(previousOpenPgIdx, startIdx -1, startIdx, endIdx)
-					console.log("MODIFICATION", expandedGroup, "\n", this.units, previousOpenPgIdx, endIdx -previousOpenPgIdx +1)
-					this.units.splice(previousOpenPgIdx, endIdx -previousOpenPgIdx +1, ...expandedGroup)
+				currentTermBuild.push(unit)
+
+				// make currentTermBuild[0] the root array, i.e. pass all the coeffs to root
+				if (unit[2] === -1 && unit[3] != null && unit[3] !== -1) {
+					unit[1] **= unit[3];
+					unit[3] = 1 // reset exponent
+				}
+
+				currentTermBuild[0][1] *= unit[1]
+				unit[1] = 1 // reset coefficient
+			}
+		}
+
+		// start doing the addition & subtraction operation
+		var arithResult = [likeTerms.pop()]
+		for (let i = likeTerms.length -1; i >= 0; i--) {
+			for (let j = 0; j < arithResult.length; j++) {
+				if (this._sameLikeTerms(arithResult[j], likeTerms[i])) {
+					// can be added together, use the root base
+					
 				}
 			}
 		}
 
-		// carry out root level addition
+
+
 		// start doing addition and subtraction
 		var initLen = this.units.length
 		var removalOffset = 0; // counter for units removed
