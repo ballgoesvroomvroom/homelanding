@@ -62,7 +62,7 @@ class AlgebraicParser {
 		"*": 3,
 		"/": 4
 	}
-	static variableRegex = /[A-Za-z\u0391-\u03C9]+/ // a-z, A-Z, all the greek symbols
+	static variableRegex = /[A-Za-z\u0391-\u03C9]{1}/ // a-z, A-Z, all the greek symbols
 	static coeffRegex = /[\d.-]+/ // include the minus symbol to capture negative coefficients
 
 	constructor(eqnStr) {
@@ -94,6 +94,7 @@ class AlgebraicParser {
 		var tokenStream = [] // stream tokens here to be parsed into units
 		var partialToken = "" // build tokens character by character
 		var partialTokenOnlyConsistsOfToken = false
+		var toPush = false // force push for current built token
 		var variableStore = {} // sniff out for variables
 		var skipCounter = 0 // amt of chars to skip
 		for (let charIdx = 0; charIdx < this.raw.length; charIdx++) {
@@ -109,12 +110,16 @@ class AlgebraicParser {
 				if (variableStore[char] == null) {
 					variableStore[char] = new RegExp(char)
 				}
+				toPush = true
 			}
 
 			// resume build token
-			if ((!partialTokenOnlyConsistsOfToken && AlgebraicParser.operations[char] != null && partialToken.length > 0) || char === ")") {
+			if ((!partialTokenOnlyConsistsOfToken && AlgebraicParser.operations[char] != null) || char === ")") {
 				// push token into stream (unless token consists of operations)
-				tokenStream.push(partialToken) // trim out all whitespaces
+				console.log("OP")
+				if (partialToken.length > 0) {
+					tokenStream.push(partialToken) // push current built token
+				}
 
 				// include operation in new partialToken
 				partialToken = char
@@ -122,6 +127,7 @@ class AlgebraicParser {
 				// set partialTokenOnlyConsistsOfToken value to true
 				partialTokenOnlyConsistsOfToken = char !== ")"
 			} else if (char === "(") {
+				console.log("PP")
 				// parenthesis demarcations (start)
 
 				// determine if partialToken contains any operation, if does, simply use that operation on this parenthesis
@@ -132,16 +138,21 @@ class AlgebraicParser {
 					// ensure is not simply a captured operation (one char), although can be simply a constant factor, e.g. n(a + b)
 
 					// push token
+					console.log("PP", char)
 					tokenStream.push(partialToken)
 
 					// multiplication operator
 					partialToken = "*("
 				} else if (tokenStream.length >= 1) {
+					// nothing in partial token
 					// use previous token to determine what operation to apply on this parenthesis
 					var prevToken = tokenStream[tokenStream.length -1]
 					if ((prevToken.length >= 1) && (prevToken[prevToken.length -1] === "^" || prevToken[prevToken.length -1] === "(")) {
 						// exponent  parenthesis or previous token was an adjacent parenthesis opening
 						partialToken = "("
+					} else {
+						// need a multiplication operation
+						partialToken = "*("
 					}
 				} else {
 					// first character met is an open parenthesis
@@ -205,6 +216,16 @@ class AlgebraicParser {
 					// continue capturing
 					partialToken += "^"
 				}
+			} else if (toPush && partialToken.length === 0 && tokenStream.length >= 1) {
+				// empty tokens bout to be pushed, ffollow up with a multiplication operation
+				partialToken += `*${char}`
+
+				tokenStream.push(partialToken) // push built token
+				partialToken = "" // reset token
+				partialTokenOnlyConsistsOfToken = false // reset value
+
+				// reset value
+				toPush = false
 			} else {
 				// continue building token
 				partialToken += char
@@ -215,6 +236,16 @@ class AlgebraicParser {
 						partialTokenOnlyConsistsOfToken = false
 					}
 				}
+
+				if (toPush) {
+					tokenStream.push(partialToken)
+					partialToken = ""
+					partialTokenOnlyConsistsOfToken = false
+
+					// reset value
+					toPush = false
+					console.log([...tokenStream])
+				}
 			}
 		}
 
@@ -222,6 +253,8 @@ class AlgebraicParser {
 		if (partialToken.length > 0) {
 			tokenStream.push(partialToken)
 		}
+
+		console.log("T", tokenStream)
 
 		// build units based on tokens in tokenStream
 		var units = []
@@ -381,8 +414,8 @@ class AlgebraicParser {
 				for (let unitIdx = endIdx +1; unitIdx < this.units.length; unitIdx++) {
 					var superseedingUnit = this.units[unitIdx]
 
-					if (superseedingUnit[0] === 3) {
-						// multiplication, move it forward to start of parenthesis
+					if (superseedingUnit[0] === 3 && superseedingUnit[4] === 1) {
+						// multiplication & a number term (constant/variable), move it forward to start of parenthesis
 						this.units.splice(unitIdx, 1) // splice from last index
 						this.units.splice(startIdx, 0, superseedingUnit)
 
@@ -763,17 +796,39 @@ class AlgebraicParser {
 	_multUnits(...units) {
 		// chain multiply units supplied here
 		// units are wrapped by an array, with the second element (also an array element at index 1) representing the power if base has an exponent of null
-		var result = [unit[0]]
+		// WILL MODIFY contents within units, use .toSpliced() if you still want to preserve the previous units
+		var result = [units[0]]
+		console.log("INITIAL RESULT", JSON.parse(JSON.stringify(result)))
 		for (let i = 1; i < units.length; i++) {
 			// start by multiplying the second unit with the first unit
 			var rightoperand = units[i]
-			for (let j = j; j < result.length; j++) {
+			var success = false
+			console.log("START CYCLE", JSON.parse(JSON.stringify(result)))
+			for (let j = 0; j < result.length; j++) {
 				// list of candidates if they cannot be simplified farther
 
 				var leftoperand = result[j]
-				var result = this._multUnit(leftoperand[0], rightoperand[0]) // supply the exponent groups if any
+				var postOpResult = this._multUnit(leftoperand, rightoperand) // supply the exponent groups if any
+				console.log("TRYING", JSON.parse(JSON.stringify(leftoperand)), JSON.parse(JSON.stringify(rightoperand)), postOpResult)
+				if (postOpResult) {
+					// was able to simpifly farther
+					result[j] = postOpResult
+					success = true
+					break
+				} else {
+					console.log("NOT SUCCESSFULLY, trying next in result pool")
+				}
+			}
+
+			if (!success) {
+				rightoperand[0] = 3 // change it to multiplication before pushing it in
+
+				result.push(rightoperand)
+				console.log("RESULT POOL", JSON.parse(JSON.stringify(result)))
 			}
 		}
+
+		return result
 	}
 
 	_simplifyParenthesis(startContentIdx, endContentIdx) {
@@ -817,14 +872,15 @@ class AlgebraicParser {
 	_multAdjacentParenthesis(firstPgIdx, firstPgCloseIdx, secondPgIdx, secondClosePgIdx) {
 		// expands out the adjacent parenthesis group with multiplication
 		// inner parenthesis group should have been reduced to minimal by .simplify()
+		// return the new units group inclusive of the removal of previous parenthesis demarcation
 		// firstPgIdx: integer, index of the first parenthesis group demarcation (inclusive)
 		// secondPgIdx: integer, index of the second parenthesis group demarcation (inclusive)
 
 		// extract out all the terms to be used as factors (in both groups)
-		var groupFactors = [];
+		var groupFactors = []; // stream final factorList into here
 		for (let g = 0; g < 2; g++) {
+			var factorList = [] // stream built factors into here
 			var currentFactor = [] // build factors here
-			var factorList = []
 
 			var startIdx = firstPgIdx *(1 -g) +secondPgIdx *g // firstPgIdx during first iteration
 			var endIdx = firstPgCloseIdx *(1 -g) +secondClosePgIdx *g
@@ -853,6 +909,9 @@ class AlgebraicParser {
 						factorList.push([currentFactor, exponentBuild])
 					}
 
+					// reset currentFactor
+					currentFactor = [];
+
 					// ignore this unit, continue
 					continue
 				} else if (exponentScope === 0 && unit[4] === 1) {
@@ -875,23 +934,32 @@ class AlgebraicParser {
 				}
 			}
 
+			// push any remaining factorList
+			if (currentFactor.length >= 1) {
+				factorList.push([currentFactor])
+			}
+
 			groupFactors.push(factorList)
 		}
 
 		// construct the new parenthesis group
 		var group = [] // stream new units into here
 		for (let i = 0; i < groupFactors[0].length; i++) {
-			var unit = groupFactors[0][i];
+			var unit = groupFactors[0][i][0];
+			console.log("UNIT", unit)
 
 			// multiply every term in the second pg by unit
 			for (let j = 0; j < groupFactors[1].length; j++) {
 				// chain all the terms together, operation does not matter since ._multUnits assume multiplication operation & hence does not check for operation mode value
-				var result = this._multUnits(...unit.splice(unit.length, 0, groupFactors[1][j])) // result would be an array
+				var chain = unit.toSpliced(unit.length, 0, ...groupFactors[1][j][0])
+				console.log("CHAIN", chain, groupFactors[1][j][0])
+				var result = this._multUnits(...chain) // result would be an array
 
-				group.slice(group.length, 0, ...result) // spread out array container
+				group.splice(group.length, 0, ...result) // spread out array container
 			}
 		}
 
+		console.log("FINAL", JSON.parse(JSON.stringify(group)))
 		return group
 	}
 
@@ -1104,31 +1172,11 @@ class AlgebraicParser {
 			}
 		}
 
-		// try to break non-exponent parenthesis groups (including expansion)
-		// CODE HERE
-		var closePgIdxMapping = {}; // create a mapping of parenthesis endings idx to their opening counterparts
-		for (let [startIdx, endIdx] of this.parenthesisGroup()) {
-			// create mapping entry
-			closePgIdxMapping[endIdx] = startIdx;
-
-			var openParenthesis = this.units[startIdx]
-			if (openParenthesis[0] === 3) {
-				// multiplication
-				var factor = this.units[startIdx -1]
-				if (factor[4] === 3) {
-					// close parenthesis
-					var previousOpenPgIdx = closePgIdxMapping[startIdx -1] // mapping works cause of how this.parenthisGroup behaves, it start the inner-most PG with left to right fashion
-					var expandedGroup = this._multAdjacentParenthesis(previousOpenPgIdx, startIdx -1, startIdx, endIdx)
-					this.units.splice(previousOpenPgIdx, endIdx -previousOpenPgIdx +1, expandedGroup)
-				}
-			}
-		}
-
 		// try to simplify complex exponents after simplifying contents of parenthesis
 		// i.e. bring down 10^(2) [4 units] to 10^2 [1 unit]
 		// should have minimal nested parenthesis by now
 		for (let [startIdx, endIdx] of this.parenthesisGroup()) {
-				var base = this.units[startIdx -1] // base with null pointer as exponent value represents complex exponents
+			var base = this.units[startIdx -1] // base with null pointer as exponent value represents complex exponents
 			if (this.units[startIdx][0] === 5 && base[4] === 1 && base == null) {
 				// exponent open parenthesis demarcation, only work with bases who have exponents set to null and aren't close parenthesis (e.g. (x + 1)^2)
 				if (this._countUnits(this.units.slice(startIdx +1, endIdx)) === 1) {
@@ -1158,7 +1206,130 @@ class AlgebraicParser {
 			}
 		}
 
-		// carry out any expansion 
+		// expand ALL parenthesis groups, start from inner-most
+		for (let [startIdx, endIdx] of this.hardLookupParenthesisGroup()) {
+			// start extracting all the group-units in the parenthesis group to be expanded on
+			var groupUnits = [[this.units[startIdx +1]]]; // stream all the tokens here
+			for (let j = startIdx +2; j < endIdx; j++) {
+				// start with a 2 offset since the unit directly adjacent to the open parenthesis is already included
+				if (this.units[j][4] !== 1) {
+					// do not work on this unit, continue
+					continue
+				}
+
+				if (this.units[j][0] === 3) {
+					// stream into current build
+					groupUnits[groupUnits.length -1].push(this.units[j])
+				} else if (this.units[j] === 1) {
+					// new group
+					groupUnits.push([this.units[j]])
+				}
+			}
+
+			if (true) {
+				// parenthesis is to be expanded AND has units infront
+				var factor = this.units[startIdx][1] // negative coefficient perhaps, 1 by default (ALWAYS A CONSTANT VALUE SINCE IT CAN ONLY REPRESENT NUMBERS ONLY)
+				if (this.units[startIdx][0] === 3) {
+					// there is a factor infront, i.e. 10x(30a)
+					// continuously build factor, i.e. 10x*3b(30a)
+
+					// first, apply the VERY FIRST factor to current constant factor
+					var prematureFactor = this.units[startIdx -1]
+					prematureFactor[1] *= factor // apply factor
+					this.units[startIdx][1] = 1 // reset factor
+
+					factor = [prematureFactor] // build it into a list, start streaming factors if they are any
+					if (this.units[startIdx -1][0] === 3) {
+						for (let j = startIdx -2; j >= 0; j++) {
+							// look at the second and ongoing factor (if no longer a mult op, stop building factors)
+							factor.push(this.units[j])
+
+							if (this.units[j][0] !== 3) {
+								break; // stop operation
+							}
+						}
+					}
+
+					// apply factors to all the terms inside the group
+					var result = [] // stream results here
+					for (let units of groupUnits) {
+						var multOpResult = this._multUnits(factor.toSpliced(factor.length, 0, ...units))
+						result.splice(result.length, 0, ...multOpResult)
+					}
+
+					// build into this.units
+					console.log("OVERWRITE", result)
+					this.units.splice(startIdx, endIdx -startIdx +1, ...result)
+				} else {
+					// constant factor
+					for (let units of groupUnits) {
+						units[0][1] *= factor
+					}
+
+					// de-service both parenthesis demarcation
+					console.log("DESERVICED", startIdx, endIdx)
+					this._deserviceUnit(startIdx, endIdx)
+				}
+			}
+		}
+
+		// try to break non-exponent parenthesis groups (including expansion)
+		// CODE HERE
+		console.log("V", JSON.parse(JSON.stringify(this.units)))
+		var closePgIdxMapping = {}; // create a mapping of parenthesis endings idx to their opening counterparts
+		for (let [startIdx, endIdx] of this.parenthesisGroup()) {
+			// create mapping entry
+			closePgIdxMapping[endIdx] = startIdx;
+
+			var openParenthesis = this.units[startIdx]
+			if (openParenthesis[0] === 3) {
+				// multiplication
+				var factor = this.units[startIdx -1]
+				console.log("FACTOR", factor, startIdx)
+				if (factor[4] === 3) {
+					// close parenthesis
+					var previousOpenPgIdx = closePgIdxMapping[startIdx -1] // mapping works cause of how this.parenthisGroup behaves, it start the inner-most PG with left to right fashion
+					console.log("PASSED PARAMS", previousOpenPgIdx, startIdx -1, startIdx, endIdx)
+					var expandedGroup = this._multAdjacentParenthesis(previousOpenPgIdx, startIdx -1, startIdx, endIdx)
+					console.log("MODIFICATION", expandedGroup, "\n", this.units, previousOpenPgIdx, endIdx -previousOpenPgIdx +1)
+					this.units.splice(previousOpenPgIdx, endIdx -previousOpenPgIdx +1, ...expandedGroup)
+				}
+			}
+		}
+
+		// carry out root level addition
+		// start doing addition and subtraction
+		var initLen = this.units.length
+		var removalOffset = 0; // counter for units removed
+		var isFirstUnitOfScope = true;
+		for (let unitIdx = 0; unitIdx < initLen; unitIdx++) {
+			var unit = this.units[unitIdx -removalOffset]
+			if (unit[4] === 2 || unit[4] === 3 || unit[4] === 4) {
+				// parenthesis demarcation OR deserviced unit
+				// check for this first, if true, continuing skiping next unit
+				isFirstUnitOfScope = true
+				continue // move on to next next unit
+			} else if (isFirstUnitOfScope && unit[4] !== 4) {
+				// no operations on this unit (unit is IN service)
+				isFirstUnitOfScope = false; // toggle it false
+			}
+
+			if (unitIdx > 0 && unit[0] === 1) {
+				var loIdx = this._findLeftOperandWithSameBaseAndExpoWithinSameScope(unitIdx -removalOffset)
+				if (loIdx == null) {
+					// no valid left operand, CANT !loIdx since 0 is a falsey value
+					continue; // continue with next token
+				}
+
+				var success = this._addAdjacent(loIdx, unitIdx -removalOffset, true)
+
+				if (success) {
+					removalOffset++;
+				}
+			}
+		}
+
+		// group items together before removing
 	}
 
 	simplify() {
@@ -1325,6 +1496,49 @@ class AlgebraicParser {
 		}
 	}
 
+	*hardLookupParenthesisGroup() {
+		// always refreshes the index, ONLY use this if parenthesis demarcations are being removed
+		// will ignore exponent brackets
+		var running = true
+		while (running) {
+			var found = false
+			var start, end;
+
+			var lftFindOpenPtr = null; // will be null when parenthesis groups are escaped (for nested findings)
+			for (let unitIdx = 0; unitIdx < this.units.length; unitIdx++) {
+				var unit = this.units[unitIdx]
+				if (unit[4] === 3) {
+					// close parenthesis, back track to find the open parenthesis
+					var backTrackPtr = lftFindOpenPtr ?? unitIdx // if no pointer reference stored, use unitIdx (current indication of where close parenthesis is)
+					for (let j = backTrackPtr -1; j >= 0; j--) {
+						if (this.units[j][4] === 2 && this.units[j][0] !== 5) {
+							// matching open parenthesis
+							lftFindOpenPtr = j
+
+							// carry out operation here
+							found = true
+							start = j
+							end = unitIdx
+
+							break
+						}
+					}
+				} else if (unit[4] === 2) {
+					// met a open parenthesis, do nothing but reset leftPointer reference in order to reach this open parenthesis later on
+					lftFindOpenPtr = null; // reset pointer (discard reference to previously stored open parenthesis)
+				}
+			}
+
+			if (found) {
+				found = false
+				yield [start, end]
+			} else {
+				running = false
+				break
+			}
+		}
+	}
+
 	buildRepr() {
 		// build a string representation based on this.units
 		var r = ""
@@ -1342,9 +1556,11 @@ class AlgebraicParser {
 			var resetScopeIdx = false; // if true, will reset scopeIdx
 			if (unit[1] < 0) {
 				prefix = "-"
-			} else if (scopeIdx === 0 && unit[4] === 2) {
+			}
+
+			if (scopeIdx === 0 && unit[4] === 2) {
 				// parenthesis start demarcation
-				prefix = "("
+				prefix += "("
 				resetScopeIdx = true
 			} else if (scopeIdx > 0) {
 				// if not, prefix remain empty
