@@ -195,6 +195,29 @@ class AlgebraicEqn {
 	}
 }
 
+class JumbleAlgebraicExpr {
+	constructor(options) {
+		// options: {variableStyle: char, containsNeg: boolean, containsMultOp: boolean, argsRange: int[] size 2}
+		// argsRange is inclusive
+		var base = rando(2, 50)
+		var argsNo = rando(...options.argsRange)
+
+		var terms = ""; // build terms here
+		for (let i = 0; i < argsNo; i++) {
+			var coeff = rando(1, base)
+
+			// determine polarity
+			var isNeg = false
+			if (options.containsNeg && rando() >= .85) {
+				isNeg = true
+			}
+
+			// determine operation
+			var op = 1; // 1 for add, 2 for sub, 3 for mult, 4 for div (div works on gcd)
+		}
+	}
+}
+
 class AlgebraicExpr {
 	constructor(variables, polynomialDegree) {
 		// variables: array of characters to be used as variables
@@ -1128,6 +1151,9 @@ class SimplifyAlgebraic extends BaseQuestion {
 			if (coeff < 0) {
 				prefix = "-"
 			} else if (qnStr.length > 0) {
+				if (difficultyLevel >= 2) {
+
+				}
 				prefix = "+"
 			}
 
@@ -1280,6 +1306,12 @@ class TwoSimQn extends BaseQuestion {
 		// toughnessDegree 1-3 (with 3 being the toughest)
 
 		// form random equations with relations to a and b\
+	}
+}
+
+class Inequalities extends BaseQuestion {
+	constructor(difficultyLevel) {
+
 	}
 }
 
