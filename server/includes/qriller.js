@@ -197,24 +197,70 @@ class AlgebraicEqn {
 
 class JumbleAlgebraicExpr {
 	constructor(options) {
-		// options: {variableStyle: char, containsNeg: boolean, containsMultOp: boolean, argsRange: int[] size 2}
+		// options: {variableStyles: char[], containsNeg: boolean, containsMultOp: boolean, argsRange: int[] size 2}
 		// argsRange is inclusive
-		var base = rando(2, 50)
+		// look ahead approach
+		var initialN = rando(2, 50)
 		var argsNo = rando(...options.argsRange)
 
 		var terms = ""; // build terms here
-		for (let i = 0; i < argsNo; i++) {
-			var coeff = rando(1, base)
+		var nextCoeff = "";
+		var nextBase = null;
+		for (let i = 0; i < argsNo -1; i++) {
+			var coeff, base, op;
+			if (factorOf) {
+				// use coeff
+				coeff = nextCoeff
+				base = nextBase
 
-			// determine polarity
-			var isNeg = false
-			if (options.containsNeg && rando() >= .85) {
-				isNeg = true
+				// reset forced coeff values
+				nextCoeff = null;
+				nextBase = null;
+
+				// next operation has to be add / subtraction
+				op = 1
+			} else {
+				// determine operation first, if its division, need to generate a base first
+				if (rando() >= 0.85) {
+					// mult operation
+					op = 2;
+
+					coeff = rando(2, initialN) *((options.conainsNeg && rando() >= .85) ? -1 : 1)
+					base = options.variableStyles[rando(0, options.variableStyles.length -1)]
+				} else if (rando() >= 0.85) {
+					// division
+					op = 3
+
+					// generate a base
+					var varChoice = options.variableStyles[rando(0, options.variableStyles.lenght -1)]
+					nextCoeff = rando(2, initialN) *((options.conainsNeg && rando() >= .85) ? -1 : 1)
+					nextBase = varChoice
+
+					coeff = nextCoeff *rando(1, 6) *((options.conainsNeg && rando() >= .85) ? -1 : 1) // random factor with negative factor
+				} else {
+					// op is 1, adition OR subtraction
+					op = 1;
+					coeff = rando(2, initialN) *((options.conainsNeg && rando() >= .85) ? -1 : 1)
+					base = options.variableStyles[rando(0, options.variableStyles.length -1)]
+				}
 			}
 
-			// determine operation
-			var op = 1; // 1 for add, 2 for sub, 3 for mult, 4 for div (div works on gcd)
+			// match op
+			var postfix = "+"
+			switch (op) {
+				case 2:
+					prefix = "*"
+					break
+				case 3:
+					prefix = "÷"
+			}
+
+
+			// build term
+			terms += `${coeff}${base}${postfix}`
 		}
+
+		return terms.slice(0, terms.length -1) // exclude last postfix
 	}
 }
 
