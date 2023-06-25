@@ -207,7 +207,8 @@ class JumbleAlgebraicExpr {
 		var nextCoeff = "";
 		var nextBase = null;
 		var nextBaseForceConstant = false // for multiplication, prevent squares
-		for (let i = 0; i < argsNo -1; i++) {
+		var nextNegBaseEncapsulateInParenthesis = false // if true, will encapsulate next negative integer with parenthesis
+		for (let i = 0; i < argsNo; i++) {
 			var coeff, base, op;
 			if (nextCoeff) {
 				// use coeff
@@ -226,26 +227,34 @@ class JumbleAlgebraicExpr {
 					// mult operation
 					op = 2;
 
-					coeff = rando(2, initialN) *((options.conainsNeg && rando() >= .85) ? -1 : 1)
+					coeff = rando(1, Math.floor(initialN /3)) *((options.conainsNeg && rando() >= .85) ? -1 : 1)
 					base = nextBaseForceConstant ? "" : options.variableStyles[rando(0, options.variableStyles.length -1)]
 
-					// make sure next term generated is not an algebraic term
+					nextBaseForceConstant = true // force constant
+					nextNegBaseEncapsulateInParenthesis = true // need to wrap neg with parenthesis
 				} else if (i < argsNo -1 && rando() >= 0.85) {
 					// division (ONLY if this control loop is resp for generating next term)
 					op = 3
 
 					// generate a base
 					var varChoice = options.variableStyles[rando(0, options.variableStyles.length -1)]
-					nextCoeff = rando(2, initialN) *((options.conainsNeg && rando() >= .85) ? -1 : 1)
+					nextCoeff = rando(1, initialN) *((options.conainsNeg && rando() >= .85) ? -1 : 1)
 					nextBase = varChoice
 					base = varChoice
 
 					coeff = nextCoeff *rando(1, 6) *((options.conainsNeg && rando() >= .85) ? -1 : 1) // random factor with negative factor
+
+					// make sure next term generated is a constant
+					nextBaseForceConstant = true
+					nextNegBaseEncapsulateInParenthesis = true // need to wrap neg with parenthesis
 				} else {
 					// op is 1, adition OR subtraction
 					op = 1;
-					coeff = rando(2, initialN) *((options.conainsNeg && rando() >= .85) ? -1 : 1)
+					coeff = rando(1, initialN) *((options.conainsNeg && rando() >= .85) ? -1 : 1)
 					base = nextBaseForceConstant ? "" : options.variableStyles[rando(0, options.variableStyles.length -1)]
+
+					nextBaseForceConstant = false // reset force constant
+					nextNegBaseEncapsulateInParenthesis = false // no need to wrap neg with parenthesis, will just drop the current prefix
 				}
 			}
 
@@ -263,6 +272,10 @@ class JumbleAlgebraicExpr {
 				prefix = ""; // remove prefix
 			}
 
+			if (base.length > 0 && Math.abs(coeff) === 1) {
+				// not a constat, exactly 1, no need coeff
+				coeff = coeff < 0 ? "-" : ""; // empty
+			}
 
 			// build term
 			terms += `${coeff}${base}${prefix}`
@@ -1102,7 +1115,7 @@ class FutureAlgebra extends BaseQuestion {
 			variableStyles: [["x", "y"], ["a", "b"]][rando(0, 1)],
 			containsNeg: false,
 			containsMultOp: false,
-			argsRange: [2, 5],
+			argsRange: [1, 4],
 			trimTrilingPrefix: true,
 		}
 
@@ -1123,6 +1136,7 @@ class FutureAlgebra extends BaseQuestion {
 
 				// generate terms
 				eqn = new JumbleAlgebraicExpr(paramsOptions).result()
+				break
 			case 4:
 				// all 4 arithemtic ops with negative numbers, with parenthesis
 				// generate either a min 2 times
@@ -1133,17 +1147,33 @@ class FutureAlgebra extends BaseQuestion {
 				var terms = rando(2, 3)
 				var parenthesisPointer = rando(1, terms)
 				for (let i = 0; i < terms; i++) {
-					if (i >= parenthesisPointer) {
-						// right after parenthesis, add a plus postfix (has continuing elements)
+					if (i === parenthesisPointer) {
+						// right after parenthesis, add a plus postfix (has continuing elements) (ONCE ONLY)
 						eqn += "+";
 					}
 
 					if (i === parenthesisPointer -1) {
 						// create parenthesis
 						paramsOptions.trimTrilingPrefix = true // trim trailing prefix
-						eqn += `+${rando(1, 9)}(${new JumbleAlgebraicExpr(paramsOptions).result()})`
+						paramsOptions.argsRange[1] = 3
+						console.log("PARAMS", paramsOptions)
+
+						// generate factor
+						var factor = rando(0, 9) *(rando() >= .85 ? -1 : 1)
+						var factorPrefix = ""
+						if (factor === -1) {
+							factorPrefix = "-"
+						}
+
+						// factor representative
+						if (Math.abs(factor) === 1) {
+							factor = ""
+						}
+
+						eqn += `${factorPrefix}${rando(1, 9)}(${new JumbleAlgebraicExpr(paramsOptions).result()})`
 					} else {
 						paramsOptions.trimTrilingPrefix = i === (terms -1) // only trim if its the last term
+						paramsOptions.argsRange[1] = 4
 						eqn += `${new JumbleAlgebraicExpr(paramsOptions).result()}`
 					}
 				}
@@ -1443,6 +1473,20 @@ class TwoSimQn extends BaseQuestion {
 
 class Inequalities extends BaseQuestion {
 	constructor(difficultyLevel) {
+
+	}
+}
+
+
+// order of operations
+class OOPInt extends BaseQuestion {
+	constructor() {
+
+	}
+}
+
+class OOPFrac extends BaseQuestion {
+	constructor() {
 
 	}
 }

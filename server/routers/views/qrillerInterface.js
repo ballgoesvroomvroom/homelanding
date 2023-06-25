@@ -294,7 +294,16 @@ presetRouter.get("/algetest", (req, res) => {
 		"[3.1.2] Simplification of Algebraic Expressions Part II", "Manipulate algebraic terms and simplify each expression to their simplest form.",
 		qriller.FutureAlgebra,
 		100,
-		3)
+		4)
+})
+
+presetRouter.get("/oop/1.1", (req, res) => {
+	return Utils.generateQriller(
+		res,
+		"[1.1.2] Simplification of Algebraic Expressions Part II", "Manipulate algebraic terms and simplify each expression to their simplest form.",
+		qriller.OOPInt,
+		100,
+		4)
 })
 
 router.use("/presets", presetRouter)
