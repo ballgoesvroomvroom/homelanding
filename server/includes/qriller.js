@@ -197,7 +197,7 @@ class AlgebraicEqn {
 
 class JumbleAlgebraicExpr {
 	constructor(options) {
-		// options: {variableStyles: char[], containsNeg: boolean, containsMultOp: boolean, argsRange: int[] size 2}
+		// options: {variableStyles: char[], containsNeg: boolean, containsMultOp: boolean, argsRange: int[] size 2, trimTrilingPrefix: boolean}
 		// argsRange is inclusive
 		// look ahead approach
 		var initialN = rando(2, 50)
@@ -206,12 +206,13 @@ class JumbleAlgebraicExpr {
 		var terms = ""; // build terms here
 		var nextCoeff = "";
 		var nextBase = null;
+		var nextBaseForceConstant = false // for multiplication, prevent squares
 		for (let i = 0; i < argsNo -1; i++) {
 			var coeff, base, op;
-			if (factorOf) {
+			if (nextCoeff) {
 				// use coeff
 				coeff = nextCoeff
-				base = nextBase
+				base = (rando() >= .85) ? nextBase : "" // empty base (division)
 
 				// reset forced coeff values
 				nextCoeff = null;
@@ -226,22 +227,25 @@ class JumbleAlgebraicExpr {
 					op = 2;
 
 					coeff = rando(2, initialN) *((options.conainsNeg && rando() >= .85) ? -1 : 1)
-					base = options.variableStyles[rando(0, options.variableStyles.length -1)]
-				} else if (rando() >= 0.85) {
-					// division
+					base = nextBaseForceConstant ? "" : options.variableStyles[rando(0, options.variableStyles.length -1)]
+
+					// make sure next term generated is not an algebraic term
+				} else if (i < argsNo -1 && rando() >= 0.85) {
+					// division (ONLY if this control loop is resp for generating next term)
 					op = 3
 
 					// generate a base
-					var varChoice = options.variableStyles[rando(0, options.variableStyles.lenght -1)]
+					var varChoice = options.variableStyles[rando(0, options.variableStyles.length -1)]
 					nextCoeff = rando(2, initialN) *((options.conainsNeg && rando() >= .85) ? -1 : 1)
 					nextBase = varChoice
+					base = varChoice
 
 					coeff = nextCoeff *rando(1, 6) *((options.conainsNeg && rando() >= .85) ? -1 : 1) // random factor with negative factor
 				} else {
 					// op is 1, adition OR subtraction
 					op = 1;
 					coeff = rando(2, initialN) *((options.conainsNeg && rando() >= .85) ? -1 : 1)
-					base = options.variableStyles[rando(0, options.variableStyles.length -1)]
+					base = nextBaseForceConstant ? "" : options.variableStyles[rando(0, options.variableStyles.length -1)]
 				}
 			}
 
@@ -264,7 +268,13 @@ class JumbleAlgebraicExpr {
 			terms += `${coeff}${base}${prefix}`
 		}
 
-		return terms.slice(0, terms.length -1) // exclude last prefix
+		// store as fields
+		this.options = options
+		this.terms = terms
+	}
+
+	result() {
+		return this.options.trimTrilingPrefix ? this.terms.slice(0, this.terms.length -1) : this.terms // exclude last prefix if options.trimTrilingPrefix is true
 	}
 }
 
@@ -1086,11 +1096,14 @@ class RelativePercManipulation extends BaseQuestion {
 
 class FutureAlgebra extends BaseQuestion {
 	constructor(difficultyLevel) {
+		super();
+
 		var paramsOptions = {
 			variableStyles: [["x", "y"], ["a", "b"]][rando(0, 1)],
 			containsNeg: false,
 			containsMultOp: false,
-			minArgsRange: [2, 5],
+			argsRange: [2, 5],
+			trimTrilingPrefix: true,
 		}
 
 		var eqn = "";
@@ -1109,24 +1122,34 @@ class FutureAlgebra extends BaseQuestion {
 				// catch block
 
 				// generate terms
-				eqn = new JumbleAlgebraicExpr(paramsOptions)
+				eqn = new JumbleAlgebraicExpr(paramsOptions).result()
 			case 4:
 				// all 4 arithemtic ops with negative numbers, with parenthesis
 				// generate either a min 2 times
 				paramsOptions.containsNeg = true
 				paramsOptions.containsMultOp = true
+				paramsOptions.trimTrilingPrefix = false
 
 				var terms = rando(2, 3)
 				var parenthesisPointer = rando(1, terms)
 				for (let i = 0; i < terms; i++) {
+					if (i >= parenthesisPointer) {
+						// right after parenthesis, add a plus postfix (has continuing elements)
+						eqn += "+";
+					}
+
 					if (i === parenthesisPointer -1) {
 						// create parenthesis
-						eqn += `(${new JumbleAlgebraicExpr(paramsOptions)})`
+						paramsOptions.trimTrilingPrefix = true // trim trailing prefix
+						eqn += `+${rando(1, 9)}(${new JumbleAlgebraicExpr(paramsOptions).result()})`
 					} else {
-						eqn += `${new JumbleAlgebraicExpr(paramsOptions)}`
+						paramsOptions.trimTrilingPrefix = i === (terms -1) // only trim if its the last term
+						eqn += `${new JumbleAlgebraicExpr(paramsOptions).result()}`
 					}
 				}
 		}
+
+		console.log("GENERATED", eqn)
 
 		// generate answer
 		var answer = new algEngine.AlgebraicParser(eqn)
@@ -1433,6 +1456,7 @@ module.exports = {
 	ReversePerc,
 	RelativePerc,
 	RelativePercManipulation,
+	FutureAlgebra,
 	SimplifyAlgebraic,
 	ModernAlgebra
 }

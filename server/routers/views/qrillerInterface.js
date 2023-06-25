@@ -288,6 +288,15 @@ presetRouter.get("/simplalgeparent", (req, res) => {
 		3)
 })
 
+presetRouter.get("/algetest", (req, res) => {
+	return Utils.generateQriller(
+		res,
+		"[3.1.2] Simplification of Algebraic Expressions Part II", "Manipulate algebraic terms and simplify each expression to their simplest form.",
+		qriller.FutureAlgebra,
+		100,
+		3)
+})
+
 router.use("/presets", presetRouter)
 
 module.exports = { // export router object and authenticated middleware
