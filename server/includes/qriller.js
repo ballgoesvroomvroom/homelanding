@@ -246,7 +246,7 @@ class JumbleAlgebraicExpr {
 			}
 
 			// match op
-			var postfix = "+"
+			var prefix = "+"
 			switch (op) {
 				case 2:
 					prefix = "*"
@@ -255,12 +255,16 @@ class JumbleAlgebraicExpr {
 					prefix = "÷"
 			}
 
+			if (nextCoeff && nextCoeff < 0) {
+				prefix = ""; // remove prefix
+			}
+
 
 			// build term
-			terms += `${coeff}${base}${postfix}`
+			terms += `${coeff}${base}${prefix}`
 		}
 
-		return terms.slice(0, terms.length -1) // exclude last postfix
+		return terms.slice(0, terms.length -1) // exclude last prefix
 	}
 }
 
@@ -1077,6 +1081,65 @@ class RelativePercManipulation extends BaseQuestion {
 		this.qnLatexEqn.push(`${percVal}\\%`)
 		this.answerObj = new BaseAnswer(true)
 		this.answerObj.set(`${answer}`)
+	}
+}
+
+class FutureAlgebra extends BaseQuestion {
+	constructor(difficultyLevel) {
+		var paramsOptions = {
+			variableStyles: [["x", "y"], ["a", "b"]][rando(0, 1)],
+			containsNeg: false,
+			containsMultOp: false,
+			minArgsRange: [2, 5],
+		}
+
+		var eqn = "";
+		switch (difficultyLevel) {
+			case 1:
+				// only addition and subtraction, pos ints only, no parenthesis
+				// use options as is
+			case 2:
+				// only addition and subtraction, with neg int, no parenthesis
+				paramsOptions.containsNeg = true
+			case 3:
+				// all 4 arithemtic ops with negative numbers, no parenthesis
+				paramsOptions.containsNeg = true
+				paramsOptions.containsMultOp = true
+			case -1:
+				// catch block
+
+				// generate terms
+				eqn = new JumbleAlgebraicExpr(paramsOptions)
+			case 4:
+				// all 4 arithemtic ops with negative numbers, with parenthesis
+				// generate either a min 2 times
+				paramsOptions.containsNeg = true
+				paramsOptions.containsMultOp = true
+
+				var terms = rando(2, 3)
+				var parenthesisPointer = rando(1, terms)
+				for (let i = 0; i < terms; i++) {
+					if (i === parenthesisPointer -1) {
+						// create parenthesis
+						eqn += `(${new JumbleAlgebraicExpr(paramsOptions)})`
+					} else {
+						eqn += `${new JumbleAlgebraicExpr(paramsOptions)}`
+					}
+				}
+		}
+
+		// generate answer
+		var answer = new algEngine.AlgebraicParser(eqn)
+		answer.tokenise().clean()
+		answer.simplify()
+
+		var answerRepr = answer.buildRepr(); // build once
+
+		// set fields
+		this.qnReprString = "Simplify %%0%%"
+		this.qnLatexEqn.push(eqn)
+		this.answerObj = new BaseAnswer(false)
+		this.answerObj.set("%%0%%", [answerRepr])
 	}
 }
 
