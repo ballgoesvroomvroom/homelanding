@@ -1484,7 +1484,7 @@ class OOPInt extends BaseQuestion {
 		// generate from the back
 		var result = ""; // stream terms into here to build results
 		var nextTerm = null;
-		for (let i = maxTerms -1; i >= 0; i++) {
+		for (let i = maxTerms -1; i >= 0; i--) {
 			var base;
 			var negFactor = (rando() >= .85) ? -1 : 1
 			if (nextTerm) {
@@ -1501,25 +1501,38 @@ class OOPInt extends BaseQuestion {
 				if (rando() >= .85) {
 					// multiplication
 					op = "×"
+
+					// wrap base in parenthesis
+					if (base < 0) {
+						base = `(${base})`
+					}
 				} else if (rando() >= .85) {
 					// division (also generate a nex term, so remains as whole numbers)
 					op = "÷"
 
+					// wrap base in parenthesis
+					if (base < 0) {
+						base = `(${base})`
+					}
+
+					// force next term so it is a whole number
 					nextTerm = base *rando(1, 2 +Math.floor(upperTermValueLim -base))
 				} else {
 					// addition
-					op = "+";
+					op = base > 0 ? "+" : "";
 				}
 			}
 
-			result += `${prefix}${base}`
+			result = `${op}${base}` +result
 		}
 
 		return result;
 	}
 
 	constructor() {
-		var scenario = rando(1, 3)
+		super();
+
+		var scenario = rando(1, 4)
 		var qn;
 		switch (scenario) {
 			case 1:
@@ -1528,28 +1541,48 @@ class OOPInt extends BaseQuestion {
 				break
 			case 2:
 				// with parenthesis at the ends
-				var factor = rando(1, 9) *(rando() >=.8 ? -1 : 1)
-				if (Math.abs(factor) === 1) {
+				var factor = rando(1, 9)
+				if (factor === 1) {
 					factor = ""
 				}
 
 				var joint = rando() >= .5 ? "+" : "-";
-				qn = `${factor}(${OOPInt.generateSequence(20, rando(2, 4))})${joint}${OOPInt.generateSequence(20, 4)}`
+				qn = `${factor}(${OOPInt.generateSequence(20, rando(2, 4))})${joint}${OOPInt.generateSequence(20, rando(2, 5))}`
 				break
 			case 3:
 				// with parenthesis at the front
-				var factor = rando(1, 9) *(rando() >=.8 ? -1 : 1)
-				if (Math.abs(factor) === 1) {
+				var factor = rando(1, 9)
+				if (factor === 1) {
 					factor = ""
 				}
 
-				var joint = rando() >= .5 ? "+" : "-";
-				qn = `(${OOPInt.generateSequence(20, 4)})${joint}${factor}(${OOPInt.generateSequence(20, 4)})`
+				var joint = rando() >= .8 ? "+" : "-";
+				qn = `(${OOPInt.generateSequence(20, rando(2, 4))})${joint}${factor}(${OOPInt.generateSequence(20, rando(2, 4))})`
+				break
 			case 4:
 				// with parenthesis at the center
-				qn = `${}`
+				var factor = rando(1, 9)
+				if (factor === 1) {
+					factor = ""
+				}
 
+				var joint1 = rando() >= .5 ? "+" : "-";
+				var joint2 = rando() >= .5 ? "+" : "-";
+				qn = `${OOPInt.generateSequence(20, rando(2, 4))}${joint1}${factor}(${OOPInt.generateSequence(20, rando(2, 4))})${joint2}${OOPInt.generateSequence(20, rando(2, 4))}`
 		}
+
+		// generate answer
+		var answer = new algEngine.AlgebraicParser(qn)
+		answer.tokenise().clean()
+		answer.simplify()
+
+		var answerRepr = answer.buildRepr(); // build once
+
+		// set fields
+		this.qnReprString = "Simplify %%0%%"
+		this.qnLatexEqn.push(qn)
+		this.answerObj = new BaseAnswer(false)
+		this.answerObj.set("%%0%%", [answer])
 	}
 }
 
@@ -1570,5 +1603,7 @@ module.exports = {
 	RelativePercManipulation,
 	FutureAlgebra,
 	SimplifyAlgebraic,
-	ModernAlgebra
+	ModernAlgebra,
+
+	OOPInt, OOPFrac
 }

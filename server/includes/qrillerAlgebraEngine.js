@@ -41,7 +41,9 @@ class AlgebraicParser {
 		"+": 1,
 		"-": 1,
 		"*": 3,
-		"/": 4
+		"×": 3,
+		"/": 4,
+		"÷": 4
 	}
 	static variableRegex = /[A-Za-z\u0391-\u03C9]+/ // a-z, A-Z, all the greek symbols
 	static coeffRegex = /[\d.-]+/ // include the minus symbol to capture negative coefficients
