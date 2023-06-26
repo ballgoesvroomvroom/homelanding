@@ -1480,8 +1480,76 @@ class Inequalities extends BaseQuestion {
 
 // order of operations
 class OOPInt extends BaseQuestion {
-	constructor() {
+	static generateSequence(upperTermValueLim, maxTerms) {
+		// generate from the back
+		var result = ""; // stream terms into here to build results
+		var nextTerm = null;
+		for (let i = maxTerms -1; i >= 0; i++) {
+			var base;
+			var negFactor = (rando() >= .85) ? -1 : 1
+			if (nextTerm) {
+				base = nextTerm; // already generated this term
 
+				nextTerm = null; // reset
+			} else {
+				base = rando(1, upperTermValueLim) *negFactor
+			}
+
+			// calculate operation if still generating next term (direction: rtl)
+			var op = "";
+			if (i > 0) {
+				if (rando() >= .85) {
+					// multiplication
+					op = "×"
+				} else if (rando() >= .85) {
+					// division (also generate a nex term, so remains as whole numbers)
+					op = "÷"
+
+					nextTerm = base *rando(1, 2 +Math.floor(upperTermValueLim -base))
+				} else {
+					// addition
+					op = "+";
+				}
+			}
+
+			result += `${prefix}${base}`
+		}
+
+		return result;
+	}
+
+	constructor() {
+		var scenario = rando(1, 3)
+		var qn;
+		switch (scenario) {
+			case 1:
+				// no parenthesis
+				qn = OOPInt.generateSequence(20, rando(3, 6))
+				break
+			case 2:
+				// with parenthesis at the ends
+				var factor = rando(1, 9) *(rando() >=.8 ? -1 : 1)
+				if (Math.abs(factor) === 1) {
+					factor = ""
+				}
+
+				var joint = rando() >= .5 ? "+" : "-";
+				qn = `${factor}(${OOPInt.generateSequence(20, rando(2, 4))})${joint}${OOPInt.generateSequence(20, 4)}`
+				break
+			case 3:
+				// with parenthesis at the front
+				var factor = rando(1, 9) *(rando() >=.8 ? -1 : 1)
+				if (Math.abs(factor) === 1) {
+					factor = ""
+				}
+
+				var joint = rando() >= .5 ? "+" : "-";
+				qn = `(${OOPInt.generateSequence(20, 4)})${joint}${factor}(${OOPInt.generateSequence(20, 4)})`
+			case 4:
+				// with parenthesis at the center
+				qn = `${}`
+
+		}
 	}
 }
 
