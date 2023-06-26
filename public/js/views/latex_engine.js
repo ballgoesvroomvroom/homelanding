@@ -96,6 +96,8 @@ class AlgebraicParser {
 		var tokenStream = [] // stream tokens here to be parsed into units
 		var partialToken = "" // build tokens character by character
 		var partialTokenOnlyConsistsOfToken = false
+		var prevIsAlgebraicTerm = false; // true when previous token is an algebraic term
+		var isAlgebraicTerm = false; // true when char is algebraic term
 		var variableStore = {} // sniff out for variables
 		var skipCounter = 0 // amt of chars to skip
 		for (let charIdx = 0; charIdx < this.raw.length; charIdx++) {
@@ -111,7 +113,11 @@ class AlgebraicParser {
 				if (variableStore[char] == null) {
 					variableStore[char] = new RegExp(char)
 				}
+
+				isAlgebraicTerm = true
 			}
+
+			console.log("R", char, isAlgebraicTerm, prevIsAlgebraicTerm, partialToken)
 
 			// resume build token
 			if ((!partialTokenOnlyConsistsOfToken && AlgebraicParser.operations[char] != null) || char === ")") {
@@ -164,9 +170,6 @@ class AlgebraicParser {
 
 				// reset token
 				partialToken = ""
-
-				// set value
-				notExpectingMultiplicationString = true
 			} else if (char === "^") {
 				// exponent operation
 				// look forward to see if its a algberaic value or a cosntant exponent
@@ -219,6 +222,18 @@ class AlgebraicParser {
 					// continue capturing
 					partialToken += "^"
 				}
+			} else if (prevIsAlgebraicTerm && isAlgebraicTerm) {
+				// push current token
+				if (partialToken.length > 0) {
+					// SHOULD BE since contains algebraic term
+					tokenStream.push(partialToken);
+				}
+
+				// push the current partial token
+				tokenStream.push(`*${char}`); // add the multiplication operation first
+
+				// reset partialToken
+				partialToken = "";
 			} else {
 				// continue building token
 				partialToken += char
@@ -230,6 +245,10 @@ class AlgebraicParser {
 					}
 				}
 			}
+
+			// reset states
+			prevIsAlgebraicTerm = isAlgebraicTerm
+			isAlgebraicTerm = false
 		}
 
 		// trailing token
@@ -1123,18 +1142,16 @@ class AlgebraicParser {
 		for (let i = 0; i < termA.length; i++) {
 			var unit = termA[i]
 			if (unit[4] === 1 && unit[2] !== -1) {
-				if (variables.indexOf(unit[2]) !== -1) {
+				if (variables.indexOf(unit[2]) === -1) {
 					variables.push(unit[2])
 				}
 			}
-			if (variables.indexOf(termA[]))
-			variables.push(termA[i])
 		}
 
 		// spot for missing terms in termA that are present in termB
 		// if not spot for excess terms in termA that are absent in termB
 		for (let i = 0; i < termB.length; i++) {
-			var unit = termA[i]
+			var unit = termB[i]
 			if (unit[4] === 1 && unit[2] !== -1) {
 				var idx = variables.indexOf(unit[2])
 				if (idx === -1) {
@@ -1316,10 +1333,44 @@ class AlgebraicParser {
 			}
 		}
 
+		// do addition, subtraction on constants
+		var constantUnitIdx; // store idx of constant unit (for reference)
+		console.log("PRE OP", this.units)
+		for (let i = 0; i < this.units.length; i++) {
+			var unit = this.units[i];
+			if (unit[4] !== 1) {
+				continue; // de-serviced; work with only values
+			}
+
+			if (unit[2] === -1 && typeof unit[3] === "number") {
+				// constant (exponent is also not variable)
+				if (constantUnitIdx == null) {
+					// store the current pointer as a refernce for the constant element
+					constantUnitIdx = i
+
+					// flatten exponents (constant exponent)
+					unit[1] **= unit[3]
+					unit[3] = 1; // reset exponent
+
+					console.log("FOUND", constantUnitIdx)
+
+					continue; // continue with loop
+				} else {
+					// perform add operation on leftoperand and rightoperand
+					var leftoperand = this.units[constantUnitIdx]
+					this.units[constantUnitIdx][1] += unit[1] **unit[3] // constant term (right operand, exponent too)
+					console.log("ADDED", unit)
+
+					// deservice unit (rightoperand)
+					this._deserviceUnit(i)
+				}
+			}
+		}
+
 		// carry out root level addition by sniffing out the like terms first
 		// there should be no more parenthesis
-		var likeTerms = []; // stream like terms here
-		var currentTermBuild = []; // build like terms here
+		var likeTerms = []; // stream like terms here (indices only)
+		var currentTermBuild = []; // build like terms here (indices only)
 		for (let i = 0; i < this.units.length; i++) {
 			var unit = this.units[i]
 			if (unit[4] !== 1) {
@@ -1333,17 +1384,19 @@ class AlgebraicParser {
 					likeTerms.push(currentTermBuild)
 
 					// reset build array
-					currentTermBuild = [unit];
+					currentTermBuild = [i];
+				} else {
+					currentTermBuild = [i]; // build
+				}
 
-					// flatten unit
-					if (unit[2] === -1 && unit[3] != null && unit[3] !== 1) {
-						unit[1] **= unit[3];
-						unit[3] = 1 // reset
-					}
+				// flatten unit
+				if (unit[2] === -1 && unit[3] != null && unit[3] !== 1) {
+					unit[1] **= unit[3];
+					unit[3] = 1 // reset
 				}
 			} else if (unit[0] === 3) {
 				// multiplication
-				currentTermBuild.push(unit)
+				currentTermBuild.push(i) // should have a leading plus operation
 
 				// make currentTermBuild[0] the root array, i.e. pass all the coeffs to root
 				if (unit[2] === -1 && unit[3] != null && unit[3] !== -1) {
@@ -1351,56 +1404,50 @@ class AlgebraicParser {
 					unit[3] = 1 // reset exponent
 				}
 
-				currentTermBuild[0][1] *= unit[1]
+				this.units[currentTermBuild[0]][1] *= unit[1]
 				unit[1] = 1 // reset coefficient
 			}
 		}
 
+		if (currentTermBuild.length >= 1) {	
+			// push into likeTerms
+			likeTerms.push(currentTermBuild)
+		}
+
+
 		// start doing the addition & subtraction operation
-		var arithResult = [likeTerms.pop()]
+		var arithResult = [likeTerms.pop()] // all the terms in likeTerms will end up here
 		for (let i = likeTerms.length -1; i >= 0; i--) {
-			for (let j = 0; j < arithResult.length; j++) {
-				if (this._sameLikeTerms(arithResult[j], likeTerms[i])) {
+			// start from the end since lesser shifting operations this way
+			var rightoperand = arithResult[arithResult.length -1].map(idx => {
+				return this.units[idx];
+			}); // latest element
+			// find matching leftoperand
+			var leftoperand;
+			var foundMatching = false;
+			for (let j = 0; j < likeTerms.length; j++) {
+				leftoperand = likeTerms[j].map(idx => {
+					return this.units[idx]
+				})
+
+				if (this._sameLikeTerms(leftoperand, rightoperand)) {
 					// can be added together, use the root base
+					leftoperand[0][1] += rightoperand[0][1]
 					
+					// deservice right operand
+					this._deserviceUnit(...likeTerms[i])
+
+					// add into arithResult, remove from likeTerms
+					likeTerms.splice(j, 1)
+
+					// quit finding
+					foundMatching = true; // set state
+					break;
 				}
+
+				arithResult.push(likeTerms.pop()); // focus on next term
 			}
 		}
-
-
-
-		// start doing addition and subtraction
-		var initLen = this.units.length
-		var removalOffset = 0; // counter for units removed
-		var isFirstUnitOfScope = true;
-		for (let unitIdx = 0; unitIdx < initLen; unitIdx++) {
-			var unit = this.units[unitIdx -removalOffset]
-			if (unit[4] === 2 || unit[4] === 3 || unit[4] === 4) {
-				// parenthesis demarcation OR deserviced unit
-				// check for this first, if true, continuing skiping next unit
-				isFirstUnitOfScope = true
-				continue // move on to next next unit
-			} else if (isFirstUnitOfScope && unit[4] !== 4) {
-				// no operations on this unit (unit is IN service)
-				isFirstUnitOfScope = false; // toggle it false
-			}
-
-			if (unitIdx > 0 && unit[0] === 1) {
-				var loIdx = this._findLeftOperandWithSameBaseAndExpoWithinSameScope(unitIdx -removalOffset)
-				if (loIdx == null) {
-					// no valid left operand, CANT !loIdx since 0 is a falsey value
-					continue; // continue with next token
-				}
-
-				var success = this._addAdjacent(loIdx, unitIdx -removalOffset, true)
-
-				if (success) {
-					removalOffset++;
-				}
-			}
-		}
-
-		// group items together before removing
 	}
 
 	simplify() {
@@ -1625,10 +1672,6 @@ class AlgebraicParser {
 			// determine prefix
 			var prefix = "";
 			var resetScopeIdx = false; // if true, will reset scopeIdx
-			if (unit[1] < 0) {
-				prefix = "-"
-			}
-
 			if (scopeIdx === 0 && unit[4] === 2) {
 				// parenthesis start demarcation
 				prefix += "("
@@ -1637,7 +1680,7 @@ class AlgebraicParser {
 				// if not, prefix remain empty
 				switch (unit[0]) {
 					case 1:
-						prefix = "+"
+						prefix = unit[1] < 0 ? "-" : "+"
 						if (unit[4] === 2) {
 							// if type (4th index of unit] === 2, is an open parenthesis demarcation
 							// includes open parenthesis
@@ -1725,6 +1768,10 @@ $(document).ready(e => {
 			d.simplifyTest()
 			var ad = d.buildRepr()
 			// var roots = d.solveForRoots()
+
+			// wrap renderers around raw result
+			id = katex.renderToString(id, {throwOnError: false})
+			ad = katex.renderToString(ad, {throwOnError: false})
 
 			$("#display-pp").html(id.length === 0 ? '&nbsp;' : id)
 			$("#display-cp").html(ad.length === 0 ? '&nbsp;' : ad)
