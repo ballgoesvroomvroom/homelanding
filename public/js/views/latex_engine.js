@@ -936,7 +936,7 @@ class AlgebraicParser {
 			// multiply every term in the second pg by unit
 			for (let j = 0; j < groupFactors[1].length; j++) {
 				// chain all the terms together, operation does not matter since ._multUnits assume multiplication operation & hence does not check for operation mode value
-				var chain = unit.toSpliced(unit.length, 0, ...groupFactors[1][j].map(unitData => [...unitData]))
+				var chain = unit.map(unitData => [...unitData]).toSpliced(unit.length, 0, ...groupFactors[1][j].map(unitData => [...unitData]))
 				var result = this._multUnits(...chain) // result would be an array
 
 				group.splice(group.length, 0, ...result) // spread out array container
@@ -1312,8 +1312,8 @@ class AlgebraicParser {
 					// apply factors to all the terms inside the group
 					var result = [] // stream results here
 					for (let units of groupUnits) {
-						console.log("PARAMS", factor.toSpliced(factor.length, 0, ...units))
-						var multOpResult = this._multUnits(...factor.toSpliced(factor.length, 0, ...units))
+						console.log("PARAMS", factor.map(unitData => [...unitData]).toSpliced(factor.length, 0, ...units))
+						var multOpResult = this._multUnits(...factor.map(unitData => [...unitData]).toSpliced(factor.length, 0, ...units))
 						console.log("MULT RESULT", multOpResult)
 						result.splice(result.length, 0, ...multOpResult)
 					}
