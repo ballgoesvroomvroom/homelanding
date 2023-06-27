@@ -638,8 +638,10 @@ class AlgebraicParser {
 
 		// compare scenarios
 		var sameTerm = leftoperand[2] === rightoperand[2];
+		console.log("SAME TERM?", sameTerm)
 		if (sameTerm && leftoperand[2] !== -1) {
 			// algebraic terms
+			console.log("ALGEBRAIC TERM", JSON.parse(JSON.stringify(newTerm)), JSON.parse(JSON.stringify(rightoperand)))
 			newTerm[1] *= rightoperand[1];
 			newTerm[3] += rightoperand[3]; // sum the powers
 		} else if (sameTerm && leftoperand[2] === 1) {
@@ -811,11 +813,14 @@ class AlgebraicParser {
 				// list of candidates if they cannot be simplified farther
 
 				var leftoperand = result[j]
+				console.log("BEF TRYING", JSON.parse(JSON.stringify(leftoperand)), JSON.parse(JSON.stringify(rightoperand)))
 				var postOpResult = this._multUnit(leftoperand, rightoperand) // supply the exponent groups if any
 				console.log("TRYING", JSON.parse(JSON.stringify(leftoperand)), JSON.parse(JSON.stringify(rightoperand)), postOpResult)
 				if (postOpResult) {
 					// was able to simpifly farther
-					result[j] = postOpResult
+					result[j] = postOpResult;
+
+					// set states, escape control loop (sourcing candidates for mult op)
 					success = true
 					break
 				} else {
@@ -826,10 +831,19 @@ class AlgebraicParser {
 			if (!success) {
 				rightoperand[0] = 3 // change it to multiplication before pushing it in
 
+				// push the coefficient to root term (index 0 of result array)
+				result[0][1] *= rightoperand[1]
+				rightoperand[1] = 1; // reset
+
 				result.push(rightoperand)
 				console.log("RESULT POOL", JSON.parse(JSON.stringify(result)))
+			} else {
+				console.log("SUCCESS", JSON.parse(JSON.stringify(result)))
 			}
 		}
+
+		// ensure op is 1 for root term (index 0 of result array)
+		result[0][0] = 1;
 
 		return result
 	}
@@ -887,42 +901,14 @@ class AlgebraicParser {
 
 			var startIdx = firstPgIdx *(1 -g) +secondPgIdx *g // firstPgIdx during first iteration
 			var endIdx = firstPgCloseIdx *(1 -g) +secondClosePgIdx *g
-
-			var exponentScope = 0; // if >= 1, will ignore all units, will be decremented by close parenthesis
-			var exponentBuild = []; // build complex exponents here
 			for (let i = startIdx +1; i < endIdx; i++) {
 				var unit = this.units[i]
-				if (unit[0] === 5 && unit[4] === 2) {
-					// exponent open parenthesis group
-					exponentScope = 1; // start scope so iteration knows to ignore it
-					
-					// push current base (unit) into factorList after retrieving the exponent group
-				} else if (exponentScope >= 1 && unit[4] === 3) {
-					// close parenthesis, and exponentScope >= 1, need to decrement
-
-					// exponent scope
-					if (exponentScope >= 1) {
-						exponentScope--
-					}
-
-					if (exponentScope === 0) {
-						// reached the end, closed exponent scope
-						// push whatever was in exponent build into factorList
-						// also push the unit representing the base
-						factorList.push([currentFactor, exponentBuild])
-					}
-
-					// reset currentFactor
-					currentFactor = [];
-
-					// ignore this unit, continue
-					continue
-				} else if (exponentScope === 0 && unit[4] === 1) {
+				if (unit[4] === 1) {
 					if (unit[0] === 1) {
 						// addition operation, a whole new factor by itself
 						// push current factor (if any)
 						if (currentFactor.length >= 1) {
-							factorList.push([currentFactor]);
+							factorList.push(currentFactor);
 						}
 
 						currentFactor = [unit]; // new factor
@@ -931,15 +917,12 @@ class AlgebraicParser {
 						// add to current factor
 						currentFactor.push(unit)
 					}
-				} else if (exponentScope >= 1) {
-					// exponent content, push into exponentBuild, including parenthesis demarcations
-					exponentBuild.push(unit)
 				}
 			}
 
 			// push any remaining factorList
 			if (currentFactor.length >= 1) {
-				factorList.push([currentFactor])
+				factorList.push(currentFactor)
 			}
 
 			groupFactors.push(factorList)
@@ -948,21 +931,18 @@ class AlgebraicParser {
 		// construct the new parenthesis group
 		var group = [] // stream new units into here
 		for (let i = 0; i < groupFactors[0].length; i++) {
-			var unit = groupFactors[0][i][0];
-			console.log("UNIT", unit)
+			var unit = groupFactors[0][i];
 
 			// multiply every term in the second pg by unit
 			for (let j = 0; j < groupFactors[1].length; j++) {
 				// chain all the terms together, operation does not matter since ._multUnits assume multiplication operation & hence does not check for operation mode value
-				var chain = unit.toSpliced(unit.length, 0, ...groupFactors[1][j][0])
-				console.log("CHAIN", chain, groupFactors[1][j][0])
+				var chain = unit.toSpliced(unit.length, 0, ...groupFactors[1][j].map(unitData => [...unitData]))
 				var result = this._multUnits(...chain) // result would be an array
 
 				group.splice(group.length, 0, ...result) // spread out array container
 			}
 		}
 
-		console.log("FINAL", JSON.parse(JSON.stringify(group)))
 		return group
 	}
 
@@ -1138,12 +1118,19 @@ class AlgebraicParser {
 	_sameLikeTerms(termA, termB) {
 		// returns true if termA === termB
 		// should only contain multiplication operation other than the root term
-		var variables = [] // extract out all the variables in termA
+		// takes into account of exponents, should have been simplified with no duplicate terms (4x^2*x^3 is not valid and should be 4x^5)
+		var variables = {} // extract out all the variables in termA; store the as a dictionary where the key is the base and the exponent is the value
+		var variablesLen = 0
 		for (let i = 0; i < termA.length; i++) {
 			var unit = termA[i]
-			if (unit[4] === 1 && unit[2] !== -1) {
-				if (variables.indexOf(unit[2]) === -1) {
-					variables.push(unit[2])
+			if (unit[4] === 1 && unit[2] !== -1 && unit[3]) {
+				if (typeof unit[3] === "number" && variables[unit[2]] == null) {
+					// not in yet
+					variables[unit[2]] = unit[3];
+					variablesLen++; // increment count
+				} else {
+					// in already, throw error
+					throw new ParserError(`Like terms [${termA}] was not simplified or has a complex exponent`)
 				}
 			}
 		}
@@ -1153,20 +1140,27 @@ class AlgebraicParser {
 		for (let i = 0; i < termB.length; i++) {
 			var unit = termB[i]
 			if (unit[4] === 1 && unit[2] !== -1) {
-				var idx = variables.indexOf(unit[2])
-				if (idx === -1) {
+				if (variables[unit[2]] == null) {
+					return false; // no term found in termA
+				} else if (typeof unit[3] !== "number") {
+					// complex exponent in termB
+					throw new ParserError(`Like terms (second term, B) [${termB}] contains a complex exponent`)
+				} else if (variables[unit[2]] !== unit[3]) {
+					// different exponent
 					return false
 				} else {
-					variables.splice(idx, 1) // remove that element
+					// same exponent, exact term
+					variablesLen--; // decrement term
 				}
 			}
 		}
 
-		return variables.length === 0
+		return variablesLen === 0
 	}
 
 	simplifyTest() {
 		this._applyExponents();
+		// simplify within parenthesis
 		for (let [startIdx, endIdx] of this.parenthesisGroup()) {
 			for (let j = startIdx +2; j < endIdx; j++) {
 				// plus 2 to skip the adjacent element right after starting the parenthesis group since that unit has no operations
@@ -1256,19 +1250,18 @@ class AlgebraicParser {
 					var previousOpenPgIdx = closePgIdxMapping[startIdx -1] // mapping works cause of how this.parenthisGroup behaves, it start the inner-most PG with left to right fashion
 					console.log("PASSED PARAMS", previousOpenPgIdx, startIdx -1, startIdx, endIdx)
 					var expandedGroup = this._multAdjacentParenthesis(previousOpenPgIdx, startIdx -1, startIdx, endIdx)
-					console.log("MODIFICATION", expandedGroup, "\n", this.units, previousOpenPgIdx, endIdx -previousOpenPgIdx +1)
+					console.log("MODIFICATION", JSON.parse(JSON.stringify(expandedGroup)), "\n", this.units, previousOpenPgIdx, endIdx -previousOpenPgIdx +1)
 					this.units.splice(previousOpenPgIdx, endIdx -previousOpenPgIdx +1, ...expandedGroup)
 				}
 			}
 		}
 
 		// expand ALL parenthesis groups, start from inner-most
-		var closePgIdxMapping = {}; // create a mapping of parenthesis endings idx to their opening counterparts
 		for (let [startIdx, endIdx] of this.hardLookupParenthesisGroup()) {
 			// extracting all the group-units in the parenthesis group to be expanded on
-			var groupUnits = [[this.units[startIdx +1]]]; // stream all the tokens here
-			for (let j = startIdx +2; j < endIdx; j++) {
-				// start with a 2 offset since the unit directly adjacent to the open parenthesis is already included
+			var groupUnits = []; // stream all the tokens here, like terms (i.e. chained by multiplication operation) are encapsulated in their own arrays
+			for (let j = startIdx +1; j < endIdx; j++) {
+				// start with a 1 offset since the parenthesis demarcation was included in startIdx
 				if (this.units[j][4] !== 1) {
 					// do not work on this unit, continue
 					continue
@@ -1277,15 +1270,16 @@ class AlgebraicParser {
 				if (this.units[j][0] === 3) {
 					// stream into current build
 					groupUnits[groupUnits.length -1].push(this.units[j])
-				} else if (this.units[j] === 1) {
+				} else if (this.units[j][0] === 1) {
 					// new group
 					groupUnits.push([this.units[j]])
-					}
+				}
 			}
 
 			if (true) {
 				// parenthesis is to be expanded AND has units infront
 				var factor = this.units[startIdx][1] // negative coefficient perhaps, 1 by default (ALWAYS A CONSTANT VALUE SINCE IT CAN ONLY REPRESENT NUMBERS ONLY)
+				console.log("SFACTOR", factor)
 				if (this.units[startIdx][0] === 3) {
 					// there is a factor infront, i.e. 10x(30a)
 					// continuously build factor, i.e. 10x*3b(30a)
@@ -1297,7 +1291,7 @@ class AlgebraicParser {
 
 					factor = [prematureFactor] // build it into a list, start streaming factors if they are any
 					if (this.units[startIdx -1][0] === 3) {
-						for (let j = startIdx -2; j >= 0; j++) {
+						for (let j = startIdx -2; j >= 0; j--) {
 							// look at the second and ongoing factor (if no longer a mult op, stop building factors)
 							factor.push(this.units[j])
 
@@ -1306,6 +1300,14 @@ class AlgebraicParser {
 							}
 						}
 					}
+
+					// reverse factor (order may not matter, but representation will not be exact)
+					// e.g. 3bc will become 3cb after multiplication operation
+					if (factor.length > 1) {
+						factor.reverse()
+					}
+
+					console.log("CFACTOR", factor, groupUnits)
 
 					// apply factors to all the terms inside the group
 					var result = [] // stream results here
@@ -1367,6 +1369,8 @@ class AlgebraicParser {
 			}
 		}
 
+		console.log("PREMATUR", this.units)
+
 		// carry out root level addition by sniffing out the like terms first
 		// there should be no more parenthesis
 		var likeTerms = []; // stream like terms here (indices only)
@@ -1396,16 +1400,41 @@ class AlgebraicParser {
 				}
 			} else if (unit[0] === 3) {
 				// multiplication
-				currentTermBuild.push(i) // should have a leading plus operation
 
-				// make currentTermBuild[0] the root array, i.e. pass all the coeffs to root
-				if (unit[2] === -1 && unit[3] != null && unit[3] !== -1) {
+				// flatten current unit (constant)
+				if (unit[2] === -1 && typeof unit[3] === "number") {
 					unit[1] **= unit[3];
 					unit[3] = 1 // reset exponent
 				}
 
+				// make currentTermBuild[0] the root array, i.e. pass all the coeffs to root
 				this.units[currentTermBuild[0]][1] *= unit[1]
 				unit[1] = 1 // reset coefficient
+
+				// try to find exact bases in currentTermBuild, if any, merge by raising exponents
+				if (typeof unit[3] === "number") {
+					// constant exponent (can be either constant base or algebraic base)
+					var manageToMerge = false;
+					for (let j = 0; j < currentTermBuild.length; j++) {
+						var unitPartOfLikeTerm = this.units[currentTermBuild[j]];
+						if (typeof unitPartOfLikeTerm[3] === "number" && unitPartOfLikeTerm[2] === unit[2]) {
+							unitPartOfLikeTerm[3] += unit[3];
+
+							// found matching, deservice unit
+							this._deserviceUnit(i)
+							manageToMerge = true; // set state
+							break; // exit control loop
+						}
+					}
+
+					if (manageToMerge === false) {
+						// push it to currentTermBuild, did not manage to merge
+						currentTermBuild.push(i)
+					}
+				} else {
+					// add it to like terms, no chance of merging with another term (i.e. different bases, non-constant exponent)
+					currentTermBuild.push(i) // should have a leading plus operation inside currentTermBuild (i.e. currentTermBuild.length >= 1)
+				}
 			}
 		}
 
@@ -1414,8 +1443,9 @@ class AlgebraicParser {
 			likeTerms.push(currentTermBuild)
 		}
 
+		console.log("LIKETERMS", JSON.parse(JSON.stringify(this.units)), JSON.parse(JSON.stringify(likeTerms)))
 
-		// start doing the addition & subtraction operation
+		// start doing the addition & subtraction operation on EXTRACTED like terms
 		var arithResult = [likeTerms.pop()] // all the terms in likeTerms will end up here
 		for (let i = likeTerms.length -1; i >= 0; i--) {
 			// start from the end since lesser shifting operations this way
@@ -1429,13 +1459,22 @@ class AlgebraicParser {
 				leftoperand = likeTerms[j].map(idx => {
 					return this.units[idx]
 				})
+				console.log("FIND MATCH?", likeTerms[j], arithResult[arithResult.length -1], rightoperand)
 
 				if (this._sameLikeTerms(leftoperand, rightoperand)) {
+					console.log("FOUND MATCHING", leftoperand, rightoperand)
 					// can be added together, use the root base
 					leftoperand[0][1] += rightoperand[0][1]
+
+					if (leftoperand[0][1] === 0) {
+						// empty term, deservice also
+						console.log("EMPTY", likeTerms[j])
+						this._deserviceUnit(...likeTerms[j])
+					}
 					
 					// deservice right operand
-					this._deserviceUnit(...likeTerms[i])
+					console.log("DESERVICING", arithResult[arithResult.length -1])
+					this._deserviceUnit(...arithResult[arithResult.length -1])
 
 					// add into arithResult, remove from likeTerms
 					likeTerms.splice(j, 1)
@@ -1444,10 +1483,12 @@ class AlgebraicParser {
 					foundMatching = true; // set state
 					break;
 				}
-
-				arithResult.push(likeTerms.pop()); // focus on next term
 			}
+
+			arithResult.push(likeTerms.pop()); // focus on next term
 		}
+
+		console.log("FINAL", this.units)
 	}
 
 	simplify() {
