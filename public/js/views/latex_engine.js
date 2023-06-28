@@ -272,6 +272,7 @@ class AlgebraicParser {
 
 			// determine operation
 			var operation;
+			var isDivision = false;
 			if (token[0] === ")") {
 				// end of parenthesis
 
@@ -300,6 +301,12 @@ class AlgebraicParser {
 				} else if (operation == null && localScopeIdx >= 1) {
 					// no operation captured
 					throw new ParserError(`Token [${token}] cannot be parsed, missing an operation`)
+				}
+
+				if (operation === 4) {
+					// division
+					isDivision = true // set state so coefficient will be reciprocal of itself instead
+					operation = 3 // use 3
 				}
 			}
 
@@ -338,6 +345,11 @@ class AlgebraicParser {
 				} else {
 					coeff = parseFloat(coeffMatch[0])
 				}
+			}
+
+			if (isDivision) {
+				// reciprocal of coefficient
+				coeff = 1 /coeff
 			}
 
 			// test for algebraic variables within base
@@ -1336,6 +1348,43 @@ class AlgebraicParser {
 			}
 		}
 
+		// do multiplication on constants
+		for (let i = 1; i < this.units.length; i++) {
+			var unit = this.units[i];
+			if (unit[4] !== 1) {
+				continue;
+			}
+
+			if (unit[2] === -1 && unit[0] === 3 && typeof unit[3] === "number") {
+				// constant factor
+				for (let j = i -1; j >= 0; j--) {
+					var leftoperand = this.units[j]
+					if (leftoperand[4] === 2 || leftoperand[4] === 3) {
+						// parenthesis, stop
+						break
+					} else if (leftoperand[4] === 4) {
+						// deserviced, ignore
+						continue
+					}
+
+					if (leftoperand[2] === -1 && typeof unit[3] === "number") {
+						// can add
+						
+
+						if (leftoperand[0] === 3) {
+							// more to mult
+
+						} else {
+							break; // no more
+						}
+					} else {
+						// not a constant term, i.e. 10x * 10
+						break; // no more
+					}
+				}
+			}
+		}
+
 		// do addition, subtraction on constants
 		var constantUnitIdx; // store idx of constant unit (for reference)
 		console.log("PRE OP", this.units)
@@ -1345,8 +1394,8 @@ class AlgebraicParser {
 				continue; // de-serviced; work with only values
 			}
 
-			if (unit[2] === -1 && typeof unit[3] === "number") {
-				// constant (exponent is also not variable)
+			if (unit[2] === -1 && unit[0] === 1 && typeof unit[3] === "number") {
+				// constant (exponent is also not variable), only applies to addition operation
 				if (constantUnitIdx == null) {
 					// store the current pointer as a refernce for the constant element
 					constantUnitIdx = i
