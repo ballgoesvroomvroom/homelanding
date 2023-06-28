@@ -1465,8 +1465,8 @@ class AlgebraicParser {
 					if (leftoperand[0][1] === 0) {
 						// empty, deservice it
 						// remove the built unit in arithResult too
-						console.log("EMPTY", JSON.parse(JSON.stringify(arithResult)))
-						this._deserviceUnit(...likeTerms[likeTerms.length -1])
+						console.log("EMPTY", JSON.parse(JSON.stringify(arithResult)), j)
+						this._deserviceUnit(...likeTerms[likeTerms.length -1], ...arithResult[j]) // deservice both left and right operands (they cancel each other out)
 						arithResult.splice(j, 1)
 					} else {
 						// overwrite pushed unit (after deservicing pushed unit)
