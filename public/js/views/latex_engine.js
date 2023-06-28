@@ -260,6 +260,7 @@ class AlgebraicParser {
 
 		// build units based on tokens in tokenStream
 		var units = []
+		var exponentUnitPtr = []; // store units here that have exponents to be built
 		var localScopeIdx = 0; // will increment as long as is within same scope
 		var expectingParenthesis = false; // will be toggled true when exponent has no value
 		for (let tokenIdx = 0; tokenIdx < tokenStream.length; tokenIdx++) {
@@ -1449,43 +1450,43 @@ class AlgebraicParser {
 		var arithResult = [likeTerms.pop()] // all the terms in likeTerms will end up here
 		for (let i = likeTerms.length -1; i >= 0; i--) {
 			// start from the end since lesser shifting operations this way
-			var rightoperand = arithResult[arithResult.length -1].map(idx => {
-				return this.units[idx];
-			}); // latest element
-			// find matching leftoperand
-			var leftoperand;
-			var foundMatching = false;
-			for (let j = 0; j < likeTerms.length; j++) {
-				leftoperand = likeTerms[j].map(idx => {
-					return this.units[idx]
-				})
-				console.log("FIND MATCH?", likeTerms[j], arithResult[arithResult.length -1], rightoperand)
+			var leftoperand = likeTerms[likeTerms.length -1].map(idx => this.units[idx])
+			var foundMatching = false; // state
+			for (let j = 0; j < arithResult.length; j++) {
+				// iterate thorugh merged resuls
+				var rightoperand = arithResult[j].map(idx => this.units[idx])
 
+				console.log("TESTING MATCH", likeTerms[likeTerms.length -1], arithResult[j])
 				if (this._sameLikeTerms(leftoperand, rightoperand)) {
-					console.log("FOUND MATCHING", leftoperand, rightoperand)
-					// can be added together, use the root base
+					// same term, can merge (modify the one that has yet to been pushed to result, lftoperand)
+					console.log("MATCH FOUND", leftoperand[0][1], rightoperand[0][1])
 					leftoperand[0][1] += rightoperand[0][1]
 
 					if (leftoperand[0][1] === 0) {
-						// empty term, deservice also
-						console.log("EMPTY", likeTerms[j])
-						this._deserviceUnit(...likeTerms[j])
+						// empty, deservice it
+						// remove the built unit in arithResult too
+						console.log("EMPTY", JSON.parse(JSON.stringify(arithResult)))
+						this._deserviceUnit(...likeTerms[likeTerms.length -1])
+						arithResult.splice(j, 1)
+					} else {
+						// overwrite pushed unit (after deservicing pushed unit)
+						this._deserviceUnit(...arithResult[j])
+						arithResult[j] = likeTerms[likeTerms.length -1]
 					}
-					
-					// deservice right operand
-					console.log("DESERVICING", arithResult[arithResult.length -1])
-					this._deserviceUnit(...arithResult[arithResult.length -1])
 
-					// add into arithResult, remove from likeTerms
-					likeTerms.splice(j, 1)
+					// remove unit
+					likeTerms.pop();
 
 					// quit finding
-					foundMatching = true; // set state
-					break;
+					foundMatching = true
+					break
 				}
 			}
 
-			arithResult.push(likeTerms.pop()); // focus on next term
+			if (!foundMatching) {
+				// no match found, push otherwise
+				arithResult.push(likeTerms.pop())
+			}
 		}
 
 		console.log("FINAL", this.units)
@@ -1717,6 +1718,9 @@ class AlgebraicParser {
 				// parenthesis start demarcation
 				prefix += "("
 				resetScopeIdx = true
+			} else if (scopeIdx === 0 && unit[1] < 0) {
+				// negative
+				prefix = "-"
 			} else if (scopeIdx > 0) {
 				// if not, prefix remain empty
 				switch (unit[0]) {
