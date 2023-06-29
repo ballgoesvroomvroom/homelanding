@@ -1385,40 +1385,6 @@ class AlgebraicParser {
 			}
 		}
 
-		// do addition, subtraction on constants
-		var constantUnitIdx; // store idx of constant unit (for reference)
-		console.log("PRE OP", this.units)
-		for (let i = 0; i < this.units.length; i++) {
-			var unit = this.units[i];
-			if (unit[4] !== 1) {
-				continue; // de-serviced; work with only values
-			}
-
-			if (unit[2] === -1 && unit[0] === 1 && typeof unit[3] === "number") {
-				// constant (exponent is also not variable), only applies to addition operation
-				if (constantUnitIdx == null) {
-					// store the current pointer as a refernce for the constant element
-					constantUnitIdx = i
-
-					// flatten exponents (constant exponent)
-					unit[1] **= unit[3]
-					unit[3] = 1; // reset exponent
-
-					console.log("FOUND", constantUnitIdx)
-
-					continue; // continue with loop
-				} else {
-					// perform add operation on leftoperand and rightoperand
-					var leftoperand = this.units[constantUnitIdx]
-					this.units[constantUnitIdx][1] += unit[1] **unit[3] // constant term (right operand, exponent too)
-					console.log("ADDED", unit)
-
-					// deservice unit (rightoperand)
-					this._deserviceUnit(i)
-				}
-			}
-		}
-
 		console.log("PREMATUR", this.units)
 
 		// carry out root level addition by sniffing out the like terms first
@@ -1457,13 +1423,23 @@ class AlgebraicParser {
 					unit[3] = 1 // reset exponent
 				}
 
-				// make currentTermBuild[0] the root array, i.e. pass all the coeffs to root
+				// make currentTermBuild[0] the root array; PASS ALL the coeffs to root
 				this.units[currentTermBuild[0]][1] *= unit[1]
 				unit[1] = 1 // reset coefficient
 
+				if (unit[2] === -1) {
+					// constant value
+					// exponent is already one
+					// constant value of 1 (multiplication factor of 1 is not needed)
+					console.log("CONSTANT", i)
+					this._deserviceUnit(i)
+				}
+
 				// try to find exact bases in currentTermBuild, if any, merge by raising exponents
-				if (typeof unit[3] === "number") {
-					// constant exponent (can be either constant base or algebraic base)
+				// e.g. 10ab *a can be merged to 10(a^2)b
+				// this only applies to algebraic terms with a constant exponent
+				if (typeof unit[2] === "string" && typeof unit[3] === "number") {
+					// constant exponent (algebraic base)
 					var manageToMerge = false;
 					for (let j = 0; j < currentTermBuild.length; j++) {
 						var unitPartOfLikeTerm = this.units[currentTermBuild[j]];
@@ -1507,7 +1483,7 @@ class AlgebraicParser {
 
 				console.log("TESTING MATCH", likeTerms[likeTerms.length -1], arithResult[j])
 				if (this._sameLikeTerms(leftoperand, rightoperand)) {
-					// same term, can merge (modify the one that has yet to been pushed to result, lftoperand)
+					// same term, can merge (modify the one that has yet to been pushed to result, leftoperand)
 					console.log("MATCH FOUND", leftoperand[0][1], rightoperand[0][1])
 					leftoperand[0][1] += rightoperand[0][1]
 
@@ -1535,6 +1511,40 @@ class AlgebraicParser {
 			if (!foundMatching) {
 				// no match found, push otherwise
 				arithResult.push(likeTerms.pop())
+			}
+		}
+
+		// do addition, subtraction on constants
+		var constantUnitIdx; // store idx of constant unit (for reference)
+		console.log("PRE OP", this.units)
+		for (let i = 0; i < this.units.length; i++) {
+			var unit = this.units[i];
+			if (unit[4] !== 1) {
+				continue; // de-serviced; work with only values
+			}
+
+			if (unit[2] === -1 && unit[0] === 1 && typeof unit[3] === "number") {
+				// constant (exponent is also not variable), only applies to addition operation
+				if (constantUnitIdx == null) {
+					// store the current pointer as a refernce for the constant element
+					constantUnitIdx = i
+
+					// flatten exponents (constant exponent)
+					unit[1] **= unit[3]
+					unit[3] = 1; // reset exponent
+
+					console.log("FOUND", constantUnitIdx)
+
+					continue; // continue with loop
+				} else {
+					// perform add operation on leftoperand and rightoperand
+					var leftoperand = this.units[constantUnitIdx]
+					this.units[constantUnitIdx][1] += unit[1] **unit[3] // constant term (right operand, exponent too)
+					console.log("ADDED", unit)
+
+					// deservice unit (rightoperand)
+					this._deserviceUnit(i)
+				}
 			}
 		}
 
