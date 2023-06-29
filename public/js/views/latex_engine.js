@@ -71,6 +71,9 @@ class AlgebraicParser {
 		this.raw = eqnStr.replaceAll(" ", "") // remove ALL whitespace
 		this.tokens = [] // store tokens in order
 		this.units = [] // parsed tokens goes here
+
+		// states
+		this.flipPolarity = false; // mostly for exponents (reciprocals)
 	}
 
 	tokenise() {
@@ -261,8 +264,10 @@ class AlgebraicParser {
 		// build units based on tokens in tokenStream
 		var units = []
 		var exponentUnitPtr = []; // store units here that have exponents to be built
+		var openingParenthesisPtr = []; // store idx of open parenthesis units here
 		var localScopeIdx = 0; // will increment as long as is within same scope
 		var expectingParenthesis = false; // will be toggled true when exponent has no value
+		var toPopExponent = false; // if true, will call .pop() method on exponentUnitPtr
 		for (let tokenIdx = 0; tokenIdx < tokenStream.length; tokenIdx++) {
 			var token = tokenStream[tokenIdx]
 
@@ -279,16 +284,18 @@ class AlgebraicParser {
 				// check if there is any operation
 				if (token.length > 1) {
 					operation = AlgebraicParser.operations[token[1]]
-					if (operation == null) {
+					if (operation == null && token.indexOf("^") === -1) {
+						// include caret (exponent operator) in this case
 						throw new ParserError(`Token [${token}] does not contain any operation preceeding the close parenthesis`)
 					}
 				}
 			} else if (expectingParenthesis) {
 				if (token[token.length -1] === "(") {
 					expectingParenthesis = false; // reset value
-					operation = 5 // exponents
+					operation = 1
 				} else {
 					// expected open parenthesis from previous token but no parenthesis
+					throw new ParserError(`Token [${token}] is not wrapped but any parethesis (declaration for previous exponent); not done internally too`)
 				}
 			} else {
 				operation = AlgebraicParser.operations[token[0]] // first char
@@ -308,17 +315,26 @@ class AlgebraicParser {
 					isDivision = true // set state so coefficient will be reciprocal of itself instead
 					operation = 3 // use 3
 				}
+
+				if (token[token.length -1] === "(") {
+					// normal opening parenthesis, add idx to array (so exponents on closing parenthesis will be brought forward)
+					openingParenthesisPtr.push(units.length); // idx of THIS current unit to be built
+				}
 			}
 
 			// identify base and exponent
 			var base, exponent;
 			var caretIdx = token.indexOf("^");
+			console.log("BASE SNIFFING", token, caretIdx)
 			if (caretIdx !== -1) {
 				// has an exponent
 				var exponentSection = token.slice(caretIdx +1)
 				if (exponentSection.length === 0) {
 					expectingParenthesis = true
-					exponent = null; // set to null pointer in unit
+
+					// create new algeraic parser to be added into exponent (nested objects)
+					exponent = new AlgebraicParser("");
+					exponentUnitPtr.push(exponent) // push current exponent container to be built
 				} else {
 					// should be a constant, as variable exponents have been enclosed with parenthesis demarcations during lexing
 					exponent = parseFloat(exponentSection)
@@ -347,13 +363,29 @@ class AlgebraicParser {
 				}
 			}
 
-			if (isDivision) {
-				// reciprocal of coefficient
-				coeff = 1 /coeff
-			}
-
 			// test for algebraic variables within base
 			var variable = -1; // -1 for constants
+			if (token[token.length -1] === "(" || token[0] === ")") {
+				// parenthesis demarcation gets 0
+				variable = 0;
+			} else {
+				for (let [variableChar, variableRegExp] of Object.entries(variableStore)) {
+					var match = variableRegExp.exec(token)
+					if (match) {
+						// has a variable
+						variable = match[0]
+
+						// EXPONENT HAS ALREADY BEEN SET TO 1 BY DEFAULT, NO LONGER 0
+						// BELOW IS OLD COMMENT
+						// // if exponent is 0, change it to 1 (0 is a falsy value)
+						// if (exponent != null && exponent == 0) {
+						// 	exponent = 1 // linear term
+						// }
+
+						break
+					}
+				}
+			}
 			for (let [variableChar, variableRegExp] of Object.entries(variableStore)) {
 				var match = variableRegExp.exec(token)
 				if (match) {
@@ -371,12 +403,52 @@ class AlgebraicParser {
 				}
 			}
 
+			// handle division operation (nuances between mult & div)
+			if (isDivision) {
+				// reciprocal of coefficient
+				coeff = 1 /coeff
+
+				if (variable !== -1 && typeof exponent === "number") {
+					// inverse the variables too (by changing the exponent), brackets also
+					// anything else but not numbers since they are already inversed
+					exponent *= -1
+				} else if (variable !== 1 && exponent instanceof AlgebraicParser) {
+					exponent.flipPolarity = true // will call .applyPolarity() method on closing (when .pop is called on entry in exponentUnitPtr)
+				}
+			}
+
 			// identify type
 			var type = 1
 			if (token[token.length -1] === "(") {
 				type = 2 // open parenthesis demarcation
+
+				// push into openingParenthesis
 			} else if (token[0] === ")") {
 				type = 3 // close parenthesis demarcation
+
+				if (exponentUnitPtr.length > 0) {
+					toPopExponent = true; // pop away exponent focus; cannot pop here if not closing parenthesis demarcation will go into this.units instead of exponent object
+				} else if (openingParenthesisPtr.length > 0) {
+					// find opening parenthesis, pass any exponents to it (for ease of calculations)
+					// and also pass back any exponents open parenthesis has (ensure they are both the same value)
+					var opUnit = units[openingParenthesisPtr.pop()];
+					if (typeof opUnit[3] === "number" && opUnit[3] === -1) {
+						// should be -1 ONLY, caused by division operation
+						if (typeof exponent === "number") {
+							// constant exponent
+							exponent *= opUnit[3]
+							opUnit[3] = exponent
+						} else {
+							// exponent is complex, an array (being built)
+							throw new ParserError(`Complex exponent for token [${token}] not yet supported`)
+						}
+					} else if (opUnit[3] instanceof AlgebraicParser) {
+						throw new ParserError(`Backlog reference triggered by [${token}]: Open parenthesis token [${opUnit}] has complex exponents`)
+					}
+				} else {
+					// no matching open parenthesis
+					throw new ParserError(`Token [${token}] with idx: ${units.length}; has no matching open parenthesis`)
+				}
 			}
 
 			// identify scope
@@ -390,16 +462,62 @@ class AlgebraicParser {
 			}
 
 			// push built unit into units stream
-			units.push([
+			var unit = [
 				operation, coeff, variable, exponent, type
-				])
+			]
+			if (!expectingParenthesis && exponentUnitPtr.length > 0) {
+				// prevent the unit (with array as exponent to be pushed into the reference array, results in circular reference)
+				// exponents to be built
+				exponentUnitPtr[exponentUnitPtr.length -1].units.push(unit)
+			} else {
+				units.push(unit)
+			}
+
+			console.log("PUSHED", unit)
+
+			if (toPopExponent && exponentUnitPtr.length > 0) {
+				toPopExponent = false; // toggle value
+
+				// call POP operation ONLY after current unit (in building) has already been pushed
+				// AT THE SAME TIME, apply polarity (i.e. if it is a reciprocal)
+				exponentUnitPtr.pop().applyPolarity();
+			} else if (toPopExponent && exponentUnitPtr.length === 0) {
+				// should not happen since toPopExponent is only toggled true when exponentUnitPtr.length > 0
+				throw new ParserError(`Token [${token}] trigged closing of exponent close parenthesis, but no exponent close parenthesis found`)
+			}
 		}
 
 
 		this.units = units
-		console.log("UNITS", JSON.stringify(this.units))
+		console.log("UNITS", JSON.parse(JSON.stringify(this.units)))
+
+		// ensure parenthesis
 
 		return this // for chaining purposes
+	}
+
+	applyPolarity() {
+		// flip polarity
+		if (!this.flipPolarity) {
+			// no need to flip polarity
+			return;
+		}
+
+		for (let i = 0; i < this.units.length; i++) {
+			var unit = this.units[i];
+			if (unit[4] === 1 && unit[0] === 1) {
+				// only apply to coefficients of terms who are not multiplications
+				if (typeof unit[3] === "number") {
+					unit[1] **= unit[3] *-1; // -1 to flip polarity
+					unit[3] = 1; // reset exponent value
+				} else if (unit[3] instanceof AlgebraicParser) {
+					unit[3].flipPolarity = !unit[3].flipPolarity
+					if (unit[3].flipPolarity) {
+						unit[3].applyPolarity(); // apply polarity (beauty of using itself object to represent exponents, can work with nested exponents perfectly)
+					}
+				}
+			}
+		}
 	}
 
 	swap(a, b) {
@@ -1385,7 +1503,7 @@ class AlgebraicParser {
 			}
 		}
 
-		console.log("PREMATUR", this.units)
+		console.log("PREMATUR", JSON.parse(JSON.stringify(this.units)))
 
 		// carry out root level addition by sniffing out the like terms first
 		// there should be no more parenthesis
@@ -1410,7 +1528,7 @@ class AlgebraicParser {
 				}
 
 				// flatten unit
-				if (unit[2] === -1 && unit[3] != null && unit[3] !== 1) {
+				if (unit[2] === -1 && typeof unit[3] === "number") {
 					unit[1] **= unit[3];
 					unit[3] = 1 // reset
 				}
@@ -1424,8 +1542,10 @@ class AlgebraicParser {
 				}
 
 				// make currentTermBuild[0] the root array; PASS ALL the coeffs to root
+				console.log("BEF", JSON.parse(JSON.stringify(this.units)))
 				this.units[currentTermBuild[0]][1] *= unit[1]
 				unit[1] = 1 // reset coefficient
+				console.log("AFT", JSON.parse(JSON.stringify(this.units)))
 
 				if (unit[2] === -1) {
 					// constant value
@@ -1525,7 +1645,7 @@ class AlgebraicParser {
 
 		// do addition, subtraction on constants
 		var constantUnitIdx; // store idx of constant unit (for reference)
-		console.log("PRE OP", this.units)
+		console.log("PRE OP", JSON.parse(JSON.stringify(this.units)))
 		for (let i = 0; i < this.units.length; i++) {
 			var unit = this.units[i];
 			if (unit[4] !== 1) {
@@ -1696,6 +1816,10 @@ class AlgebraicParser {
 
 	}
 
+	completeTheSquare() {
+		
+	}
+
 	*parenthesisGroup() {
 		// generator function, returns [startIdx, endIdx] of parenthesis groups, inclusive of parenthesis demarcation units
 
@@ -1735,7 +1859,7 @@ class AlgebraicParser {
 			var lftFindOpenPtr = null; // will be null when parenthesis groups are escaped (for nested findings)
 			for (let unitIdx = 0; unitIdx < this.units.length; unitIdx++) {
 				var unit = this.units[unitIdx]
-				if (unit[4] === 3) {
+				if (unit[4] === 3 && typeof unit[3] === "number" && unit[3] >= 1) {
 					// close parenthesis, back track to find the open parenthesis
 					var backTrackPtr = lftFindOpenPtr ?? unitIdx // if no pointer reference stored, use unitIdx (current indication of where close parenthesis is)
 					for (let j = backTrackPtr -1; j >= 0; j--) {
@@ -1751,7 +1875,7 @@ class AlgebraicParser {
 							break
 						}
 					}
-				} else if (unit[4] === 2) {
+				} else if (unit[4] === 2 && typeof unit[3] === "number" && unit[3] >= 1) {
 					// met a open parenthesis, do nothing but reset leftPointer reference in order to reach this open parenthesis later on
 					lftFindOpenPtr = null; // reset pointer (discard reference to previously stored open parenthesis)
 				}
@@ -1769,14 +1893,106 @@ class AlgebraicParser {
 
 	buildRepr() {
 		// build a string representation based on this.units
+		console.log("BUILDREPR", JSON.parse(JSON.stringify(this.units)))
+
+		// get an array of like terms segregated by plus/minus operations (fractions declaration ONLY)
+		var fractionReprSlice = []; // element schema: [[leftoperandStartIdx, leftoperandEndIdx], [rightoperandStartIdx, rightoperandEndIdx]]; indices are INCLUSIVE
+		for (let i = 0; i < this.units.length; i++) {
+			var unit = this.units[i];
+
+			if ((unit[4] === 1 || unit[4] === 2) && typeof unit[3] === "number" && unit[3] < 0) {
+				// only sniff out for fraction possibility on numbers and start parenthesis
+				console.log("SNIFFING FOR", i)
+				var leftoperandStartIdx = -1;
+				var leftoperandEndIdx = i -1;
+				var rightoperandStartIdx = i;
+				var rightoperandEndIdx = -1;
+
+				// look behind to get the left operand
+				var pgIdx = 0;
+				for (let j = i -1; j >= 0; j--) {
+					var prevUnit = this.units[j];
+					if (prevUnit[4] === 3) {
+						// close parenthesis index, increment pgIdx until it reaches zero (decremented by stumbling on an open parenthesis)
+						pgIdx++;
+					} else if (prevUnit[4] === 2) {
+						// start parenthesis index
+						pgIdx--;
+					}
+
+					if (pgIdx === 0) {
+						leftoperandStartIdx = j; // inclusive
+						break
+					}
+				}
+
+				// look forward to get startingIndex now
+				pgIdx = 0; // reset pgIdx
+				for (let k = i; k < this.units.length; k++) {
+					// start from i since division operation is on the right operand 
+					var supUnit = this.units[k];
+
+					if (supUnit[4] === 2) {
+						// start parenthesis index, increment pgIdx until it reaches zero (decremented by stumbling on a close parenthesis)
+						pgIdx++;
+					} else if (supUnit[4] === 3) {
+						// close parenthesis index
+						pgIdx--;
+					}
+
+					if (pgIdx === 0) {
+						rightoperandEndIdx = k; // inclusive
+						break
+					}
+				}
+
+				fractionReprSlice.push([[leftoperandStartIdx, leftoperandEndIdx], [rightoperandStartIdx, rightoperandEndIdx]])
+			}
+		}
+
+		console.log("SNIFFED OUT", fractionReprSlice)
+
+
 		var r = ""
 		var scopeIdx = 0; // scopeIdx to globally uniquely idenitify scope within equation
+		var fractionPtr = fractionReprSlice.pop(); // pop out fraction element
+		console.log(fractionPtr)
 		for (let unitIdx = 0; unitIdx < this.units.length; unitIdx++) {
 			var unit = this.units[unitIdx]
 
 			if (unit[4] === 4) {
 				// deserviced unit, aka empty unit, ignore
 				continue
+			}
+
+			// look forward to spot for fraction representation possibilities
+			var latexPrefixWrap = "";
+			var latexSuffixWrap = "";
+			var reversePolarity = false;
+			if (fractionPtr) {
+				if (unitIdx >= fractionPtr[1][0] && unitIdx <= fractionPtr[1][1]) {
+					// right operand (aka denominator)
+					reversePolarity = true; // negate exponents
+				}
+
+				if (unitIdx === fractionPtr[0][0]) {
+					// start of left operand
+					latexPrefixWrap = "\\frac{"
+				} else if (unitIdx === fractionPtr[1][0]) {
+					// start of right operand
+					latexPrefixWrap = "{"
+				}
+
+				if (unitIdx === fractionPtr[0][1]) {
+					// end of left operand
+					latexSuffixWrap = "}"
+				} else if (unitIdx === fractionPtr[1][1]) {
+					// end of right operand
+					latexSuffixWrap = "}"
+
+					// get new element
+					fractionPtr = fractionReprSlice.pop();
+				}
 			}
 
 			// determine prefix
@@ -1851,13 +2067,26 @@ class AlgebraicParser {
 
 			// determine exponent
 			var exponent = "";
-			if (unit[3] && unit[3] !== 1) {
-				// unit[3] may be null or 0, both are false values and would not pass the if statement
-				if (unit[3] < 0 || Math.floor(Math.abs(unit[3]) /10) >= 1) {
-					// negative sign, OR more than or equals to doube digits
-					exponent = `^{${unit[3]}}`; // wrap it in curly braces (conform to latex engine's renderer)
-				} else {
-					exponent = `^${unit[3]}`; // no need parenthesis
+			if (unit[4] === 2) {
+				// no need to display exponent, purely for calculations only
+
+			} else {
+				if (typeof unit[3] === "number" && ((reversePolarity && Math.abs(unit[3]) !== 1) || (!reversePolarity && unit[3] !== 1))) {
+					// unit[3] may be null or 0, both are false values and would not pass the if statement
+					exponent = `^{${unit[3] *(reversePolarity ? -1 : 1)}}`; // always wrap it in curly braces (conform to latex engine's renderer; so double digits or digits with negative signs prefix will not overflow)
+				} else if (unit[3] instanceof AlgebraicParser) {
+					console.log("EXPONENT CLASS", unit[3])
+					if (reversePolarity && !unit[3].flipPolarity) {
+						// have yet to flip polarity, do so
+						unit[3].flipPolarity = true
+						unit[3].applyPolarity()
+					}
+
+					exponent = `^{${unit[3].buildRepr()}}`
+					if (reversePolarity && unit[3].flipPolarity) {
+						unit[3].applyPolarity();
+						unit[3].flipPolarity = false
+					}
 				}
 			}
 
@@ -1868,7 +2097,7 @@ class AlgebraicParser {
 				scopeIdx++
 			}
 
-			r += `${prefix}${coeff}${variableChoice}${exponent}`
+			r += `${latexPrefixWrap}${prefix}${coeff}${variableChoice}${exponent}${latexSuffixWrap}`
 		}
 
 		return r.length === 0 ? "0" : r
@@ -1883,7 +2112,7 @@ $(document).ready(e => {
 			d.tokenise().clean()
 
 			var id = d.buildRepr()
-			d.simplifyTest()
+			// d.simplifyTest()
 			var ad = d.buildRepr()
 			// var roots = d.solveForRoots()
 
