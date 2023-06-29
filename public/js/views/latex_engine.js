@@ -1446,6 +1446,15 @@ class AlgebraicParser {
 						if (typeof unitPartOfLikeTerm[3] === "number" && unitPartOfLikeTerm[2] === unit[2]) {
 							unitPartOfLikeTerm[3] += unit[3];
 
+							// check if poewrs cancel each other out, i.e. anything raised to the power of 0 is a constant
+							if (unitPartOfLikeTerm[3] === 0) {
+								// change it to a constant
+								console.log("EXPO CANCELLED", JSON.parse(JSON.stringify(unitPartOfLikeTerm)))
+								unitPartOfLikeTerm[2] = -1; // represents a constant
+								unitPartOfLikeTerm[3] = 1; // reset exponent to 1, else when applied, coeff will be 1
+								console.log("EXPO AFTER", JSON.parse(JSON.stringify(unitPartOfLikeTerm)))
+							}
+
 							// found matching, deservice unit
 							this._deserviceUnit(i)
 							manageToMerge = true; // set state
@@ -1826,7 +1835,7 @@ class AlgebraicParser {
 
 			// determine coeff
 			var coeff = ""
-			if (unit[4] === 1 && (unit[2] === -1 || Math.abs(unit[1]) > 1)) {
+			if (unit[4] === 1 && (unit[2] === -1 || Math.abs(unit[1]) !== 1)) {
 				// unit type is a value, not parenthesis (2 & 3)
 				// constant, coeff is important OR has coefficient for an algebraic term
 				coeff = Math.abs(unit[1])
@@ -1842,10 +1851,10 @@ class AlgebraicParser {
 
 			// determine exponent
 			var exponent = "";
-			if (unit[3] && unit[3] > 1) {
+			if (unit[3] && unit[3] !== 1) {
 				// unit[3] may be null or 0, both are false values and would not pass the if statement
-				if (Math.floor(Math.abs(unit[3]) /10) >= 1) {
-					// double digit
+				if (unit[3] < 0 || Math.floor(Math.abs(unit[3]) /10) >= 1) {
+					// negative sign, OR more than or equals to doube digits
 					exponent = `^{${unit[3]}}`; // wrap it in curly braces (conform to latex engine's renderer)
 				} else {
 					exponent = `^${unit[3]}`; // no need parenthesis
