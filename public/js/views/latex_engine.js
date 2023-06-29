@@ -1844,7 +1844,12 @@ class AlgebraicParser {
 			var exponent = "";
 			if (unit[3] && unit[3] > 1) {
 				// unit[3] may be null or 0, both are false values and would not pass the if statement
-				exponent = `^${unit[3]}`
+				if (Math.floor(Math.abs(unit[3]) /10) >= 1) {
+					// double digit
+					exponent = `^{${unit[3]}}`; // wrap it in curly braces (conform to latex engine's renderer)
+				} else {
+					exponent = `^${unit[3]}`; // no need parenthesis
+				}
 			}
 
 			// handle scope idx
