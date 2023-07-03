@@ -567,6 +567,8 @@ class AlgebraicParser {
 				}
 			}
 		}
+
+		return this; // for chaining purposes
 	}
 
 	_copyUnits() {
@@ -1364,6 +1366,8 @@ class AlgebraicParser {
 			}
 		}
 
+		console.log("FLAG A", JSON.parse(JSON.stringify(this.units)))
+
 		// expand adjacent parenthesis groups FIRST
 		console.log("V", JSON.parse(JSON.stringify(this.units)))
 		var closePgIdxMapping = {}; // create a mapping of parenthesis endings idx to their opening counterparts
@@ -1391,6 +1395,7 @@ class AlgebraicParser {
 		for (let [startIdx, endIdx] of this.hardLookupParenthesisGroup()) {
 			// extracting all the group-units in the parenthesis group to be expanded on
 			var groupUnits = []; // stream all the tokens here, like terms (i.e. chained by multiplication operation) are encapsulated in their own arrays
+			console.log("HARDLOOKUP", startIdx, endIdx)
 			for (let j = startIdx +1; j < endIdx; j++) {
 				// start with a 1 offset since the parenthesis demarcation was included in startIdx
 				if (this.units[j][4] !== 1) {
@@ -1466,6 +1471,8 @@ class AlgebraicParser {
 			}
 		}
 
+		console.log("FLAG B", JSON.parse(JSON.stringify(this.units)))
+
 		// do multiplication on constants
 		for (let i = 1; i < this.units.length; i++) {
 			var unit = this.units[i];
@@ -1503,7 +1510,7 @@ class AlgebraicParser {
 			}
 		}
 
-		console.log("PREMATUR", JSON.parse(JSON.stringify(this.units)))
+		console.log("FLAG C", JSON.parse(JSON.stringify(this.units)))
 
 		// carry out root level addition by sniffing out the like terms first
 		// there should be no more parenthesis
@@ -1511,8 +1518,8 @@ class AlgebraicParser {
 		var currentTermBuild = []; // build like terms here (indices only)
 		for (let i = 0; i < this.units.length; i++) {
 			var unit = this.units[i]
-			if (unit[4] !== 1) {
-				// de-serviced
+			if (unit[4] === 4) {
+				// de-serviced (allow parenthesis to pass)
 				continue
 			}
 
@@ -1645,6 +1652,7 @@ class AlgebraicParser {
 
 		// determine fractions, same denominators can merge, if not ignore
 		// use arithResult to sniff out fractions
+		console.log("FLAG D", JSON.parse(JSON.stringify(this.units)))
 		console.log(this.units, "SNIFFED OUT ARITH", arithResult)
 
 		// do addition, subtraction on constants
@@ -1682,6 +1690,7 @@ class AlgebraicParser {
 		}
 
 		console.log("FINAL", this.units)
+		return this; // chaining purposes
 	}
 
 	simplify() {
@@ -1897,7 +1906,6 @@ class AlgebraicParser {
 
 	buildRepr() {
 		// build a string representation based on this.units
-		console.log("BUILDREPR", JSON.parse(JSON.stringify(this.units)))
 
 		// get an array of like terms segregated by plus/minus operations (fractions declaration ONLY)
 		var fractionReprSlice = []; // element schema: [[leftoperandStartIdx, leftoperandEndIdx], [rightoperandStartIdx, rightoperandEndIdx]]; indices are INCLUSIVE
@@ -1906,7 +1914,6 @@ class AlgebraicParser {
 
 			if ((unit[4] === 1 || unit[4] === 2) && typeof unit[3] === "number" && unit[3] < 0) {
 				// only sniff out for fraction possibility on numbers and start parenthesis
-				console.log("SNIFFING FOR", i)
 				var leftoperandStartIdx = -1;
 				var leftoperandEndIdx = i -1;
 				var rightoperandStartIdx = i;
@@ -1954,13 +1961,10 @@ class AlgebraicParser {
 			}
 		}
 
-		console.log("SNIFFED OUT", fractionReprSlice)
-
 
 		var r = ""
 		var scopeIdx = 0; // scopeIdx to globally uniquely idenitify scope within equation
 		var indentDepth = 0; // increments whn approaching an open parenthesis, decrements when encountering a close parenthesis
-		console.log(fractionPtr)
 		for (let unitIdx = 0; unitIdx < this.units.length; unitIdx++) {
 			var unit = this.units[unitIdx]
 
@@ -2021,7 +2025,7 @@ class AlgebraicParser {
 
 			// coefficient
 			var coeff = unit[1];
-			if (typeof unit[2] !== -1 && Math.abs(coeff) === 1) {
+			if (unit[2] !== -1 && Math.abs(coeff) === 1) {
 				// no need to show coefficient for factors (constants need to show)
 				coeff = unit[1] < 0 ? "-" : "";
 			}
@@ -2096,110 +2100,6 @@ class AlgebraicParser {
 			}
 
 			r += `${prefix}${latexPrefixWrap}${coeff}${parenthesisOpen}${base}${exponent}${parenthesisClose}${latexSuffixWrap}`
-			// // determine prefix
-			// var prefix = "";
-			// var openParenthesis = "";
-			// var resetScopeIdx = false; // if true, will reset scopeIdx
-			// if (scopeIdx === 0 && unit[4] === 2) {
-			// 	// parenthesis start demarcation
-			// 	prefix += "("
-			// 	resetScopeIdx = true
-			// } else if (scopeIdx === 0 && unit[1] < 0) {
-			// 	// negative
-			// 	prefix = "-"
-			// } else if (scopeIdx > 0) {
-			// 	// if not, prefix remain empty
-			// 	switch (unit[0]) {
-			// 		case 1:
-			// 			prefix = unit[1] < 0 ? "-" : "+"
-			// 			if (unit[4] === 2) {
-			// 				// if type (4th index of unit] === 2, is an open parenthesis demarcation
-			// 				// includes open parenthesis
-			// 				prefix += "("
-
-			// 				// reset scopeIdx
-			// 				resetScopeIdx = true
-			// 			} else if (unit[4] === 3) {
-			// 				// close parenthesis
-			// 				prefix = ")"
-			// 			}
-
-			// 			break
-			// 		case 3:
-			// 			if (unit[4] == 2) {
-			// 				// no need for asterisk operation
-			// 				prefix = "("
-
-			// 				// reset scopeIdx
-			// 				resetScopeIdx = true
-			// 			} else if (unit[4] === 3) {
-			// 				// close parenthesis
-			// 				prefix = ")"
-			// 			} else if (needPrefix) {
-			// 				prefix = "*"
-			// 			}
-			// 			break
-			// 		case 4:
-			// 			prefix = "/"
-			// 			break
-			// 		case 5:
-			// 			prefix = "^("
-
-			// 			// reset scopeIdx
-			// 			resetScopeIdx = true;
-			// 			break
-			// 	}
-			// }
-
-			// // determine coeff
-			// var coeff = ""
-			// if (unit[4] === 1 && (unit[2] === -1 || Math.abs(unit[1]) !== 1)) {
-			// 	// unit type is a value, not parenthesis (2 & 3)
-			// 	// constant, coeff is important OR has coefficient for an algebraic term
-			// 	coeff = Math.abs(unit[1])
-			// }
-
-			// console.log("T", unit, reversePolarity)
-			// if (reversePolarity && indentDepth === 0 && typeof coeff === "number" && (unit[2] === -1 || typeof unit[2] === "string")) {
-			// 	// flip the coeff for constants and algebraic terms (only for root terms not enclosed by parenthesis)
-			// 	coeff = 1 /coeff
-
-			// }
-
-			// // determine base
-			// var variableChoice = "" // empty by default as constant is already represented by the 'coefficient'
-			// if (typeof unit[2] === "string") {
-			// 	variableChoice = unit[2]
-			// } else {
-			// 	// function names
-			// }
-
-			// // determine exponent
-			// var exponent = "";
-			// if (unit[4] === 2) {
-			// 	// no need to display exponent, purely for calculations only
-
-			// } else {
-			// 	if (typeof unit[3] === "number" && ((reversePolarity && Math.abs(unit[3]) !== 1) || (!reversePolarity && unit[3] !== 1))) {
-			// 		// unit[3] may be null or 0, both are false values and would not pass the if statement
-			// 		exponent = `^{${unit[3] *(reversePolarity ? -1 : 1)}}`; // always wrap it in curly braces (conform to latex engine's renderer; so double digits or digits with negative signs prefix will not overflow)
-			// 	} else if (unit[3] instanceof AlgebraicParser) {
-			// 		console.log("EXPONENT CLASS", unit[3])
-			// 		if (reversePolarity && !unit[3].flipPolarity) {
-			// 			// have yet to flip polarity, do so
-			// 			unit[3].flipPolarity = true
-			// 			unit[3].applyPolarity()
-			// 		}
-
-			// 		exponent = `^{${unit[3].buildRepr()}}`
-			// 		if (reversePolarity && unit[3].flipPolarity) {
-			// 			unit[3].applyPolarity();
-			// 			unit[3].flipPolarity = false
-			// 		}
-			// 	}
-			// }
-
-			// r += `${prefix}${latexPrefixWrap}${coeff}${variableChoice}${exponent}${latexSuffixWrap}`
 		}
 
 		return r.length === 0 ? "0" : r
@@ -2207,38 +2107,47 @@ class AlgebraicParser {
 }
 
 $(document).ready(e => {
-	US().then(payload => {
-		for (const case of payload)
-			var input = case[0];
-			var output = case[1];
+	var testCaseCount = 0;
+	var totalTestCaseCount = -1; // to be set
+	RUN_TESTCASES().then(payload => {
+		totalTestCaseCount = payload.length
+		for (let testcase of payload) {
+			try {
+				var input = testcase[0];
+				var output = testcase[1];
 
-			var result = new AlgebraicParser(input)
-				.tokenise()
-				.clean()
-				.simplifyTest()
-				.buildRepr();
+				var result = new AlgebraicParser(input)
+					.tokenise()
+					.clean()
+					.simplifyTest()
+					.buildRepr();
 
-			if (result != output.trim().replaceAll(" ", "")) {
-				// doesn't match
-				return Promise.reject(input)
+				if (result != output.trim().replaceAll(" ", "")) {
+					// doesn't match
+					return Promise.reject([new Error("Mismatch output"), input])
+				} else {
+					testCaseCount++; // increase
+				}
+			} catch (e) {
+				return Promise.reject([e, input])
 			}
 		}
 
 		return true;
-	}).catch(failed) {
+	}).catch(failed => {
 		if (failed) {
-			console.log("FAILED", failed)
+			console.log("FAILED", failed[1], failed[0])
 		}
 
 		return false
-	}.then(r) {
+	}).then(r => {
 		if (!r) {
 			// not all test cases passed
-			console.log("NOT ALL TEST CASES PASSED")
+			console.log(`Passed ${testCaseCount}/${totalTestCaseCount}`)
 		} else {
-			console.log("ALL TEST CASES PASSED")
+			console.log(`Passed all ${totalTestCaseCount} test cases!`)
 		}
-	}
+	})
 
 
 	$("#user-input-test").on("input", e => {
