@@ -1601,7 +1601,7 @@ class AlgebraicParser {
 		console.log("LIKETERMS", JSON.parse(JSON.stringify(this.units)), JSON.parse(JSON.stringify(likeTerms)))
 
 		// start doing the addition & subtraction operation on EXTRACTED like terms
-		var arithResult = [likeTerms.pop()] // all the terms in likeTerms will end up here
+		var arithResult = [likeTerms.pop()] // all the terms in likeTerms will end up here (indices only)
 		for (let i = likeTerms.length -1; i >= 0; i--) {
 			// start from the end since lesser shifting operations this way
 			var leftoperand = likeTerms[likeTerms.length -1].map(idx => this.units[idx])
@@ -1642,6 +1642,10 @@ class AlgebraicParser {
 				arithResult.push(likeTerms.pop())
 			}
 		}
+
+		// determine fractions, same denominators can merge, if not ignore
+		// use arithResult to sniff out fractions
+		console.log(this.units, "SNIFFED OUT ARITH", arithResult)
 
 		// do addition, subtraction on constants
 		var constantUnitIdx; // store idx of constant unit (for reference)
@@ -1955,7 +1959,7 @@ class AlgebraicParser {
 
 		var r = ""
 		var scopeIdx = 0; // scopeIdx to globally uniquely idenitify scope within equation
-		var fractionPtr = fractionReprSlice.pop(); // pop out fraction element
+		var indentDepth = 0; // increments whn approaching an open parenthesis, decrements when encountering a close parenthesis
 		console.log(fractionPtr)
 		for (let unitIdx = 0; unitIdx < this.units.length; unitIdx++) {
 			var unit = this.units[unitIdx]
@@ -1969,103 +1973,88 @@ class AlgebraicParser {
 			var latexPrefixWrap = "";
 			var latexSuffixWrap = "";
 			var reversePolarity = false;
-			if (fractionPtr) {
-				if (unitIdx >= fractionPtr[1][0] && unitIdx <= fractionPtr[1][1]) {
-					// right operand (aka denominator)
-					reversePolarity = true; // negate exponents
-				}
+			var needPrefix = true;
+			if (fractionReprSlice.length > 0) {
+				for (let j = 0; j < fractionReprSlice.length; j++) {
+					var fractionPtr = fractionReprSlice[j];
 
-				if (unitIdx === fractionPtr[0][0]) {
-					// start of left operand
-					latexPrefixWrap = "\\frac{"
-				} else if (unitIdx === fractionPtr[1][0]) {
-					// start of right operand
-					latexPrefixWrap = "{"
-				}
+					if (unitIdx >= fractionPtr[1][0] && unitIdx <= fractionPtr[1][1]) {
+						// right operand (aka denominator)
+						reversePolarity = true; // negate exponents and coefficients
+					}
 
-				if (unitIdx === fractionPtr[0][1]) {
-					// end of left operand
-					latexSuffixWrap = "}"
-				} else if (unitIdx === fractionPtr[1][1]) {
-					// end of right operand
-					latexSuffixWrap = "}"
+					if (unitIdx === fractionPtr[0][0]) {
+						// start of left operand
+						latexPrefixWrap = "\\frac{"
+					} else if (unitIdx === fractionPtr[1][0]) {
+						// start of right operand
+						latexPrefixWrap = "{"
+						needPrefix = false;
+					}
 
-					// get new element
-					fractionPtr = fractionReprSlice.pop();
+					if (unitIdx === fractionPtr[0][1]) {
+						// end of left operand
+						latexSuffixWrap = "}"
+					} else if (unitIdx === fractionPtr[1][1]) {
+						// end of right operand
+						latexSuffixWrap = "}"
+
+						// get new element
+						fractionPtr = fractionReprSlice.splice(j, 1);
+					}
+
+					if (latexPrefixWrap.length === 0 && latexSuffixWrap.length === 0) {
+						break; // found index
+					}
 				}
 			}
 
 			// determine prefix
 			var prefix = "";
-			var resetScopeIdx = false; // if true, will reset scopeIdx
-			if (scopeIdx === 0 && unit[4] === 2) {
-				// parenthesis start demarcation
-				prefix += "("
-				resetScopeIdx = true
-			} else if (scopeIdx === 0 && unit[1] < 0) {
-				// negative
-				prefix = "-"
-			} else if (scopeIdx > 0) {
-				// if not, prefix remain empty
-				switch (unit[0]) {
-					case 1:
-						prefix = unit[1] < 0 ? "-" : "+"
-						if (unit[4] === 2) {
-							// if type (4th index of unit] === 2, is an open parenthesis demarcation
-							// includes open parenthesis
-							prefix += "("
+			if (scopeIdx > 0 && unit[0] === 1 && (unit[4] === 1 || unit[4] === 2)) {
+				// only has prefix for plus, minus arithmetic operations and on terms that are values and open parenthesis
+				prefix = unit[1] > 0 ? "+" : ""; // no need negative sign since coeff will include
+			} else if (unit[0] === 3 && unit[4] === 1 && unit[1] !== 1) {
+				// multiplication on term that is not 1 (do not to show sign for 1 since anything multiply by 1 is just itself)
+				prefix = "*"
+			}
 
-							// reset scopeIdx
-							resetScopeIdx = true
-						} else if (unit[4] === 3) {
-							// close parenthesis
-							prefix = ")"
-						}
+			// coefficient
+			var coeff = unit[1];
+			if (typeof unit[2] !== -1 && Math.abs(coeff) === 1) {
+				// no need to show coefficient for factors (constants need to show)
+				coeff = unit[1] < 0 ? "-" : "";
+			}
+			if (reversePolarity && indentDepth === 0 && typeof coeff === "number" && (unit[2] === -1 || typeof unit[2] === "string")) {
+				// flip the coeff for constants and algebraic terms (only for root terms not enclosed by parenthesis)
+				coeff = 1 /coeff
+			}
 
-						break
-					case 3:
-						if (unit[4] == 2) {
-							// no need for asterisk operation
-							prefix = "("
+			// base
+			var base = "";
+			if (typeof unit[2] === "string") {
+				// variable
+				base = unit[2]
+			}
 
-							// reset scopeIdx
-							resetScopeIdx = true
-						} else if (unit[4] === 3) {
-							// close parenthesis
-							prefix = ")"
-						} else {
-							prefix = "*"
-						}
-						break
-					case 4:
-						prefix = "/"
-						break
-					case 5:
-						prefix = "^("
+			// handle parenthesis (and resetScopeIdx)
+			var parenthesisOpen = "";
+			var parenthesisClose = "";
+			var resetScopeIdx = true;
+			if (unit[4] === 2) {
+				// open parenthesis
+				parenthesisOpen = "(";
+				// resetScopeIdx = true;
+			} else {
+				resetScopeIdx = false;
 
-						// reset scopeIdx
-						resetScopeIdx = true;
-						break
+				if (unit[4] === 3) {
+					// close parenthesis
+					parenthesisClose = ")";
 				}
 			}
 
-			// determine coeff
-			var coeff = ""
-			if (unit[4] === 1 && (unit[2] === -1 || Math.abs(unit[1]) !== 1)) {
-				// unit type is a value, not parenthesis (2 & 3)
-				// constant, coeff is important OR has coefficient for an algebraic term
-				coeff = Math.abs(unit[1])
-			}
-
-			// determine base
-			var variableChoice = "" // empty by default as constant is already represented by the 'coefficient'
-			if (typeof unit[2] === "string") {
-				variableChoice = unit[2]
-			} else {
-				// function names
-			}
-
-			// determine exponent
+			// exponent
 			var exponent = "";
 			if (unit[4] === 2) {
 				// no need to display exponent, purely for calculations only
@@ -2097,7 +2086,120 @@ class AlgebraicParser {
 				scopeIdx++
 			}
 
-			r += `${latexPrefixWrap}${prefix}${coeff}${variableChoice}${exponent}${latexSuffixWrap}`
+			// handle indentDepth
+			if (unit[4] === 2) {
+				// encountered open parenthesis, increment
+				indentDepth++;
+			} else if (unit[4] === 3) {
+				// encountered close parenthesis, decrement
+				indentDepth--;
+			}
+
+			r += `${prefix}${latexPrefixWrap}${coeff}${parenthesisOpen}${base}${exponent}${parenthesisClose}${latexSuffixWrap}`
+			// // determine prefix
+			// var prefix = "";
+			// var openParenthesis = "";
+			// var resetScopeIdx = false; // if true, will reset scopeIdx
+			// if (scopeIdx === 0 && unit[4] === 2) {
+			// 	// parenthesis start demarcation
+			// 	prefix += "("
+			// 	resetScopeIdx = true
+			// } else if (scopeIdx === 0 && unit[1] < 0) {
+			// 	// negative
+			// 	prefix = "-"
+			// } else if (scopeIdx > 0) {
+			// 	// if not, prefix remain empty
+			// 	switch (unit[0]) {
+			// 		case 1:
+			// 			prefix = unit[1] < 0 ? "-" : "+"
+			// 			if (unit[4] === 2) {
+			// 				// if type (4th index of unit] === 2, is an open parenthesis demarcation
+			// 				// includes open parenthesis
+			// 				prefix += "("
+
+			// 				// reset scopeIdx
+			// 				resetScopeIdx = true
+			// 			} else if (unit[4] === 3) {
+			// 				// close parenthesis
+			// 				prefix = ")"
+			// 			}
+
+			// 			break
+			// 		case 3:
+			// 			if (unit[4] == 2) {
+			// 				// no need for asterisk operation
+			// 				prefix = "("
+
+			// 				// reset scopeIdx
+			// 				resetScopeIdx = true
+			// 			} else if (unit[4] === 3) {
+			// 				// close parenthesis
+			// 				prefix = ")"
+			// 			} else if (needPrefix) {
+			// 				prefix = "*"
+			// 			}
+			// 			break
+			// 		case 4:
+			// 			prefix = "/"
+			// 			break
+			// 		case 5:
+			// 			prefix = "^("
+
+			// 			// reset scopeIdx
+			// 			resetScopeIdx = true;
+			// 			break
+			// 	}
+			// }
+
+			// // determine coeff
+			// var coeff = ""
+			// if (unit[4] === 1 && (unit[2] === -1 || Math.abs(unit[1]) !== 1)) {
+			// 	// unit type is a value, not parenthesis (2 & 3)
+			// 	// constant, coeff is important OR has coefficient for an algebraic term
+			// 	coeff = Math.abs(unit[1])
+			// }
+
+			// console.log("T", unit, reversePolarity)
+			// if (reversePolarity && indentDepth === 0 && typeof coeff === "number" && (unit[2] === -1 || typeof unit[2] === "string")) {
+			// 	// flip the coeff for constants and algebraic terms (only for root terms not enclosed by parenthesis)
+			// 	coeff = 1 /coeff
+
+			// }
+
+			// // determine base
+			// var variableChoice = "" // empty by default as constant is already represented by the 'coefficient'
+			// if (typeof unit[2] === "string") {
+			// 	variableChoice = unit[2]
+			// } else {
+			// 	// function names
+			// }
+
+			// // determine exponent
+			// var exponent = "";
+			// if (unit[4] === 2) {
+			// 	// no need to display exponent, purely for calculations only
+
+			// } else {
+			// 	if (typeof unit[3] === "number" && ((reversePolarity && Math.abs(unit[3]) !== 1) || (!reversePolarity && unit[3] !== 1))) {
+			// 		// unit[3] may be null or 0, both are false values and would not pass the if statement
+			// 		exponent = `^{${unit[3] *(reversePolarity ? -1 : 1)}}`; // always wrap it in curly braces (conform to latex engine's renderer; so double digits or digits with negative signs prefix will not overflow)
+			// 	} else if (unit[3] instanceof AlgebraicParser) {
+			// 		console.log("EXPONENT CLASS", unit[3])
+			// 		if (reversePolarity && !unit[3].flipPolarity) {
+			// 			// have yet to flip polarity, do so
+			// 			unit[3].flipPolarity = true
+			// 			unit[3].applyPolarity()
+			// 		}
+
+			// 		exponent = `^{${unit[3].buildRepr()}}`
+			// 		if (reversePolarity && unit[3].flipPolarity) {
+			// 			unit[3].applyPolarity();
+			// 			unit[3].flipPolarity = false
+			// 		}
+			// 	}
+			// }
+
+			// r += `${prefix}${latexPrefixWrap}${coeff}${variableChoice}${exponent}${latexSuffixWrap}`
 		}
 
 		return r.length === 0 ? "0" : r
@@ -2105,6 +2207,40 @@ class AlgebraicParser {
 }
 
 $(document).ready(e => {
+	US().then(payload => {
+		for (const case of payload)
+			var input = case[0];
+			var output = case[1];
+
+			var result = new AlgebraicParser(input)
+				.tokenise()
+				.clean()
+				.simplifyTest()
+				.buildRepr();
+
+			if (result != output.trim().replaceAll(" ", "")) {
+				// doesn't match
+				return Promise.reject(input)
+			}
+		}
+
+		return true;
+	}).catch(failed) {
+		if (failed) {
+			console.log("FAILED", failed)
+		}
+
+		return false
+	}.then(r) {
+		if (!r) {
+			// not all test cases passed
+			console.log("NOT ALL TEST CASES PASSED")
+		} else {
+			console.log("ALL TEST CASES PASSED")
+		}
+	}
+
+
 	$("#user-input-test").on("input", e => {
 		try {
 			var d = new AlgebraicParser(e.target.value)
@@ -2112,12 +2248,12 @@ $(document).ready(e => {
 			d.tokenise().clean()
 
 			var id = d.buildRepr()
-			// d.simplifyTest()
+			d.simplifyTest()
 			var ad = d.buildRepr()
 			// var roots = d.solveForRoots()
 
 			// wrap renderers around raw result
-			id = katex.renderToString(id, {throwOnError: false})
+			// id = katex.renderToString(id, {throwOnError: false})
 			ad = katex.renderToString(ad, {throwOnError: false})
 
 			$("#display-pp").html(id.length === 0 ? '&nbsp;' : id)
