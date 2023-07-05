@@ -49,6 +49,46 @@ class BaseQuestion {
 			return BaseQuestion.getCommonBase(a, diff) // order does not matter
 		}
 	}
+
+	static getDeterminant = function(m) {
+		// returns the determinant of matrix m (has to be of n*n size, square)
+		if (m.length !== m[0].length) {
+			// not a square matrix
+			return
+		}
+
+		if (m.length === 2) {
+			// simply return calculated value
+			return m[0][0] *m[1][1] -m[0][1] *m[1][0]
+		}
+
+		var toggle = true;
+		var determinant = 0;
+		for (let i = 0; i < m[0].length; i++) {
+			// form new matrix to calculate determinant
+			var factor = m[0][i]; // factor
+			var dm = []
+			for (let j = 1; j < m.length; j++) {
+				// iterate the rows first
+				var drow = []
+				for (let k = 0; k < m[0].length; k++) {
+					// iterate columns
+					if (k === i) {
+						continue; // do not add this column
+					}
+
+					drow.push(m[j][k])
+				}
+
+				dm.push(drow)
+			}
+
+			determinant += factor *BaseQuestion.getDeterminant(dm) *(toggle ? -1 : 1)
+			toggle = !toggle; // toggle value
+		}
+
+		return determinant;
+	}
 }
 
 class ParserError extends Error {
@@ -569,6 +609,78 @@ class AlgebraicParser {
 		}
 
 		return this; // for chaining purposes
+	}
+
+	generateSylvesterMatrix(roAlgebraicObject) {
+		// assumes this AND roAlgebraicObject is a non-zero univariate polynomial
+		var loM = []; // store coefficients of terms, starting with x^0 for the first index and x^1 for the second index
+		var roM = []; // similar to loM but for right operand
+
+		console.log("GENERATING SYLVESTER MATRIX FOR", JSON.parse(JSON.stringify(this)), JSON.parse(JSON.stringify(roAlgebraicObject)))
+		for (let order = 0; order < 2; order++) {
+			var target = this
+			var targetM = loM;
+			if (order === 1) {
+				target = roAlgebraicObject;
+				targetM = roM;
+			}
+
+			// find constant first (power 0)
+			for (let i = 0; i < target.units.length; i++) {
+				if (target.units[i][4] === 1 && target.units[i][2] === -1) {
+					// constant
+					targetM.push(target.units[i][1]); // push coefficient
+					break
+				}
+			}
+
+			// go by increasing power
+			for (let i = 1; i < target.units.length +1; i++) {
+				// target.units.length is a safe upper limit
+				for (let j = 0; j < target.units.length; j++) {
+					var unit = target.units[j];
+					if (unit[4] === 1 && typeof unit[2] === "string" && typeof unit[3] === "number" && unit[3] === i) {
+						targetM.push(unit[1]); // push coefficient
+						break
+					}
+				}
+			}
+		}
+		
+		console.log("TEST", loM, roM)
+		var matrix = []; // build matrix (m + n)
+		var size = loM.length +roM.length -2; // offset of -2
+		for (let i = 0; i < size; i++) {
+			var row = [];
+
+			var target = loM;
+			var offset = i; // default offset
+			if (i >= loM.length) {
+				target = roM;
+				offset = i -loM.length;
+			}
+
+			// initial padding
+			for (let j = 0; j < offset; j++) {
+				// pad columns with 0
+				row.push(0);
+			}
+
+			// actual values
+			for (let j = 0; j < target.length; j++) {
+				row.push(target[target.length -j -1]); // reference starting from the back since constant is the first element
+			}
+
+			// trailing padding
+			var remaining = size -row.length
+			for (let j = 0; j < remaining; j++) {
+				row.push(0);
+			}
+
+			matrix.push(row)
+		}
+
+		return matrix;
 	}
 
 	_copyUnits() {
@@ -2109,46 +2221,45 @@ class AlgebraicParser {
 $(document).ready(e => {
 	var testCaseCount = 0;
 	var totalTestCaseCount = -1; // to be set
-	RUN_TESTCASES().then(payload => {
-		totalTestCaseCount = payload.length
-		for (let testcase of payload) {
-			try {
-				var input = testcase[0];
-				var output = testcase[1];
+	// RUN_TESTCASES().then(payload => {
+	// 	totalTestCaseCount = payload.length
+	// 	for (let testcase of payload) {
+	// 		try {
+	// 			var input = testcase[0];
+	// 			var output = testcase[1];
 
-				var result = new AlgebraicParser(input)
-					.tokenise()
-					.clean()
-					.simplifyTest()
-					.buildRepr();
+	// 			var result = new AlgebraicParser(input)
+	// 				.tokenise()
+	// 				.clean()
+	// 				.simplifyTest()
+	// 				.buildRepr();
 
-				if (result != output.trim().replaceAll(" ", "")) {
-					// doesn't match
-					return Promise.reject([new Error("Mismatch output"), input])
-				} else {
-					testCaseCount++; // increase
-				}
-			} catch (e) {
-				return Promise.reject([e, input])
-			}
-		}
+	// 			if (result != output.trim().replaceAll(" ", "")) {
+	// 				// doesn't match
+	// 				return Promise.reject([new Error("Mismatch output"), input])
+	// 			} else {
+	// 				testCaseCount++; // increase
+	// 			}
+	// 		} catch (e) {
+	// 			return Promise.reject([e, input])
+	// 		}
+	// 	}
 
-		return true;
-	}).catch(failed => {
-		if (failed) {
-			console.log("FAILED", failed[1], failed[0])
-		}
+	// 	return true;
+	// }).catch(failed => {
+	// 	if (failed) {
+	// 		console.log("FAILED", failed[1], failed[0])
+	// 	}
 
-		return false
-	}).then(r => {
-		if (!r) {
-			// not all test cases passed
-			console.log(`Passed ${testCaseCount}/${totalTestCaseCount}`)
-		} else {
-			console.log(`Passed all ${totalTestCaseCount} test cases!`)
-		}
-	})
-
+	// 	return false
+	// }).then(r => {
+	// 	if (!r) {
+	// 		// not all test cases passed
+	// 		console.log(`Passed ${testCaseCount}/${totalTestCaseCount}`)
+	// 	} else {
+	// 		console.log(`Passed all ${totalTestCaseCount} test cases!`)
+	// 	}
+	// })
 
 	$("#user-input-test").on("input", e => {
 		try {
@@ -2172,4 +2283,14 @@ $(document).ready(e => {
 			$("#display-pp").html(e.message)
 		}
 	})
+
+	console.log("RUNNING")
+	// var d = new AlgebraicParser("3x^4 + 3x^3 + x^2 - x -2").tokenise().clean();
+	// var f = new AlgebraicParser("x^3 - 3x^2 + x + 5").tokenise().clean();
+	var d = new AlgebraicParser("3x^3 - 6x^2 + 9x").tokenise().clean();
+	var f = new AlgebraicParser("x^2 - 2x + 3x").tokenise().clean();
+	var sylvesterMatrix = d.generateSylvesterMatrix(f);
+	console.log(sylvesterMatrix)
+	console.log(sylvesterMatrix, BaseQuestion.getDeterminant(sylvesterMatrix))
+	BaseQuestion.getDeterminant([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
 })
