@@ -180,32 +180,32 @@
 						<input name="contact-email-addr" placeholder="Email address" type="text">
 					</form>
 					<hr>
-					<form class="guest-particulars-form" name="guest-1-particulars">
+					<form class="guest-particulars-form" name="guest-particulars">
 						<div class="guest-particulars-form-header">
-							<h1>GUEST 1</h1>
+							<h1>DETAILS</h1>
 							<h4 class="guest-particulars-name-disp">&nbsp;</h4>
 						</div>
 						<div class="guest-particulars-name-container">
 							<div>
-								<label for="guest-1-firstname">First name</label>
-								<input name="guest-1-firstname" placeholder="First name" type="text" pattern="[a-zA-Z\s\/]{3,255}" maxlength="255">
+								<label for="guest-firstname">First name</label>
+								<input name="guest-firstname" placeholder="First name" type="text" pattern="[a-zA-Z\s\/]{3,255}" maxlength="255">
 							</div>
 							<div>
-								<label for="guest-1-lastname">Last name</label>
-								<input name="guest-1-lastname" placeholder="Last name" type="text" pattern="[a-zA-Z\s\/]{3,255}" maxlength="255">
+								<label for="guest-lastname">Last name</label>
+								<input name="guest-lastname" placeholder="Last name" type="text" pattern="[a-zA-Z\s\/]{3,255}" maxlength="255">
 							</div>
 						</div>
 
-						<label for="guest-1-special">Special remarks</label>
-						<input name="guest-1-special" placeholder="Dietary requirements, high chair, etc.." type="text" maxlength="255">
+						<label for="guest-special">Special remarks</label>
+						<input name="guest-special" placeholder="Dietary requirements, high chair, etc.." type="text" maxlength="255">
 
-						<div class="guest-ismainguest-container">
-							<label for="guest-1-ismainguest">Is main guest</label>
-							<input name="guest-1-ismainguest" type="checkbox" checked>
+						<div class="guest-count-input-container">
+							<label for="guest-count">Pax:</label>
+							<button class="guest-count-ticker-btn" id="guest-count-decremental-btn" type="button">-</button>
+							<input class="guest-count-input" name="guest-count" placeholder=1 type="number">
+							<button class="guest-count-ticker-btn" id="guest-count-incremental-btn" type="button">+</button>
 						</div>
 					</form>
-					<hr>
-					<button id="guest-pform-addguest">+ Add guests +</button>
 				</div>
 			</div>
 			<div id="payment-page-container" class="page-container">
@@ -451,6 +451,10 @@
 			contactEmailAddr: "", // to be set after validation
 			contactFormContainer: document.getElementById("contact-particulars-form"),
 
+			firstName: "", // to be set
+			lastName: "", // to be set
+			dietaryRequirements: "", // to be set
+			paxCount: 1, // to be set
 			guestList: [{"name": "", "specreq": "", isMainGuest: true}],
 			guestListContainerFormEle: document.getElementById("guests-pform-container"),
 
@@ -934,6 +938,46 @@
 
 				// write content
 				initialGuestNameDisp.innerHTML = content
+			})
+
+			// incremental tickers for pax count
+			var paxCountInp = initialGuestForm.getElementsByClassName("guest-count-input-container")[0].getElementsByTagName("input")[0];
+			var paxCountDecrBtn = document.getElementById("guest-count-decremental-btn")
+			var paxCountIncrBtn = document.getElementById("guest-count-incremental-btn")
+
+			// update this.paxCount upon input change
+			console.log("register	")
+			paxCountInp.addEventListener("input", e => {
+				console.log("UPDATING", typeof paxCountInp.value)
+				if (paxCountInp.value >= 100) {
+					// over limit
+					this.paxCount = 99; // limit
+					paxCountIncrBtn.click(); // simulate incremental click to trigger error handling
+				} else {
+					this.paxCount = paxCountInp.value
+				}
+			})
+
+			paxCountDecrBtn.addEventListener("click", e => {
+				e.preventDefault(); // prevent default action of the buttons
+
+				console.log("paxCount"< this.paxCount)
+				if (this.paxCount <= 1) {
+					return; // cannot decrement anymore
+				} else {
+					paxCountInp.value = --this.paxCount; // prefix decrement
+				}
+			})
+
+			paxCountIncrBtn.addEventListener("click", e => {
+				e.preventDefault(); // prevent default action of the buttons
+
+				if (this.paxCount >= 99) {
+					utils.popup(false, "Pax count has exceeded the limit, please contact our custom relations for further assistance")
+					return; // cannot increment anymore
+				} else {
+					paxCountInp.value = ++this.paxCount; // prefix increment
+				}
 			})
 
 			// card no input, auto insert space
