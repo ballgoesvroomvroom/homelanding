@@ -24,11 +24,11 @@
 		<div id="topbar-container">
 			<img id="comp-logo" src="/hotel_assets/icon.svg">
 			<div id="topbar-right-container">
-				<button id="topbar-member-login-btn">
+				<button id="topbar-member-login-btn" type="button">
 					<img src="/hotel_assets/account_icon.svg">
 					Member sign in
 				</button>
-				<button id="topbar-booknow-btn">
+				<button id="topbar-booknow-btn" type="button">
 					BOOK NOW
 				</button>
 			</div>
@@ -42,22 +42,22 @@
 			</div>
 			<div id="progress-container">
 				<div class="progress-tab-container unlocked active" id="details-tab-container">
-					<button>Details</button>
+					<button type="button">Details</button>
 					<div class="progress-tab-next-arrow">
 					</div>
 				</div>
 				<div class="progress-tab-container" id="guests-tab-container">
-					<button disabled>Guests</button>
+					<button type="button" disabled>Guests</button>
 					<div class="progress-tab-next-arrow">
 					</div>
 				</div>
 				<div class="progress-tab-container" id="payment-tab-container">
-					<button disabled>Payment</button>
+					<button type="button" disabled>Payment</button>
 					<div class="progress-tab-next-arrow">
 					</div>
 				</div>
 				<div class="progress-tab-container" id="confirmation-tab-container">
-					<button disabled>Confirmation</button>
+					<button type="button" disabled>Confirmation</button>
 				</div>
 			</div>
 		</div>
@@ -65,7 +65,7 @@
 			<div id="details-page-container" class="page-container active">
 				<div class="page-header-container">
 					<h1>Details</h1>
-					<button class="page-header-next-navigbtn">Next</button>
+					<button class="page-header-next-navigbtn" type="button">Next</button>
 				</div>
 				<hr>
 				<div id="details-pform-container">
@@ -73,15 +73,15 @@
 						<p id="details-pform-timing-display-text"></p>
 					</div>
 					<div id="details-pform-header">
-						<button id="details-pform-date-input-selector" class="active">Date</button><button id="details-pform-time-input-selector">Time</button>
+						<button id="details-pform-date-input-selector" class="active" type="button">Date</button><button id="details-pform-time-input-selector" type="button">Time</button>
 					</div>
 					<div id="details-pform-selectors-page-container">
 						<div id="details-pform-date" class="">
 							<div id="details-pform-date-header">
-								<button id="pform-date-prev-month" class="pform-date-calendar-btn">
+								<button id="pform-date-prev-month" class="pform-date-calendar-btn" type="button">
 								</button>
 								<h2 id="pform-date-calendar-header">May 2023</h2>
-								<button id="pform-date-next-month" class="pform-date-calendar-btn active">
+								<button id="pform-date-next-month" class="pform-date-calendar-btn active" type="button">
 								</button>
 							</div>
 							<table>
@@ -168,7 +168,7 @@
 			<div id="guests-page-container" class="page-container">
 				<div class="page-header-container">
 					<h1>Guests</h1>
-					<button class="page-header-next-navigbtn">Next</button>
+					<button class="page-header-next-navigbtn" type="button">Next</button>
 				</div>
 				<hr>
 				<div id="guests-pform-container">
@@ -216,11 +216,11 @@
 				<div id="payment-details-container">
 					<h2>Reservation details</h2>
 					<div id="reservation-details-container">
-						<p>Date: 26/05/23</p>
-						<p>Time: 18:00</p>
-						<p>Service: Dinner</p>
-						<p>Location: DAWN restaurant</p>
-						<p>Guests: 2pax</p>
+						<p id="reservation-payment-details-date">Date: 26/05/23</p>
+						<p id="reservation-payment-details-time">Time: 18:00</p>
+						<p id="reservation-payment-details-service">Service: Dinner</p>
+						<p id="reservation-payment-details-loc">Location: DAWN restaurant</p>
+						<p id="reservation-payment-details-paxcount">Guests:</p>
 					</div>
 					<p>A credit hold of $50 is required for reservations.<br>Upon completing your reservation, the credit hold will be released back into your bank immediately.<br>For more details, read our <a class="faq-hyperlink" href="/faq#credit-hold">FAQ ↪</a>.</p>
 				</div>
@@ -246,7 +246,7 @@
 						</div>
 					</div>
 					<hr>
-					<button id="payment-pform-processpayment">Process payment</button>
+					<button id="payment-pform-addcard" type="button">Process Card</button>
 				</form>
 			</div>
 			<div id="confirmation-page-container" class="page-container">
@@ -254,53 +254,22 @@
 					<h1>Confirmation</h1>
 				</div>
 				<hr>
-				<div id="confirmation-invoice-slip">
-					<div id="confirmation-invoice-slip-header">
-						<h2>Reservation @ DAWN [success]</h2>
-						<div id="confirmation-invoice-slip-details">
-							<p>Invoice ID: #14e89ad</p>
-							<p>Date: 18/05/2023</p>
-							<p>Time: 16:43</p>
-						</div>
-					</div>
-					<hr>
-					<div id="confirmation-invoice-reservation-details">
-						<h2>Reservation details</h2>
-						<p>Date: 26/05/23</p>
-						<p>Time: 18:00</p>
-						<p>Service: Dinner</p>
-						<p>Guests: 2pax</p>
-					</div>
-					<hr>
-					<div id="confirmation-invoice-contact-details">
-						<h2>Contact details</h2>
-						<p>Name: John Doe</p>
-						<p>Email: 230643M@mymail.nyp.edu.sg</p>
-						<p>Phone number: +6592224896</p>
-					</div>
-					<hr>
-					<div id="confirmation-invoice-guestlist">
-						<div class="confirmation-invoice-guestcontainer">
-							<h2>Jane Doe</h2>
-							<p class="confirmation-invoice-guestspecialremarks">Special remarks:<br><span class="guestspecialremarks-content">None</span></p>
-						</div>
-					</div>
-					<hr>
-					<div id="confirmation-invoice-payment-details">
-						<h2>Payment details</h2>
-						<p>Credit hold: $50 [paid]</p>
-					</div>
-					<hr>
-					<div id="confirmation-invoice-footer">
-						<p>An email copy has already been sent to your email!</p>
-						<p>Please do not hesitate to contact us at <a href="/">customerservice@dusk.com</a> or at <a href="/">+65 0000 1800</a>.</p>
-						<p id="confirmation-invoice-thankyou">
-							We are proud to serve your occassion.
-						</p>
-						<p id="confirmation-invoice-signoff">
-							Regards,<br>The Dusk Crew
-						</p>
-					</div>
+				<div id="confirmation-details-container">
+					<!-- <img src="/hotel_assets/checkmark_icon.svg"> -->
+					<h1>ƪ(˘⌣˘)ʃ</h1>
+					<h3>Thank you!</h3>
+					<p id="confirmation-final-msg">Reservation successful! Credit hold of <span>$50</span> has been placed. A confirmation email will be sent out to %%email%% shortly!</p>
+
+					<p class="confirmation-details-field-header">Date</p>
+					<p id="confirmation-details-date"></p>
+					<p class="confirmation-details-field-header">Time</p>
+					<p id="confirmation-details-time"></p>
+					<p class="confirmation-details-field-header">Service</p>
+					<p id="confirmation-details-service"></p>
+					<p class="confirmation-details-field-header">Location</p>
+					<p id="confirmation-details-location"></p>
+					<p class="confirmation-details-field-header">Guests</p>
+					<p id="confirmation-details-paxcount"></p>
 				</div>
 			</div>
 		</div>
@@ -439,8 +408,8 @@
 			timingDisplayEle: document.getElementById("details-pform-timing-display-text"),
 			selectedDateThEle: null, // to be set by th.click event
 			selectedTimeEle: null, // to be set by button.click event
-			date: "",
-			time: "",
+			date: "", // dd mmm yyyy
+			time: "", // 
 			service: "",
 
 			generatedCalender: null, // to be generated (by .register())
@@ -455,8 +424,24 @@
 			lastName: "", // to be set
 			dietaryRequirements: "", // to be set
 			paxCount: 1, // to be set
-			guestList: [{"name": "", "specreq": "", isMainGuest: true}],
 			guestListContainerFormEle: document.getElementById("guests-pform-container"),
+
+			reservationDetailsDisp: {
+				"payment": {
+					"date": document.getElementById("reservation-payment-details-date"),
+					"time": document.getElementById("reservation-payment-details-time"),
+					"service": document.getElementById("reservation-payment-details-service"),
+					"location": document.getElementById("reservation-payment-details-loc"),
+					"paxCount": document.getElementById("reservation-payment-details-paxcount")
+				},
+				"confirmation": {
+					"date": document.getElementById("confirmation-details-date"),
+					"time": document.getElementById("confirmation-details-time"),
+					"service": document.getElementById("confirmation-details-service"),
+					"location": document.getElementById("confirmation-details-location"),
+					"paxCount": document.getElementById("confirmation-details-paxcount")
+				}
+			},
 
 			invoice: {
 				detailsContainer: document.getElementById("confirmation-invoice-slip-details"),
@@ -619,6 +604,25 @@
 			var mnthString = new Date(yearIdx, mnthIdx).toLocaleString("default", {month: "short"})
 			mnthString = mnthString.charAt(0).toUpperCase() +mnthString.slice(1) // capitalise first character
 			document.getElementById("pform-date-calendar-header").innerHTML = `${mnthString} ${yearIdx}`
+		}
+
+		receiptionist.repopulateDetails = function() {
+			// re-populate fields in DOM with registration details
+
+			// payment page
+			console.log("SETTING", this.reservationDetailsDisp)
+			this.reservationDetailsDisp.payment.date.innerHTML = `Date: ${this.date}`
+			this.reservationDetailsDisp.payment.time.innerHTML = `Time: ${this.time}`
+			this.reservationDetailsDisp.payment.service.innerHTML = `Service: ${this.service}`
+			this.reservationDetailsDisp.payment.location.innerHTML = `Location: DAWN`
+			this.reservationDetailsDisp.payment.paxCount.innerHTML = `Guests: ${this.paxCount}pax`
+
+			// confirmation page
+			this.reservationDetailsDisp.confirmation.date.innerHTML = this.date;
+			this.reservationDetailsDisp.confirmation.time.innerHTML = this.time;
+			this.reservationDetailsDisp.confirmation.service.innerHTML = this.service;
+			this.reservationDetailsDisp.confirmation.location.innerHTML = "DAWN";
+			this.reservationDetailsDisp.confirmation.paxCount.innerHTML = `${this.paxCount}pax`;
 		}
 
 		receiptionist.register = function() {
@@ -948,13 +952,17 @@
 			// update this.paxCount upon input change
 			console.log("register	")
 			paxCountInp.addEventListener("input", e => {
-				console.log("UPDATING", typeof paxCountInp.value)
-				if (paxCountInp.value >= 100) {
+				var pc = 1; // fall back value
+				if (paxCountInp.length > 0) {
+					pc = parseInt(paxCountInp.value)
+				}
+
+				if (pc >= 100) {
 					// over limit
 					this.paxCount = 99; // limit
 					paxCountIncrBtn.click(); // simulate incremental click to trigger error handling
 				} else {
-					this.paxCount = paxCountInp.value
+					this.paxCount = pc
 				}
 			})
 
@@ -1012,7 +1020,7 @@
 			// card process payment
 			var cardnameInput = document.getElementById("payment-card-name-input")
 			var cardcvvInput = document.getElementById("payment-card-cvv-input")
-			var procPaymentBtn = document.getElementById("payment-pform-processpayment")
+			var procPaymentBtn = document.getElementById("payment-pform-addcard")
 
 			var paymentProcessed = false
 			procPaymentBtn.addEventListener("click", e => {
@@ -1102,16 +1110,21 @@
 			// register guests next page
 			pages.pageElements.guests.nextPageBtn.addEventListener("click", e => {
 				// verify contact email is valid
-				var success = this.validateContactEmail()
+				var success = this.validateContactEmail(); // will set this.contactEmailAddr too
 				if (!success) {
 					utils.popup(false, "Invalid contact email address")
 					return
 				}
 
 				// verify main guest details are all populated
-				var [valid, newGuestList] = this.fetchGuestList()
+				var [valid, guestDetails] = this.fetchGuestDetails()
 				if (valid) {
-					this.guestList = newGuestList
+					this.firstName = guestDetails.firstName;
+					this.lastName = guestDetails.lastName;
+					this.dietaryRequirements = guestDetails.specialReq
+
+					// repopulate DOM with correct fields
+					this.repopulateDetails();
 
 					// move to next page
 					if (pages.highestPage === 1) {
@@ -1122,10 +1135,6 @@
 					}
 				}
 			})
-		}
-
-		receiptionist.createNewGuest = function() {
-			// works with this.guestList = []
 		}
 
 		const emailNameMatch = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+$/
@@ -1162,46 +1171,38 @@
 			return true
 		}
 
-		receiptionist.fetchGuestList = function() {
-			// returns an array of guests details keyed into form
+		receiptionist.fetchGuestDetails = function() {
+			// returns guest's details keyed into form
 
-			var guestList = []; // details to be appended here
-			var mainGuestIdx = -1; // to be pointed to the guest idx who is the main guest
-			
-			var guestsFormElements = this.guestListContainerFormEle.getElementsByClassName("guest-particulars-form")
-			for (let i = 0; i < guestsFormElements.length; i++) {
-				var guestFormEle = guestsFormElements[i];
-
-				var guestInputs = guestFormEle.getElementsByTagName("input")
-
-				var firstname = guestInputs[0].value
-				var lastname = guestInputs[1].value
-				var specialreq = guestInputs[2].value
-				var ismainguest = guestInputs[3].value
-				console.log("ismainguest", ismainguest)
-
-				// validate guest
-				if (firstname.length < 3 || lastname.length < 3 || specialreq.length > 255) {
-					// failed to meet requirements
-					console.log("[DEBUG]: PARTIAL GUEST DETAILS WRONG FOR GUESTIDX", i)
-					return false 
-				}
-
-				// valid guest
-				guestList.push({
-					firstname,
-					lastname,
-					specreq: specialreq,
-					isMainGuest: ismainguest
-				})
-
-				if (ismainguest == "on") {
-					// set main guest
-					mainGuestIdx = i
-				}
+			// populate data structure later
+			var guestDetails = {
+				firstName: "",
+				lastName: "",
+				specialReq: ""
 			}
 
-			return mainGuestIdx !== -1, guestList
+			var guestFormEle = this.guestListContainerFormEle.getElementsByClassName("guest-particulars-form")[0]
+			var guestInputs = guestFormEle.getElementsByTagName("input")
+
+			var firstname = guestInputs[0].value // must be present > 0 chars
+			var lastname = guestInputs[1].value // must be present > 0 chars
+			var specialreq = guestInputs[2].value // optional field
+
+			// validate guest
+			if (firstname.length === 0) {
+				utils.popup(false, "First name details is required");
+				return [false]
+			} else if (lastname.length === 0) {
+				utils.popup(false, "Last name details is required")
+				return [false]
+			}
+
+			// populate details
+			guestDetails.firstName = firstname
+			guestDetails.lastName = lastname
+			guestDetails.specialReq = specialreq
+
+			return [true, guestDetails]
 		}
 
 		receiptionist.generateConfirmationReceipt = function() {
@@ -1214,25 +1215,11 @@
 				return false
 			}
 
-			var invoiceDetailsContainer = this.invoice.detailsContainer
-			var invoiceDetailsElements = invoiceDetailsContainer.children
-			invoiceDetailsElements[0].innerHTML = `Invoice ID: #${([...Array(4)].map(() => (Math.floor(Math.random() *255)).toString(16).padStart(2, "0"))).join("")}` // generate a 4 bytes long hex string
-			invoiceDetailsElements[1].innerHTML = `Date: ${new Date().toLocaleDateString("en-SG")}` // dd/mm/yyyy with zero padding, yay!
-			invoiceDetailsElements[2].innerHTML = `Time: ${new Date().toLocaleTimeString("en-US", {hour12: false, hour: "2-digit", minute: "2-digit"})}`
+			// update email address into confirmation screen
+			document.getElementById("confirmation-final-msg").innerHTML = `Reservation successful! Credit hold of <span class="moneyref">$50</span> has been placed. A confirmation email will be sent out to <span class="emailref">${this.contactEmailAddr}</span> shortly!`
 
-			console.log(this, this.guestList)
-			var reservationDetailsContainer = this.invoice.reservationDetailsContainer
-			var reservationDetailsElements = reservationDetailsContainer.getElementsByTagName("p")
-			reservationDetailsElements[0].innerHTML = `Date: ${this.date}`
-			reservationDetailsElements[1].innerHTML = `Time: ${this.time}`
-			reservationDetailsElements[2].innerHTML = `Service: ${this.service}`
-			reservationDetailsElements[3].innerHTML = `Guests: ${1}pax`
-
-			var contactDetailsContainer = this.invoice.contactDetailsContainer
-			var contactDetailsElements = contactDetailsContainer.getElementsByTagName("p")
-			contactDetailsElements[0].innerHTML = `Name: John Doe`
-			contactDetailsElements[1].innerHTML = `Email: ${this.contactEmailAddr}`
-			contactDetailsElements[2].innerHTML = `Phone number: -`
+			// populate details
+			// this.repopulateDetails();
 		}
 
 		pages.navbarArrowsHighlight = function() {
@@ -1322,6 +1309,8 @@
 		receiptionist.register()
 		pages.register()
 		// pages.nextPage()
-		// pages.nextPage()
+		pages.nextPage()
+		pages.nextPage()
+		pages.nextPage()
 	</script>
 </html>

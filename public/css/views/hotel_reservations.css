@@ -722,6 +722,7 @@ input:invalid {
 }
 
 .guest-count-input-container > input {
+	min-width: 0;
 }
 
 /* PAYMENT FORM CONTAINER */
@@ -808,7 +809,7 @@ input:invalid {
 	width: calc(100% - 18px);
 }
 
-#payment-pform-processpayment {
+#payment-pform-addcard {
 	padding: 20px;
 
 	border-radius: .2rem;
@@ -821,23 +822,59 @@ input:invalid {
 	transition-timing-function: linear;
 }
 
-#payment-pform-processpayment:focus,
-#payment-pform-processpayment:hover {
+#payment-pform-addcard:focus,
+#payment-pform-addcard:hover {
 	color: #fff;
 	background-color: var(--tertiary-color);
 }
 
-#payment-pform-processpayment.disabled {
+#payment-pform-addcard.disabled {
 	cursor: not-allowed;
 }
 
-#payment-pform-processpayment.disabled:hover {
+#payment-pform-addcard.disabled:hover {
 	/* no more focus pseudo-event since button has disabled attribute */
 	color: #fff;
 	background-color: #de7e6f;
 }
 
 /* CONFIRMATION PAGE */
+#confirmation-details-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+
+	padding: 20px 0;
+}
+#confirmation-details-container > h1 {
+	padding: 10px 0;
+	margin-bottom: 30px;
+
+	color: var(--tertiary-color);
+}
+
+#confirmation-details-container > h3 {
+	margin-bottom: 10px;
+
+	color: var(--tertiary-color);
+	font-size: 34px;
+}
+
+#confirmation-final-msg {
+	margin-bottom: 30px;
+	text-align: center;
+}
+
+.confirmation-details-field-header {
+	font-size: 20px;
+	padding-top: 20px;
+	padding-bottom: 10px;
+}
+
+#confirmation-details-banner {
+	font-family: sans-serif;
+	color: green;
+}
 #confirmation-invoice-slip {
 	width: calc(100% - 22px);
 
