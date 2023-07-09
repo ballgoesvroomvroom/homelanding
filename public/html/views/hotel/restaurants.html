@@ -40,46 +40,73 @@
 		<nav id="greeter-anchorjump">
 			<p>18 Marina Gardens Dr, Singapore 018953 | +65 6158 7190</p>
 		</nav>
-		<div id="line-extensions">
-			<div></div>
-			<div></div>
-			<div></div>
-		</div>
-		<div id="card-grid-container">
-			<div id="breakfast-service" class="service-card-frame">
-				<div class="service-card-container">
-					<div class="service-card-thumbnail">
+		<div id="card-grid-overflow-pseudo-container">
+			<div id="card-grid-container">
+				<div id="breakfast-service" class="service-card-frame">
+					<div class="service-card-node"></div>
+					<div class="service-card-connector"></div>
+					<div class="service-card-container">
+						<div class="service-card-thumbnail">
+						</div>
+						<div class="service-card-round-icon-container">
+						</div>
+						<div class="service-card-content-container">
+							<h1>Breakfast service<img src="/hotel_assets/croissant_icon.svg"></h1>
+							<div class="service-card-details-content-container">
+								<p><img src="/hotel_assets/star_icon.svg">4.5/5</p>
+								<p>08:00am - 12pm</p>
+							</div>
+						</div>
 					</div>
-					<div class="service-card-round-icon-container">
-					</div>
-					<div class="service-card-content-container">
-						<h1>Breakfast service<img src="/hotel_assets/croissant_icon.svg"></h1>
-						<p>08:00am - 12pm</p>
-					</div>
+					<div class="service-card-last-connector"></div>
+					<button class="service-card-menu-download" type="button">
+						<p>Download</p>
+						<h1>MENU</h1>
+					</button>
 				</div>
-			</div>
-			<div id="lunch-service" class="service-card-frame">
-				<div class="service-card-container">
-					<div class="service-card-thumbnail">
+				<div id="lunch-service" class="service-card-frame">
+					<div class="service-card-node"></div>
+					<div class="service-card-connector"></div>
+					<div class="service-card-container">
+						<div class="service-card-thumbnail">
+						</div>
+						<div class="service-card-round-icon-container">
+						</div>
+						<div class="service-card-content-container">
+							<h1>Lunch service<img src="/hotel_assets/ramen_icon.svg"></h1>
+							<div class="service-card-details-content-container">
+								<p><img src="/hotel_assets/star_icon.svg">4.5/5</p>
+								<p>12pm - 03:00pm</p>
+							</div>
+						</div>
 					</div>
-					<div class="service-card-round-icon-container">
-					</div>
-					<div class="service-card-content-container">
-						<h1>Lunch service<img src="/hotel_assets/ramen_icon.svg"></h1>
-						<p>12pm - 03:00pm</p>
-					</div>
+					<div class="service-card-last-connector"></div>
+					<button class="service-card-menu-download" type="button">
+						<p>Download</p>
+						<h1>MENU</h1>
+					</button>
 				</div>
-			</div>
-			<div id="dinner-service" class="service-card-frame">
-				<div class="service-card-container">
-					<div class="service-card-thumbnail">
+				<div id="dinner-service" class="service-card-frame">
+					<div class="service-card-node"></div>
+					<div class="service-card-connector"></div>
+					<div class="service-card-container">
+						<div class="service-card-thumbnail">
+						</div>
+						<div class="service-card-round-icon-container">
+						</div>
+						<div class="service-card-content-container">
+							<h1>Dinner service<img src="/hotel_assets/dinner_icon.svg"></h1>
+							<div class="service-card-details-content-container">
+								<p><img src="/hotel_assets/star_icon.svg">4.5/5</p>
+								<p>05:30pm- 10pm</p>
+							</div>
+						</div>
 					</div>
-					<div class="service-card-round-icon-container">
-					</div>
-					<div class="service-card-content-container">
-						<h1>Dinner service<img src="/hotel_assets/dinner_icon.svg"></h1>
-						<p>05:30pm- 10pm</p>
-					</div>
+					<div class="service-card-last-connector"></div>
+					<button class="service-card-menu-download" type="button">
+						<p>Download</p>
+						<h1>MENU</h1>
+					</button>
 				</div>
 			</div>
 		</div>
@@ -89,195 +116,8 @@
 		-->
 	</body>
 	<script>
-		// promotions entry
-		const promotionsDataByCateg = [
-			["2023HT2NDP20OFF"], // DINING
-			["UOB10OFF", "BM10OFF"], // ACCOMMODATION
-			["TESTER"], // EVENTS
-			[] // WEDDING
-		]
-		const promotionsDataConds = {
-			"WSL": "While stocks last",
-			"MEO": "Members exclusive only",
-			"TCA": "Terms & conds. apply",
-			"LTSS": "Limited to selected suites"
-		}
-		const promotionsData = {
-			"2023HT2NDP20OFF": {
-				name: "20% Off 2nd Pax for High Tea",
-				description: "2nd pax dine at a discounted price of 65.90+ (<i>U.P. 82.75+</i>)\nLimited to only one 2nd pax for a table",
-				date: "14/05/23 - 21/05/23",
-				conds: [
-					"WSL", "MEO", "TCA"
-				]
-			},
-			"UOB10OFF": {
-				name: "10% Off Suites w/ UOB Card",
-				description: "10% off for suites rooms when you pay with UOB card",
-				date: "01/01/23 - 01/06/23",
-				conds: [
-					"LTSS", "TCA"
-				]
-			},
-			"BM10OFF": {
-				name: "10% Off Rooms on Your Birthday Month",
-				description: "10% off for one classic rooms on your birthday month.\nLimited to a maximum of 5 nights stay.",
-				date: "01/01/2023 - 31/12/2024",
-				conds: [
-					"MEO", "TCA"
-				]
-			},
-			"TESTER": {
-				name: "Te",
-				description: "TEST",
-				date: "definite",
-				conds: [
-					"MEO"
-				]
-			}
-		}
-
-		// references
-		var modalWindow = document.getElementById("modal-window")
-
-		// modal object
-		const modal = {
-			window: modalWindow,
-			container: document.getElementById("modal-container"),
-
-			header: document.getElementById("modal-content-header"),
-			description: document.getElementById("modal-content-desciption-p"),
-			date: document.getElementById("modal-content-details-promo-date")
-		}
-
-		modal.toggleOpen = function(open) {
-			// open: boolean
-			if (open) {
-				modalWindow.classList.remove("hidden")
-			} else {
-				modalWindow.classList.add("hidden")
-			}
-		}
-
-		modal.loadDescription = function(id) {
-			// returns true if loading was successful
-			var data = promotionsData[id]
-			if (data == null) {
-				// no matching ids
-				return false
-			}
-
-			// load title
-			this.header.innerHTML = data.name
-			this.description.innerHTML = data.description.replaceAll("\n", "<br>")
-
-			// load timing
-			this.date.innerHTML = data.date
-
-			// return true
-			return true
-		}
-		//
-
-		// set min-date for date input (content-searchbar)
-		document.getElementById("content-searchbar-filter-date").setAttribute("min", new Date().toISOString().split("T")[0])
-
-		// promo cards population & registering of clicks
-		var containerElement = [
-			document.getElementById("dining").getElementsByClassName("promo-card-grid-container")[0],
-			document.getElementById("accommodation").getElementsByClassName("promo-card-grid-container")[0],
-			document.getElementById("events").getElementsByClassName("promo-card-grid-container")[0],
-			document.getElementById("wedding").getElementsByClassName("promo-card-grid-container")[0],
-		]
-		for (let i = 0; i < 4; i++) {
-			// category pointer
-			var promos = promotionsDataByCateg[i]
-			var container = containerElement[i]
-
-			for (let j = 0; j < promos.length; j++) {
-				let promocode = promos[j]
-				var promodata = promotionsData[promocode]
-
-				// construct new promo card element
-				var bigcontainer = document.createElement("div")
-				bigcontainer.classList.add("promo-card")
-
-				var topcontainer = document.createElement("div")
-				topcontainer.classList.add("promo-card-top-container")
-				bigcontainer.appendChild(topcontainer)
-
-				var thumbnail = document.createElement("div")
-				thumbnail.classList.add("promo-card-thumbnail")
-				// add background image here for promo card here
-				topcontainer.appendChild(thumbnail)
-
-				var specscontainer = document.createElement("div")
-				specscontainer.classList.add("promo-card-specs-container")
-				topcontainer.appendChild(specscontainer)
-
-				// add specs (date first then any conds they have)
-				var datespec = document.createElement("p")
-				datespec.className = "promo-card-specs-date"
-				datespec.innerHTML = promodata.date
-				specscontainer.appendChild(datespec)
-				for (let k = 0; k < promodata.conds.length; k++) {
-					var spec = document.createElement("p")
-					spec.className = "promo-card-specs-tc"
-					spec.innerHTML = promotionsDataConds[promodata.conds[k]]
-					specscontainer.appendChild(spec)
-				}
-
-				var detailscontainer = document.createElement("div")
-				detailscontainer.classList.add("promo-card-details")
-				bigcontainer.appendChild(detailscontainer)
-
-				var detailsheading = document.createElement("h3")
-				console
-				detailsheading.innerHTML = promodata.name
-				var viewmorebtn = document.createElement("button")
-				viewmorebtn.id = promocode
-				viewmorebtn.classList.add("promo-card-view-more-btn")
-				viewmorebtn.innerHTML = "VIEW MORE"
-
-				detailscontainer.appendChild(detailsheading)
-				detailscontainer.appendChild(viewmorebtn)
-
-				// register click events
-				viewmorebtn.addEventListener("click", e => {
-					e.stopPropagation() // stop bubbling
-
-					if (modal.loadDescription(promocode)) {
-						modal.toggleOpen(true)
-					}
-				})
-
-				// add it to container
-				container.appendChild(bigcontainer)
-			}
-		}
-
-		// promo card view more
-		var promoTriggerBtns = document.getElementsByClassName("promo-card-view-more-btn")
-		for (let i = 0; i < promoTriggerBtns.length; i++) {
-			var ele = promoTriggerBtns[i]
-			ele.addEventListener("click", e => {
-				console.log("LOADING WITH ID", e.target.id)
-				if (modal.loadDescription(e.target.id)) {
-					modal.toggleOpen(true)
-				}
-			})
-		}
-
-		// modal close interactors
-		modal.window.addEventListener("click", e => {
-			modal.toggleOpen(false)
-		})
-		document.getElementById("modal-content-close-btn").addEventListener("click", e => {
-			e.stopPropagation() // prevent event to bubble to modal-window (double triggers in this case)
-			modal.toggleOpen(false)
-		})
-		modal.container.addEventListener("click", e => {
-			e.stopPropagation() // prevent event to bubble to modal-window (triggers close in this case)
-		})
+		// set scroll for mobile to 50%
+		var cardgridcontainer = document.getElementById("card-grid-overflow-pseudo-container");
+		cardgridcontainer.scrollTo(cardgridcontainer.children[0].offsetWidth *.3333, 0)
 	</script>
 </html>

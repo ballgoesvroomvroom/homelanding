@@ -193,7 +193,7 @@ a {
 
 	min-height: 0;
 
-	padding: 30px 0;
+	padding: 30px;
 }
 
 #greeter-container > h1 {
@@ -235,7 +235,7 @@ a {
 }
 
 #greeter-anchorjump > p {
-	padding: 10px 0;
+	padding: 10px;
 
 	font-size: .9rem;
 
@@ -295,9 +295,16 @@ a {
 }
 
 /* CARD CONTENT STYLING */
+#card-grid-overflow-pseudo-container {
+	/* to support overflow on mobile */
+	overflow-x: auto;
+}
+
 #card-grid-container {
 	display: flex;
 	flex-direction: row;
+
+	position: relative;
 
 	padding-top: 40px;
 
@@ -307,8 +314,8 @@ a {
 /* INDIVIDUAL CARD STYLING */
 .service-card-frame {
 	display: flex;
-	flex-direction: row;
-	justify-content: center;
+	flex-direction: column;
+	align-items: center;
 	flex-grow: 1;
 
 	min-width: 0;
@@ -317,25 +324,38 @@ a {
 
 	aspect-ratio: .6;
 
-	padding: 0 40px;
-	padding-top: 80px;
-	padding-bottom: 40px;
+	padding: 40px;
 }
 
-.service-card-frame:nth-child(2) {
-	padding-top: 0;
-	padding-bottom: 120px;
+.service-card-node {
+	width: 32px;
+	height: 32px;
+	
+	transform: rotate(45deg);
+
+	background-color: white;
+}
+
+.service-card-connector {
+	width: 2px;
+	height: 140px;
+
+	background-color: white;
+}
+
+.service-card-frame:nth-child(2) > .service-card-connector {
+	height: 100px;
 }
 
 .service-card-container {
-	--round-icon-size: 128px;
+	--round-icon-size: 256px;
 
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 
-	width: auto;
-	height: 100%;
+	width: 100%;
+	height: auto;
 
 	aspect-ratio: .6;
 
@@ -385,6 +405,7 @@ a {
 
 	flex-grow: 1;
 
+	width: calc(100% - 40px);
 	min-height: 0;
 
 	padding: 20px;
@@ -395,13 +416,78 @@ a {
 	display: flex;
 	flex-direction: row;
 	align-items: center;
+	justify-content: center;
 
 	font-weight: 400;
 	font-size: 20px;
 }
 
-.service-card-content-container > p {
-	text-align: right;
+.service-card-details-content-container {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.service-card-details-content-container > p {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.service-card-details-content-container img {
+	width: 24px;
+	height: 24px;
+
+	padding: 4px;
+	margin-top: -4px;
+}
+
+.service-card-last-connector {
+	width: 2px;
+	height: 100px;
+
+	background-color: white;
+}
+
+.service-card-frame:nth-child(2) > .service-card-last-connector {
+	height: 140px;
+}
+
+.service-card-menu-download {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+
+	width: 100%;
+
+	padding: 20px;
+
+	border-style: solid;
+	border-width: 2px;
+	border-color: var(--secondary-color);
+	background-color: var(--primary-compl-color);
+
+	transition-property: color, background-color;
+	transition-duration: 150ms;
+	transition-timing-function: linear;
+}
+
+.service-card-menu-download:hover,
+.service-card-menu-download:focus {
+	color: #000;
+	background-color: var(--primary-color);
+}
+
+.service-card-menu-download > p {
+	font-size: 12px;
+	color: white;
+}
+
+.service-card-menu-download > h1 {
+	font-size: 34px;
+	font-weight: 500;
+	color: white;
 }
 
 /* SERVICE CARD THUMBNAILS */
@@ -421,20 +507,6 @@ a {
 }
 
 /* MEDIA QUERY */
-@media only screen and (min-width: 2000px) {
-	/* increase column row */
-	.promo-card-grid-container {
-		grid-template-columns: repeat(8, 1fr);
-	}
-}
-
-@media only screen and (max-width: 1200px) {
-	/* decrease column row */
-	.promo-card-grid-container {
-		grid-template-columns: repeat(4, 1fr);
-	}
-}
-
 @media only screen and (max-width: 900px) {
 	:root {
 		--page-horizontal-whitespace: 40px;
@@ -447,30 +519,21 @@ a {
 		margin-right: 20px;
 	}
 
-	/* reduce amount of columns for promotions-card */
-	.promo-card-grid-container {
-		grid-template-columns: repeat(3, 1fr);
+	/* disable horizontal flow on entire body */
+	body {
+		overflow-x: auto;
 	}
 
-	/* change modal to a top to bottom layout */
-	#modal-container {
-		flex-direction: column;
+	/* make the cards scrollable */
+	#card-grid-container {
+		width: 300vw;
 	}
 
-	#modal-content {
-		flex-direction: column;
-	}
-
-	#modal-content-thumbnail {
-		border-radius: .2rem .2rem 0 0;
-	}
-
-	#modal-content-right {
-		padding-top: 15px;
-	}
-
-	#modal-content-close-btn {
-		margin-top: 10px;
+	/* reduce card width so it isnt so tall (height computed by aspect ratio) */
+	/* do so by reducing big container so -container (direct children of -frame) will be shrinked */
+	.service-card-frame {
+		padding-left: 160px;
+		padding-right: 160px;
 	}
 }
 
@@ -490,24 +553,16 @@ a {
 		margin-right: 15px;
 	}
 
-	/* shorten section header banner & reduce bottom margin */
-	.section-header-container {
-		height: 200px;
-
-		margin-bottom: 10px;
+	/* expand slightly card width so it isnt so tall (height computed by aspect ratio) [RELATIVE TO PREVIOUS MEDIA QUERY] */
+	/* do so by reducing big container so -container (direct children of -frame) will be shrinked */
+	.service-card-frame {
+		padding-left: 80px;
+		padding-right: 80px;
 	}
 
-	/* shorten whitespace between header and p tag */
-	/* reduce font size too */
-	.section-header-container h2 {
-		padding-bottom: 10px;
-
-		font-size: 40px;
-	}
-
-	/* change grid container to 2 columns only */
-	.promo-card-grid-container {
-		grid-template-columns: repeat(2, 1fr);
+	/* reduce round icon size on cards */
+	.service-card-container {
+		--round-icon-size: 168px;
 	}
 }
 
@@ -519,5 +574,26 @@ a {
 	/* hide member sign in button completely */
 	#topbar-member-login-btn {
 		display: none;
+	}
+
+	/* expand slightly card width so it isnt so tall (height computed by aspect ratio) [RELATIVE TO PREVIOUS MEDIA QUERY] */
+	/* do so by reducing big container so -container (direct children of -frame) will be shrinked */
+	.service-card-frame {
+		padding-left: 20px;
+		padding-right: 20px;
+	}
+
+	/* reduce round icon size on cards */
+	.service-card-container {
+		--round-icon-size: 128px;
+	}
+
+	/* reduce height of connector */
+	.service-card-last-connector {
+		height: 40px;
+	}
+
+	.service-card-frame:nth-child(2) > .service-card-last-connector {
+		height: 80px;
 	}
 }
