@@ -14,6 +14,7 @@ class Docs {
 class Hotel {
 	static promotions = path.join(html, "views/hotel/promotions.html")
 	static reservations = path.join(html, "views/hotel/reservations.html")
+	static restaurants = path.join(html, "views/hotel/restaurants.html")
 }
 
 class Views {

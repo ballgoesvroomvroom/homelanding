@@ -20,6 +20,11 @@ router.get("/reservations", (req, res) => {
 	res.sendFile(views.hotel.reservations)
 })
 
+router.get("/restaurants", (req, res) => {
+	res.type("html")
+	res.sendFile(views.hotel.restaurants)
+})
+
 module.exports = { // export router object and authenticated middleware
 	baseURL, router
 }
