@@ -198,7 +198,11 @@ a {
 
 #greeter-container > h1 {
 	color: black;
+
+	font-family: "Times New Roman";
 	font-weight: 400;
+
+	letter-spacing: .1px;
 }
 
 #greeter-container > h3 {
