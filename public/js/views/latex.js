@@ -1,8 +1,91 @@
 // globally exposed variable QUESTIONS stores questions
+const PAPER_DIMEN = { // pixels
+	"A4": 3508,
+	"A5": 2480
+}
+
+// workbook style baseline properties
+const QUESTION_HEIGHT = 250 // baseline height each question will take in workbook style; to be multipied by qnSpaceFactor
+const QUESTION_COLUMN = 2 // paper will have 2 columns by default
+
 $(document).ready(e => {
-	$selectors = {
+	const $selectors = {
 		"questions-container": $("#questions-container"),
 		"page-share-link": $("#page-share-link")
+	}
+
+	function buildQuestion(qnStr, latexEqnArr) {
+		/*
+		 * build questions where,
+		 *	1. new line characters are converted from '\n' to '<br>'
+		 *	2. populate inline questions (to be rendered by latex visual engine) into qnStr from latexEqnArr into respective placeholders (e.g. "%%0%% divides %%1%%")
+		 *	2.1. proper html parsed and built by katex
+		 */
+
+		// replace new line characters to <br> tags
+		qnStr = qnStr.replaceAll("\n", "<br>")
+
+		// replace inline positions qnStr with built latex expr (final step since most sophiscated)
+		for (let i = 0; i < qnData[1].length; i++) {
+			qnStr = qnStr.replace(`%%${i}%%`, katex.renderToString(qnData[1][i], {throwOnError: false}))
+		}
+
+		return qnStr
+	}
+
+	function redrawPage(style, dimen, styleProp) {
+		/*
+		 * style: str, "workbook"|"classic"
+		 * dimen: str, "A4" for A4 (3508px), "A5" for A5 (2480px)
+		 * styleProp: {}, specific to the style used
+		 *		"workbook"
+		 *		- qnHtFactor (multiplies QUESTION_HEIGHT)
+		 *		- qnColumn (questions will have 2 columns)
+		 *		"classic"
+		 *		- none
+		 */
+		var pageHt = PAPER_DIMEN[dimen]
+		switch (style) {
+			case "workbook":
+				// grid view
+
+				// set default properties
+				if (!('qnHtFactor' in styleProp)) {
+					styleProp.qnHtFactor = 1
+				}
+				if (!('qnColumn' in styleProp)) {
+					styleProp.qnColumn = QUESTION_COLUMN
+				}
+
+				// start populating questions
+				var qnPerPage = Math.floor(pageHt /(QUESTION_HEIGHT *styleProp.qnHtFactor)) *styleProp.qnColumn
+				var qnPageCount = Math.floor(QUESTIONS.length /qnPerPage) +1
+				for (let pageIdx = 0; pageIdx < qnPageCount; i++) {
+					var $pageContainer = $("<div>", {
+						"class": "page-container"
+					})
+
+					for (let j = pageIdx *qnPerPage; j < (pageIdx +1) *qnPerPage; j++) {
+						// j = qnIdx
+						// qnData: [qnStr, latexEqnArr]
+						var qnData = QUESTIONS[j]
+						var qnStr = buildQuestion(..qnData) // returns a built string that can be plugged straight away (including latex expressions into html tags)
+
+						var $qnContainer = $("<div>", {
+							"class": "qn-container"
+						})
+
+						var $pTag = $("<p>")
+						$pTag.html(qnStr) // html to render
+
+						// render outside of DOM first, then to be attached to the DOM structure - unsure of performance benefits if vice versa?
+						$pTag.appendTo($qnContainer)
+						$qnContainer.appendTo($pageContainer)
+					}
+				}
+			case "classic":
+				// list view
+		}
 	}
 
 	function createNewQuestionEntry(content, $pageContainer) {
