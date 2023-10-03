@@ -10,6 +10,7 @@ const QUESTION_COLUMN = 2 // paper will have 2 columns by default
 
 $(document).ready(e => {
 	const $selectors = {
+		"body": $("body"),
 		"questions-container": $("#questions-container"),
 		"page-share-link": $("#page-share-link")
 	}
@@ -48,6 +49,11 @@ $(document).ready(e => {
 		switch (style) {
 			case "workbook":
 				// grid view
+
+				// clear document
+
+				// set style properties of page
+				document.body.className = "workbook"
 
 				// set default properties
 				if (!('qnHtFactor' in styleProp)) {
