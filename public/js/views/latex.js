@@ -45,15 +45,17 @@ $(document).ready(e => {
 		 *		"classic"
 		 *		- none
 		 */
+
+		// clear document
+		document.body.innerHTML = ""
+
+		// set style properties of page
+		document.body.className = "workbook"
+
 		var pageHt = PAPER_DIMEN[dimen]
 		switch (style) {
 			case "workbook":
 				// grid view
-
-				// clear document
-
-				// set style properties of page
-				document.body.className = "workbook"
 
 				// set default properties
 				if (!('qnHtFactor' in styleProp)) {
