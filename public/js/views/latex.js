@@ -34,6 +34,47 @@ $(document).ready(e => {
 		return qnStr
 	}
 
+	function createNewPage(ht) {
+		/*
+		 * creates and return a new page container (div tag with class 'page-container')
+		 * returns page container, and amount of space (height, in px) that can be used
+		 */
+		const $container = $("<div>", {
+			"class": "page-container"
+		})
+		$container.css("height", ht)
+
+		const $header = $("<div>", {
+			"class": "page-header"
+		})
+		$header.appendTo($container)
+
+		const $footer = $("<div>", {
+			"class": "page-footer"
+		})
+		$footer.appendTo($container)
+
+		return [$container, ht -$header.height() -$footer.height()]
+	}
+
+	function getPageHeader() {
+		/*
+		 * returns the header element to be re-used in every question page
+		 */
+		return $("<div>", {
+			"class": "page-header"
+		})
+	}
+
+	function getPageFooter() {
+		/*
+		 * returns the fpoter element to be re-used in every question page
+		 */
+		return $("<div>", {
+			"class": "page-footer"
+		})
+	}
+
 	function redrawPage(style, dimen, styleProp) {
 		/*
 		 * style: str, "workbook"|"classic"
@@ -65,23 +106,30 @@ $(document).ready(e => {
 					styleProp.qnColumn = QUESTION_COLUMN
 				}
 
+				// generate header and footer
+				const $header = getPageHeader()
+				const $footer = getPageFooter()
+
+				// calculate available space
+				const availHt = pageHt -$header.height() -$footer.height()
+
 				// start populating questions
-				var qnPerPage = Math.floor(pageHt /(QUESTION_HEIGHT *styleProp.qnHtFactor)) *styleProp.qnColumn
+				var qnPerPage = Math.floor(availHt /(QUESTION_HEIGHT *styleProp.qnHtFactor)) *styleProp.qnColumn
 				var qnPageCount = Math.floor(QUESTIONS.length /qnPerPage) +1
 				for (let pageIdx = 0; pageIdx < qnPageCount; i++) {
-					var $pageContainer = $("<div>", {
-						"class": "page-container"
-					})
+					var [$pageContainer, availHt] = createNewPage(pageHt)
 
 					for (let j = pageIdx *qnPerPage; j < (pageIdx +1) *qnPerPage; j++) {
 						// j = qnIdx
 						// qnData: [qnStr, latexEqnArr]
 						var qnData = QUESTIONS[j]
-						var qnStr = buildQuestion(..qnData) // returns a built string that can be plugged straight away (including latex expressions into html tags)
+						var qnStr = buildQuestion(...qnData) // returns a built string that can be plugged straight away (including latex expressions into html tags)
 
 						var $qnContainer = $("<div>", {
 							"class": "qn-container"
 						})
+
+						$qnContainer.css("height", `${QUESTION_HEIGHT *styleProp.qnHtFactor}px`)
 
 						var $pTag = $("<p>")
 						$pTag.html(qnStr) // html to render
@@ -149,6 +197,12 @@ $(document).ready(e => {
 			$container.appendTo($selectors["questions-container"])
 		}
 	})
+
+	// main entry function to be called during initialisation
+	function main() {
+		// set title
+
+	}
 
 	// click event for link button
 	var shareLink = window.location.hostname +`/qriller/${QRILLER_ID}`
