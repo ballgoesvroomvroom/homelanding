@@ -180,21 +180,63 @@ router.get("/:documentId/ans", (req, res) => {
 	}
 })
 
-// load presets
-presetRouter.get("/loi/0", (req, res) => {
-	const data = Utils.getDefaultProperties()
+{
+	presetRouter.get("/loi/0", (req, res) => {
+		const data = Utils.getDefaultProperties()
 
-	data.code = "1.0"
-	data.title = "Laws of Indices Part I"
-	data.note = "Manipulate algebraic expressions with indices in the form of a^m * a^n = a^(m+n) and a^m / a^n = a^(m-n)"
+		data.code = "1.0"
+		data.title = "Laws of Indices Part I"
+		data.note = "Manipulate algebraic expressions with indices in the form of\na^m * a^n = a^(m+n)\na^m / a^n = a^(m-n)"
 
-	const q = new qriller.Qriller(data)
-	q.createQuestions(qriller.LawOfIndices, 100)
+		const q = new qriller.Qriller(data)
+		q.createQuestions(qriller.LawOfIndices, 100)
 
-	res.write(Utils.populateDocument(q))
-	res.status(200).end()
-})
+		res.write(Utils.populateDocument(q))
+		res.status(200).end()
+	})
 
+	presetRouter.get("/loi/1", (req, res) => {
+		const data = Utils.getDefaultProperties()
+
+		data.code = "1.1"
+		data.title = "Laws of Indices Part II"
+		data.note = "Manipulate algebraic expressions with indices in the form of\na^0 = 1; (a^m)^n = a^(mn)\n(a*m)^b = a^b * m^b\na^(-n) = 1/a^n"
+
+		const q = new qriller.Qriller(data)
+		q.createQuestions(qriller.LawOfIndices, 100)
+
+		res.write(Utils.populateDocument(q))
+		res.status(200).end()
+	})
+
+	presetRouter.get("/loi/2", (req, res) => {
+		const data = Utils.getDefaultProperties()
+
+		data.code = "1.2"
+		data.title = "Laws of Indices Final Part"
+		data.note = "Manipulate algebraic expressions with indices in the form of\na^m * a^n = a^(m+n)\na^m / a^n = a^(m-n)\na^0 = 1; (a^m)^n = a^(mn)\n(a*m)^b = a^b * m^b\na^(-n) = 1/a^n"
+
+		const q = new qriller.Qriller(data)
+		q.createQuestions(qriller.LawOfIndices, 100)
+
+		res.write(Utils.populateDocument(q))
+		res.status(200).end()
+	})
+
+	presetRouter.get("/loi/3", (req, res) => {
+		const data = Utils.getDefaultProperties()
+
+		data.code = "1.3"
+		data.title = "Standard Form"
+		data.note = "Express numbers in standard, scientific form."
+
+		const q = new qriller.Qriller(data)
+		q.createQuestions(qriller.StandardForm, 100)
+
+		res.write(Utils.populateDocument(q))
+		res.status(200).end()
+	})
+}
 
 // presetRouter.get("/perctofrac", (req, res) => {
 // 	res.type("html")

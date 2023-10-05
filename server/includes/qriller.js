@@ -49,7 +49,7 @@ class Unknowns {
 	// determinants
 	static constants = ["a", "b", "c", "d"]
 	static axis = ["i", "j", "k"]
-	static determinants = ["x", "y"]
+	static determinants = ["x", "y", "z"]
 	static indices = ["n", "m", "i", "j", "k", "g"]
 	static greekDeterminants = ["ɑ"]
 }
@@ -78,6 +78,21 @@ class Units {
 
 		return this.num *factor
 	}
+}
+
+class BaseTenUnits extends Units {
+	units = {
+		"billionth": 0.000001, // 10^-3
+		"millionth": 0.000001, // 10^-3
+		"thousandth": 0.001, // 10^-3
+		"one": 1,
+		"hundred": 100, // 10^2
+		"thousand": 1000, // 10^3
+		"million": 1000000, // 10^6
+		"billion": 1000000000, // 10^9
+	}
+
+	static unitMap = ["billionth", "millionth", "thousandth", "one", "hundred", "thousand", "million", "billion"]
 }
 
 class LengthUnit extends Units {
@@ -1707,7 +1722,7 @@ class LawOfIndices extends BaseQuestion {
 	static segment_t(baseArr) {
 		/*
 		* generate segments (t variant) to be chained in the final question
-		* baseArr: array containing the single characters to be used as bases
+		* baseArr: array containing the single characters to be used as bases (.length property to be at least 1)
 		* NOTE: if containsAdditionOfBases is false, cannot chain, thus assumes it allows addition operation
 		* this variant only allows multiplication and division operations, oftentimes with more than 1 bases chained together
 		* returns a string representing the segment
@@ -1718,8 +1733,8 @@ class LawOfIndices extends BaseQuestion {
 		// each for LHS and RHS
 		var terms = []
 		for (let i = 0; i < 2; i++) {
-			var singleHandTerms = [BaseQuestion.randomInt(1, 9)] // 0th index representing the constant coefficient
-			var count = BaseQuestion.randomInt(0, baseArr.length -1)
+			var singleHandTerms = []
+			var count = BaseQuestion.randomInt(1, baseArr.length)
 
 			for (let j = 0; j < count; j++) {
 				var n = BaseQuestion.randomInt(0, baseArr.length -1)
@@ -1733,7 +1748,35 @@ class LawOfIndices extends BaseQuestion {
 			singleHandTerms.sort((a, b) => {
 				return a -b
 			})
+
+			singleHandTerms.push(BaseQuestion.randomInt(1, 9)) // last index representing the constant coefficient
+			terms.push(singleHandTerms);
 		}
+
+		var r = "" // final representation string
+		for (let i = 0; i < 2; i++) {
+			var coeff = terms[i][terms[i].length -1] // last element representing the constant coefficient
+			if (coeff > 1) {
+				// omit coefficient of 1
+				r += coeff
+			}
+
+			for (let j = 0; j < terms[i].length -1; j++) { // exclude the last element
+				var exp = BaseQuestion.randomInt(2, 13) // exponent value
+				r += `${baseArr[terms[i][j]]}^\{${exp}}`
+			}
+
+			if (i !== 1) {
+				// append an operation suffix
+				if (Math.random() >= .5) {
+					r += "\\times "
+				} else {
+					r += "\\div "
+				}
+			}
+		}
+
+		return r
 	}
 
 	static segment_k() {
@@ -1810,8 +1853,8 @@ class LawOfIndices extends BaseQuestion {
 
 		// determine constants
 		var constants = ["", ""]
-		var leftMultOp = (toInclMultOp && (isDualConstant | isConstantOnLHS)) ? "\\times" : ""
-		var rightMultOp = (toInclMultOp && (isDualConstant | !isConstantOnLHS)) ? "\\times" : ""
+		var leftMultOp = (toInclMultOp && (isDualConstant | isConstantOnLHS)) ? "\\times " : ""
+		var rightMultOp = (toInclMultOp && (isDualConstant | !isConstantOnLHS)) ? "\\times " : ""
 		if (containsConstant) {
 			var c
 			if (isNumericConstant) {
@@ -1856,17 +1899,99 @@ class LawOfIndices extends BaseQuestion {
 		}
 	}
 
-	constructor(containsAdditionOfBases) {
+	constructor() {
 		super();
 		var segment
 		if (Math.random() >= .5) {
-			LawOfIndices.segment_k()
+			var selection = [
+				Unknowns.determinants,
+				["v", "w", "s", "p"],
+				["m", "n", "o", "p"],
+				["i", "j", "k", "g"],
+			]
+			segment = LawOfIndices.segment_t(selection[BaseQuestion.randomInt(0, selection.length)])
 		} else {
-			LawOfIndices.segment_t()
+			segment = LawOfIndices.segment_k()
 		}
 
-		this.qnReprString = `Express %%0%% in positive index form.`
+		this.qnReprString = "Express %%0%% in positive index form."
 		this.qnLatexEqn = [segment]
+	}
+}
+
+class StandardForm extends BaseQuestion {
+	static segment_num(small) {
+		/*
+		 * generates a number with random digits (with the possibility of it being a floating point number)
+		 * small: boolean, if true, will generate digits within 4-6 digits, otherwise 6-13 digits
+		 * returns the final string
+		 */
+		var isLeadingZeroes = Math.random() >= .7 // e.g. 0.00473
+		var isWholeInteger = !isLeadingZeroes && Math.random() >= .5
+
+		var base = ""
+
+		// generate the individual digits for the base
+		if (isLeadingZeroes) {
+			// count zero places first
+			var leadingCount = BaseQuestion.randomInt(1, 6)
+			base = `0.${"0".repeat(leadingCount -1)}`
+		}
+
+		var digitCount = small ? BaseQuestion.randomInt(4, 6) : BaseQuestion.randomInt(6, 13)
+		var hasDecimal = isLeadingZeroes // already has a decimal if there are leading zeroes
+		for (let i = 0; i < digitCount; i++) {
+			var min = (isLeadingZeroes || i >= 1) ? 0 : 1 // start from 0 iff has leading zeroes or is the second digit to be generated
+			base += BaseQuestion.randomInt(min, 9)
+
+			if (!isWholeInteger && !hasDecimal && i >= 1 && i < digitCount -1 && Math.random() >= .6) {
+				// is not a whole integer, and does not yet have a decimal place, not first/last digit in generation
+				// therefore, insert a decimal
+				base += "."
+				hasDecimal = true
+			}
+		}
+
+		return base
+	}
+
+	constructor() {
+		super()
+
+		var isComputationNeeded = Math.random() >= .8
+		var isPartiallyCompleted = isComputationNeeded && Math.random() >= .6 // e.g. 44.05x10^5
+		var isInUnits = !isComputationNeeded && Math.random() >= .7 // e.g. 129 Billion in standard form
+
+		var digit = StandardForm.segment_num(isComputationNeeded || isInUnits) // random semi-large number (either integer or floating point)
+		var unit = "";
+		if (isComputationNeeded) {
+			if (isPartiallyCompleted) {
+				// append a x10^n behind
+				var n = BaseQuestion.randomInt(1, 14) *(Math.random() >= .7 ? -1 : 1) // set polarity
+				digit += `\{\\times}10^\{${n}}`
+			} else {
+				// generate another number and choose mode of operation
+				var n = StandardForm.segment_num(isComputationNeeded)
+				var op = "\\times "
+				if (Math.random() >= .5) {
+					op = "\\div "
+				}
+
+				digit += `${op}${n}`
+			}
+		} else if (isInUnits) {
+			var rn = BaseQuestion.randomInt(0, BaseTenUnits.unitMap.length -1) // random index
+			unit = BaseTenUnits.unitMap[rn]
+			if (rn >= 4 && parseInt(digit[0]) > 1) {
+				// add one 's' suffix at the end if unit 10^n, where n is positive AND leading number is > 1
+				unit += "s"
+			} else if (unit === "one") { 
+				unit = ""; // omit one
+			}
+		}
+
+		this.qnReprString = `Express %%0%% ${unit} in standard form.`
+		this.qnLatexEqn = [digit]
 	}
 }
 
@@ -1883,5 +2008,6 @@ module.exports = {
 	SimplifyAlgebraic,
 	ModernAlgebra,
 
-	LawOfIndices
+	LawOfIndices,
+	StandardForm
 }
