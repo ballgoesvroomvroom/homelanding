@@ -4,13 +4,25 @@ const mem = require("./qrillerMemory.js");
 const algEngine = require("./qrillerAlgebraEngine.js");
 
 class Qriller {
-	constructor() {
+	constructor(data) {
+		/*
+		 * constructs a new Qriller object with properties defined in data
+		 * Qriller object represents an entire worksheet, it contains the data representing the questions and worksheets as a whole
+		 * data: {
+		 *	code: str, // e.g. "1.0"
+		 *	title: str,
+		 *	note: str
+		 * }
+		 */
 		this.id = crypto.randomBytes(16).toString("hex")
 
-		this.title = ""
-		this.code = ""
-		this.note = ""
+		this.code = data.code
+		this.title = data.title
+		this.note = data.note
 		this.questions = []
+
+		// updat refs
+		this.updateRefsToMem()
 	}
 
 	createQuestions(questionClass, repeatCount, ...args) {
@@ -31,6 +43,15 @@ class Database {
 	static people = ["John", "Emma", "Michael", "Olivia", "William", "Ava", "James", "Isabella", "Alexander", "Sophia", "Daniel", "Mia", "David", "Charlotte", "Joseph", "Amelia", "Matthew", "Harper", "Samuel", "Evelyn", "Henry", "Abigail", "Andrew", "Emily", "Gabriel", "Elizabeth", "Benjamin", "Sofia", "Christopher", "Ella", "Jackson", "Victoria", "Anthony", "Avery", "Jonathan", "Grace", "Ryan", "Chloe", "Nicholas", "Scarlett", "Christian", "Zoey", "Nathan", "Lily", "Adam", "Hannah", "Thomas", "Madison", "Joshua", "Layla", "Aaron", "Aubrey", "Ethan", "Penelope", "William", "Eleanor", "Logan", "Nora", "Isaac", "Riley", "Elijah", "Savannah", "Connor", "Brooklyn", "Owen", "Leah", "Caleb", "Zoe", "Luke", "Stella", "Isaiah", "Hazel", "Jack", "Ellie", "Jordan", "Paisley", "Jeremiah", "Audrey", "Liam", "Skylar", "Wyatt", "Violet", "Sebastian", "Claire", "Jayden", "Bella", "Julian", "Lucy", "Carter", "Anna", "Brayden", "Samantha", "Gavin", "Caroline", "Levi", "Genesis", "Austin", "Aaliyah", "Charles", "Kennedy", "Hunter", "Kylie", "Aaron", "Allison", "Jason", "Maya", "Ian", "Sarah", "Connor", "Madelyn", "Colton", "Adeline", "Dominic", "Alexa", "Kevin", "Ariana", "Evan", "Elena", "Cooper", "Gabriella", "Henry", "Naomi", "Hudson", "Alice", "Adrian", "Sadie", "Jace", "Hailey", "Dylan", "Eva", "Leo", "Emilia", "Lucas", "Autumn", "Eli", "Piper", "Max", "Nevaeh", "Nolan", "Ruby", "Miles", "Serenity", "Elias", "Aria", "Brady", "Kaylee", "Adam", "Annabelle", "Asher", "Alyssa", "Jaxon", "Taylor", "Greyson", "Brielle", "Roman", "Lillian", "Santiago", "Angelina", "Mateo", "Liliana", "Sawyer", "Ashley", "Diego", "Lauren", "Leonardo", "Gianna", "Caleb", "Peyton", "Finn", "Adalyn", "Jayce", "Arianna", "Luis", "Makayla", "Maxwell", "Addison", "Axel", "Natalie", "Nathaniel", "Mia", "Juan", "Brooke", "Bryson", "Leila", "Carlos", "Nicole"]
 	static things = ["apple", "fruit", "pen", "orange", "banana", "book", "car", "dog", "cat", "chair", "table", "computer", "phone", "cup", "shirt", "shoe", "ball", "guitar", "hat", "bottle", "watch", "key", "camera", "sock", "flower", "cookie", "lamp", "bag", "bicycle", "knife", "chair", "pencil", "paper", "notebook", "umbrella", "glasses", "ring", "wallet", "headphone", "clock", "brush", "mirror", "globe", "tie", "scarf", "plate", "spoon", "fork", "knife", "pillow", "bed", "blanket", "wallet", "door", "window", "bookshelf", "candle", "oven", "refrigerator", "television", "toothbrush", "toothpaste", "soap", "towel", "shirt", "pants", "dress", "sock", "shoe", "sweater", "jacket", "coat", "belt", "hat", "gloves", "boots", "earrings", "bracelet", "necklace", "ring", "watch", "glasses", "bag", "backpack", "suitcase", "camera", "laptop", "keyboard", "mouse", "charger", "bottle", "cup", "plate", "spoon", "fork", "knife", "napkin", "tablecloth", "vase", "flower", "lamp", "candle", "painting", "sculpture", "guitar", "drum", "piano", "violin", "trumpet", "flute", "basketball", "soccer ball", "baseball", "tennis ball", "golf ball", "volleyball", "football", "helmet", "bat", "glove", "net", "brush", "comb", "mirror", "hairdryer", "soap", "shampoo", "conditioner", "toothbrush", "toothpaste", "towel", "lotion", "perfume", "wallet", "key", "phone", "tablet", "camera", "headphone", "speaker", "clock", "remote", "charger", "umbrella", "suitcase", "backpack", "map", "guidebook", "passport", "ticket", "sunglasses", "hat", "sunscreen", "water bottle", "snack", "camera", "binoculars", "journal", "pencil", "pen", "notebook", "bookmark", "calendar", "calculator", "ruler", "tape", "scissors", "glue", "stapler", "paperclip", "eraser", "highlighter", "folder", "envelope", "sticker", "postcard", "stamp", "paper"]
 	static rigidbody = ["car", "bike"]
+}
+
+class Unknowns {
+	// determinants
+	static constants = ["a", "b", "c", "d"]
+	static axis = ["i", "j", "k"]
+	static determinants = ["x", "y"]
+	static indices = ["n", "m", "i", "j", "k", "g"]
+	static greekDeterminants = ["ɑ"]
 }
 
 class Units {
@@ -456,6 +477,14 @@ class AlgebraicExpr {
 }
 
 class BaseQuestion {
+	/*
+	 * base class to be inherited
+	 * question data fields consists of .qnReprString and .qnLatexEqn
+	 * complements BaseAnswer object where it stores the answer object in .answerObj field
+	 *
+	 * qnReprString will contain placeholders in the format, '%%i&&' where i is a number starting from 0 without any form of zero-padding
+	 * placeholders will be replaced by elements in qnLatexEqn whose index corresponds to the value i
+	 */
 	qnReprString = ""
 	qnLatexEqn = []
 
@@ -497,6 +526,10 @@ class BaseQuestion {
 			return b
 		}
 		return BaseQuestion.gcd(b %a, a)
+	}
+
+	static lcm(a, b) {
+		return (a *b) /gcd(a, b)
 	}
 
 	static getDecimalPlace(float) {
@@ -568,6 +601,13 @@ class BaseQuestion {
 		}
 
 		return factorsArray
+	}
+
+	static randomInt(min, max) {
+		/*
+		 * generates a random number between min: int, and max: int (inclusive)
+		 */
+		return Math.floor(Math.random() *(max -min -1)) +min
 	}
 }
 
@@ -1586,9 +1626,247 @@ class OOPInt extends BaseQuestion {
 	}
 }
 
-class OOPFrac extends BaseQuestion {
-	constructor() {
+class Fraction {
+	constructor(a, b) {
+		/*
+		 * constructs a fraction representative object where,
+		 * a is the numerator,
+		 * b is the denominator
+		 * where both are integers
+		 */
+		this.num = a
+		this.den = b
+		this.val = a /b
+	}
 
+	simplify() {
+		/*
+		 * simplifies the numerator and denominator in place
+		 */
+		var prim = BaseQuestion.gcd(a, b)
+
+		this.a = this.a /prim
+		this.b = this.b /prim // this.val should remain the same
+
+		return this // for chaining
+	}
+
+	add(frac) {
+		/*
+		 * frac: Fraction Object
+		 * adds another fraction object and returns a new fraction object where
+		 * the sum of both fractions
+		 */
+
+		var a = this.a *frac.b + frac.a *this.b
+		var b = this.b *frac.b
+
+		return new Fraction(a, b).simplify()
+	}
+
+	sub(frac) {
+		/*
+		 * frac: Fraction Object
+		 * subtracts another fraction object and returns a new fraction object where
+		 * the difference of both fractions, i.e. this - frac = return value
+		 */
+
+		var a = this.a *frac.b - frac.a *this.b
+		var b = this.b *frac.b
+
+		return new Fraction(a, b).simplify()
+	}
+
+	mult(frac) {
+		/*
+		 * frac: Fraction Object
+		 * multiplies another fraction object and returns a new fraction object where
+		 * the product of both fractions
+		 */
+		return new Fraction(this.a *frac.a, this.b *frac.b).simplify()
+	}
+
+	div(frac) {
+		/*
+		 * frac: Fraction Object
+		 * divides another fraction object and returns a new fraction object where
+		 * the result of both fractions, i.e. this / fraction = return value
+		 */
+		return new Fraction(this.a *frac.b, this.b *frac.a).simplify()
+	}
+
+	repr() {
+		/*
+		 * returns a string where it represents the fraction object within latex's syntax
+		 */
+		return `\\frac{${this.a}}{${this.b}}`
+	}
+}
+
+class LawOfIndices extends BaseQuestion {
+	static segment_t(baseArr) {
+		/*
+		* generate segments (t variant) to be chained in the final question
+		* baseArr: array containing the single characters to be used as bases
+		* NOTE: if containsAdditionOfBases is false, cannot chain, thus assumes it allows addition operation
+		* this variant only allows multiplication and division operations, oftentimes with more than 1 bases chained together
+		* returns a string representing the segment
+		* sample output: 3xy^\{4} * 9y^\{2}
+		*/
+
+		// generate two terms, each consisting of at least 1 of the bases in basesArr
+		// each for LHS and RHS
+		var terms = []
+		for (let i = 0; i < 2; i++) {
+			var singleHandTerms = [BaseQuestion.randomInt(1, 9)] // 0th index representing the constant coefficient
+			var count = BaseQuestion.randomInt(0, baseArr.length -1)
+
+			for (let j = 0; j < count; j++) {
+				var n = BaseQuestion.randomInt(0, baseArr.length -1)
+				if (baseArr[n] in singleHandTerms) {
+
+				} else {
+					singleHandTerms.push(n) // work with the indices first to ensure sorted order of bases
+				}
+			}
+
+			singleHandTerms.sort((a, b) => {
+				return a -b
+			})
+		}
+	}
+
+	static segment_k() {
+		/*
+		 * generate segments (k variant) to be chained in the final question
+		 * NOTE: if containsAdditionOfBases is false, cannot chain, thus assumes it allows addition operation
+		 * returns a string representing the segment
+		 */
+
+		// generation states
+		var isNumericBases = Math.random() >= 0.5
+		var isNumericIndices = Math.random() >= 0.5
+		var isSameBase = Math.random() >= 0.05
+		var isBloatedBase = isSameBase && (Math.random() >= 0.5)
+		var isDualBloatedBase = isBloatedBase && (Math.random() >= 0.5) // both numbers are bloated
+		var isSameIndices = !isSameBase // if not same base, has to be same indices
+
+		var containsConstant = (isSameBase && !isBloatedBase) && Math.random() >= 0.2
+		var isNumericConstant = containsConstant && Math.random() >= .5
+		var isDualConstant = containsConstant && Math.random() >= .8
+		var isConstantOnLHS = !isDualConstant && Math.random() >= .5 // on RHS otherwise
+		var toInclMultOp = containsConstant && isNumericBases && isNumericConstant // to include when both are numbers (will always be false when containsConstant is false)
+
+		var allowsAddition = isBloatedBase && (Math.random() >= 0.5)
+		var isAdditionOp = allowsAddition && (Math.random() >= 0.5)
+		var isMultOp = !allowsAddition && (Math.random() >= 0.5) // otherwise division mod
+
+		var bases = []
+		var indices = [] // corresponds to the indices in bases
+		if (isNumericBases) {
+			bases.push(Math.floor(Math.random() *14) +2)
+
+			if (isBloatedBase) {
+				bases[0] = BaseQuestion.randomInt(2, 5)
+				bases.push(bases[0] **BaseQuestion.randomInt(2, 7 -bases[0]))
+
+				if (isDualBloatedBase) {
+					bases[0] **= BaseQuestion.randomInt(2, 7 -bases[0])
+				}
+			} else if (isSameBase) {
+				bases.push(bases[0])
+			} else {
+				bases.push(Math.floor(Math.random() *14) +2)
+			}
+		} else {
+			// algebraic base
+			bases.push(Unknowns.constants[Math.floor(Math.random() *Unknowns.constants.length)])
+
+			if (!isSameBase) {
+				bases.push(Unknowns.constants[Math.floor(Math.random() *Unknowns.constants.length)])
+			} else {
+				bases.push(bases[0])
+			}
+		}
+
+		// determine indices
+		if (isNumericIndices) {
+			indices.push(Math.floor(Math.random() *70) +2)
+
+			if (isSameIndices) {
+				indices.push(indices[0])
+			} else {
+				indices.push(Math.floor(Math.random() *70) +2)
+			}
+		} else {
+			indices.push(Unknowns.indices[Math.floor(Math.random() *Unknowns.indices.length)])
+
+			if (isSameIndices) {
+				indices.push(indices[0])
+			} else {
+				indices.push(Unknowns.indices[Math.floor(Math.random() *Unknowns.indices.length)])
+			}
+		}
+
+		// determine constants
+		var constants = ["", ""]
+		var leftMultOp = (toInclMultOp && (isDualConstant | isConstantOnLHS)) ? "\\times" : ""
+		var rightMultOp = (toInclMultOp && (isDualConstant | !isConstantOnLHS)) ? "\\times" : ""
+		if (containsConstant) {
+			var c
+			if (isNumericConstant) {
+				c = BaseQuestion.randomInt(2, 9)
+
+				if (isDualConstant) {
+					// generate another constant
+					constants[0] = c
+					constants[1] = BaseQuestion.randomInt(2, 9)
+				}
+			} else {
+				c = Unknowns.constants[Math.floor(Math.random() *Unknowns.constants.length)]
+
+				if (isDualConstant) {
+					// generate another constant
+					constants[0] = c
+					constants[1] = Unknowns.constants[Math.floor(Math.random() *Unknowns.constants.length)]
+				}
+			}
+
+			if (!isDualConstant) {
+				// exists on either sides
+				constants[isConstantOnLHS ? 0 : 1] = c
+			}
+		}
+
+		// determine operation
+		var op = "\\div"
+		if (isAdditionOp) {
+			op = "+"
+		} else if (isMultOp) {
+			op = "\\times"
+		}
+
+		// return in string
+		if (isNumericBases && !isNumericConstant) {
+			// 2^j*d
+			// bases goes first before constants
+			return `${bases[0]}^\{${indices[0]}}${leftMultOp}${constants[0]}${op} ${bases[1]}^\{${indices[1]}}${rightMultOp}${constants[1]}`
+		} else {
+			return `${constants[0]}${leftMultOp}${bases[0]}^\{${indices[0]}}${op} ${constants[1]}${rightMultOp}${bases[1]}^\{${indices[1]}}`
+		}
+	}
+
+	constructor(containsAdditionOfBases) {
+		super();
+		var segment
+		if (Math.random() >= .5) {
+			LawOfIndices.segment_k()
+		} else {
+			LawOfIndices.segment_t()
+		}
+
+		this.qnReprString = `Express %%0%% in positive index form.`
+		this.qnLatexEqn = [segment]
 	}
 }
 
@@ -1605,5 +1883,5 @@ module.exports = {
 	SimplifyAlgebraic,
 	ModernAlgebra,
 
-	OOPInt, OOPFrac
+	LawOfIndices
 }

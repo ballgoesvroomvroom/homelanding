@@ -1,68 +1,100 @@
-#questions-container {
+html {
+	font-family: Georgia, serif;
+}
+
+body {
+	--grid-columns: 2;
+
 	display: flex;
 	flex-direction: column;
+	align-items: center;
 
+	width: 100%;
+}
+
+.page-container {
 	position: relative;
+	height: calc(100vh - 50px);
+	width: auto;
 
-	counter-reset: question;
+	padding: 25px 20px;
+
+	aspect-ratio: 0.709;
+
+	border-top-style: solid;
+	border-top-width: 1px;
+	border-top-color: #cfcfcf;
+	border-bottom-style: solid;
+	border-bottom-width: 1px;
+	border-bottom-color: #cfcfcf;
+	border-inline-width: 1px;
+	border-inline-style: solid;
+	border-inline-color: #cfcfcf;
+
+	page-break-after: always;
 }
 
-.question-page-container {
+.page-content-container {
+/*	height: 100%;*/
+}
+
+body.workbook .page-content-container {
 	display: grid;
-	grid-template-rows: repeat(5, 1fr);
-	grid-template-columns: repeat(2, 1fr);
-
-	height: calc(100vh - 86px);
-
-	padding-top: 1px;
-
-	break-after: page;
-/*	page-break-before: always;*/
+	grid-template-columns: repeat(var(--grid-columns), 1fr);
 }
 
-.question-page-container:nth-child(1) {
-	flex-grow: 1;
-
-	grid-template-rows: repeat(4, 1fr);
-	height: calc(100vh - 300px);
-}
-
-.question-page-container:last-child {
-	break-after: auto;
-}
-
-.question-element {
-	min-width: 0;
-	min-height: 0;
-
-	padding: 5px;
-	margin-top: -1px;
-
-	border-style: solid;
-	border-width: 1px;
-	border-color: #d9d9d9;
-}
-
-.question-element:nth-child(even) {
-	margin-left: -1px;
-}
-
-.question-header {
+.page-header {
 	display: flex;
 	flex-direction: row;
-	align-items: flex-start;
+	justify-content: space-between;
 
-	padding-bottom: 5px;
+	margin-bottom: 20px;
 
-	counter-increment: question;
+	font-size: 0.9rem;
 }
 
-.question-header::before {
+.page-footer {
+	position: absolute;
+	bottom: 0;
+
+	width: calc(100% - 40px);
+	height: 70px;
+}
+
+.page-footer-count {
 	display: block;
-	content: counter(question) ".";
 
 	position: relative;
+	width: calc(100% - 20px);
 
-	padding-top: 5px;
-	padding-right: 5px;
+	padding: 0 10px;
+
+	font-size: .95rem;
+	text-align: right;
+}
+
+.qn-container {
+	padding: 10px;
+
+	border-top-style: solid;
+	border-left-style: solid;
+	border-color: #d9d9d9;
+	border-width: 1px;
+}
+
+.page-content-container .qn-container:nth-child(2n) {
+	border-right-style: solid;
+}
+
+.page-content-container .qn-container:nth-last-child(-n + 2) {
+	border-bottom-style: solid;
+}
+
+@media print {
+	.page-container {
+		width: 100vw;
+		height: 100vh;
+
+		border-style: none;
+	}
 }

@@ -16,7 +16,12 @@ router.get("/db/:documentId/qns", (req, res) => {
 		var plaintextqns = qriller.questions.map(qnObj => [qnObj.qnReprString, qnObj.qnLatexEqn])
 
 		res.type("text/javascript")
-		res.write(`var QRILLER_ID = "${req.params.documentId}"; var QUESTIONS = ${JSON.stringify(plaintextqns)}; var PAPER_SETUP = {"style": "workbook", "pageSize": "A4", "qnHtFactor": 1.25, "qnColumn": 2}`)
+		res.write(`
+			var QRILLER_ID = "${req.params.documentId}";
+			var QRILLER_TITLE = "${qriller.title}";
+			var QRILLER_CODE = "${qriller.code}";
+			var QUESTIONS = ${JSON.stringify(plaintextqns)};
+			var PAPER_SETUP = {"style": "workbook", "pageSize": "A4", "qnHtFactor": 1.25, "qnColumn": 2}`)
 		return res.status(200).end()
 	}
 
