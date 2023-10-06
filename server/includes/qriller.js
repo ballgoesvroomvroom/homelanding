@@ -1995,6 +1995,314 @@ class StandardForm extends BaseQuestion {
 	}
 }
 
+class FactorisingPolynomial extends BaseQuestion {
+	static segment_r() {
+		/*
+		 * generates and returns a polynomial with roots a and b (also known as the root form variant, hence segment_r)
+		 * starts by generating in the form (ax-b)(cx-d)
+		 * returns [string representation of the polynomial, factored answer]
+		 */
+		var lhsHasCoefficient = Math.random() >= 0.7
+		var rhsHasCoefficient = Math.random() >= 0.7
+		var lhsIsNegativeCoeff = lhsHasCoefficient && Math.random() >= 0.7
+		var rhsIsNegativeCoeff = rhsHasCoefficient && Math.random() >= 0.7
+
+		var isLHSRootNegative = Math.random() >= 0.5
+		var isRHSRootNegative = Math.random() >= 0.5
+
+		var a = 1, c = 1
+		if (lhsHasCoefficient) {
+			a = BaseQuestion.randomInt(2, 9) *(lhsIsNegativeCoeff ? -1 : 1)
+		}
+		if (rhsHasCoefficient) {
+			c = BaseQuestion.randomInt(2, 9) *(rhsIsNegativeCoeff ? -1 : 1)
+		}
+
+		var b = 1, d = 1
+		b = BaseQuestion.randomInt(1, 9) *(isLHSRootNegative ? -1 : 1)
+		d = BaseQuestion.randomInt(1, 9) *(isRHSRootNegative ? -1 : 1)
+
+		// expand out this polynomial and simplify
+		// in the form f(x) = (a*c)x^2 + (-da -bc)x + bd
+		var lTerm = "", xTerm = "", constantTerm = ""
+		var lcoeff = a*c, xTermCoeff = -d*a -b*c, constant = b*d
+		if (Math.abs(lcoeff) === 1) {
+			// can omit
+			lTerm = "x^2"
+		} else {
+			// will never be 0 since polynomial is of degree 2
+			lTerm = `${lcoeff}x^2`
+		}
+		if (xTermCoeff === 0) {
+			// no term
+			xTerm = ""
+		} else if (Math.abs(xTermCoeff) === 1) {
+			// can omit coeff
+			xTerm = xTermCoeff < 0 ? "-" : "+"
+			xTerm += "x"
+		} else if (xTermCoeff > 0) {
+			// include add sign
+			xTerm = `+${xTermCoeff}x`
+		} else {
+			// negative sign is attached
+			xTerm = `${xTermCoeff}x`
+		}
+		if (constant === 0) {
+			// omit
+
+		} else {
+			constantTerm = constant
+
+			if (constant > 0) {
+				// include add sign
+				constantTerm = `+${constant}`
+			}
+		}
+		var repr = `${lTerm}${xTerm}${constantTerm}` // question string
+
+		// see if we can factor out (a and b) and (c and d)
+		var lhsFactor = 1, rhsFactor = 1
+		if (a !== -1 && a !== 1 && b !== -1 && b !== 1) {
+			// both are numbers that are not 1
+			var lhsFactor = BaseQuestion.gcd(Math.abs(a), Math.abs(b))
+			if (lhsFactor !== 1) {
+				a = a /lhsFactor // should remain as a n integer since lhsFactor is an int that is a factor of both a and b
+				b = b /lhsFactor
+			}
+		}
+		if (c !== -1 && c !== 1 && d !== -1 && d !== 1) {
+			// both are numbers that are not 1
+			rhsFactor = BaseQuestion.gcd(Math.abs(c), Math.abs(d))
+			if (rhsFactor !== 1) {
+				c = c /rhsFactor // should remain as a n integer since rhsFactor is an int that is a factor of both c and d
+				d = d /rhsFactor
+			}
+		}
+
+		// write out factored answer
+		// converts a, b, c, d from integers to their string representations with value of 1 being omitted
+		// determine whether it has repeated roots
+		var isRepeatedRoots = a === c && b === d
+		var factor = lhsFactor *rhsFactor
+		var factorTerm = ""
+		if (Math.abs(factor) === 1) {
+			// omit digit
+			factorTerm = factor < 0 ? "-" : ""
+		} else {
+			factorTerm = factor
+		}
+		if (Math.abs(a) === 1) {
+			a = a < 0 ? "-" : ""
+		}
+		if (Math.abs(c) === 1) {
+			c = c < 0 ? "-" : ""
+		}
+		if (b < 0) {
+			// is already negative, change the sign to a positive
+			b = `+${b *-1}` // remove negative sign
+		} else if (b === 0) {
+			// omit
+			b = ""
+		} else if (b > 0) {
+			// include minus sign since in root form is (x-b)
+			b = `-${b}`
+		}
+		if (d < 0) {
+			// is already negative, change the sign to a positive
+			d = `+${d *-1}` // remove negative sign
+		} else if (d === 0) {
+			// omit
+			d = ""
+		} else if (d > 0) {
+			// include minus sign since in root form is (x-d)
+			d = `-${d}`
+		}
+
+		var answer = "";
+		if (isRepeatedRoots) {
+			answer = `${factorTerm}(${a}x${b})^\{2}`
+		} else {
+			answer = `${factorTerm}(${a}x${b})(${c}x${d})`
+		}
+		return [repr, answer]
+	}
+
+	static segment_l() {
+		/*
+		 * generates a linear expression to be factored
+		 * returns [string representation of the polynomial, factored answer]
+		 */
+
+		// build expression in the form ax + b
+		var isCoeffNeg = Math.random() >= .7
+		var isConstantNeg = Math.random() >= .7
+
+		// generate two numbers
+		var a = 1, b = 1
+		a = BaseQuestion.randomInt(1, 13) *(isCoeffNeg ? -1 : 1)
+		b = BaseQuestion.randomInt(1, 24) *(isConstantNeg ? -1 : 1)
+
+		// extract gcd as a factor
+		var gcd = BaseQuestion.gcd(Math.abs(a), Math.abs(b))
+		if (gcd !== 1) {
+			a /= gcd
+			b /= gcd
+		}
+
+		// generate a random integer to be used as the factor
+		var factor = BaseQuestion.randomInt(2, 13) *gcd // will never be 1 or 0 (no multiplicative inverses in Z)
+
+		// make factor negative if both coeff and constant are negative
+		if (isCoeffNeg && isConstantNeg) {
+			factor *= -1
+			a *= -1
+			b *= -1
+		}
+
+		// build question representation
+		var prefix = ""
+		if (factor *b > 0) {
+			// include plus sign
+			prefix = "+"
+		}
+		var qn = `${factor *a}x${prefix}${factor *b}`
+
+		// build answer representation
+		if (Math.abs(a) === 1) {
+			a = a < 0 ? "-" : ""
+		}
+		if (b > 0) {
+			// include plus sign
+			b = `+${b}`
+		}
+		var answer = `${factor}(${a}x${b})`
+
+		return [qn, answer]
+	}
+
+	constructor() {
+		super();
+		var qn, ans
+		if (Math.random() >= .5) {
+			[qn, ans] = FactorisingPolynomial.segment_r()
+		} else {
+			[qn, ans] = FactorisingPolynomial.segment_l()
+		}
+
+		this.qnReprString = `Factor out %%0%% completely.`
+		this.qnLatexEqn = [qn]
+	}
+}
+
+class LinearEquation extends BaseQuestion {
+	static segment_n() {
+		/*
+		 * generates a linear expression in the form ax + b
+		 * returns the string representation
+		 */
+		var isCoeffNeg = Math.random() >= .7
+		var isConstantNeg = Math.random() >= .7
+		var a = BaseQuestion.randomInt(1, 13) *(isCoeffNeg ? -1 : 1)
+		var b = BaseQuestion.randomInt(1, 19) *(isConstantNeg ? -1 : 1)
+
+		// build representative string
+		if (Math.abs(a) === 1) {
+			a = a < 0 ? "-" : ""
+		}
+		if (!isConstantNeg) {
+			b = `+${b}`
+		}
+		var repr = `${a}x${b}`
+
+		return repr
+	}
+
+	static segment_f() {
+		/*
+		 * generates a linear equation with fractions as coefficients
+		 */
+		var scenario = BaseQuestion.randomInt(1, 3)
+		switch (scenario) {
+			case 1:
+				// simply denominator the both sides
+				var lhs = LinearEquation.segment_n()
+				var rhs = LinearEquation.segment_n()
+
+				var lhsFactorIsNeg = Math.random() >= .8
+				var rhsFactorIsNeg = Math.random() >= .8
+				var lhsFactor = BaseQuestion.randomInt(1, 9)
+				var rhsFactor = BaseQuestion.randomInt(1, 9)
+
+				var lhsTerm = lhsFactorIsNeg ? "-" : ""
+				var rhsTerm = rhsFactorIsNeg ? "-" : ""
+				if (Math.abs(lhsFactor) !== 1) {
+					lhsTerm += `\frac{${lhs}}{${lhsFactor}}`
+				} else if (lhsFactor === -1) {
+					lhsTerm += `(${lhs})`
+				} else {
+					lhsTerm = lhs
+				}
+				if (Math.abs(rhsFactor) !== 1) {
+					rhsTerm += `\frac{${rhs}}{${rhsFactor}}`
+				} else if (lhsFactor === -1) {
+					rhsTerm += `(${rhs})`
+				} else {
+					rhsTerm = rhs
+				}
+
+				return `${lhsTerm}=${rhsTerm}`
+			case 2:
+				// single terms over constant denominators
+				var sides = []
+				var prevTermCount = 0;
+				for (let i = 0; i < 2; i++) {
+					var termCount = BaseQuestion.randomInt(1, 3)
+					termCount += prevTermCount // ensure no single terms on both sides
+					prevTermCount = termCount
+
+					var hasVariable = false // will be set to true when an algebraic numerator has been generated
+					for (let j = 0; j < termCount; j++) {
+						var isNumeratorAlgebraic = (Math.random() >= .3 || (!hasVariable && j === termCount -1))
+						var coeff = BaseQuestion.randomInt(1, 9)
+						var denominator = BaseQuestion.randInt(1, 9)
+
+						// build fraction representation
+						var numerator = "", denominator = ""
+						if (isNumeratorAlgebraic && coeff === 1) {
+							// can omit the coeff
+							numerator = "x"
+						}
+
+						var enclose = denominator === 1 ? "" : "\frac"
+
+						if (j > 0) {
+							
+						}
+					}
+				}
+		}
+	}
+
+	constructor() {
+		super();
+
+		var sides = []
+		for (let i = 0; i < 2; i++) {
+			var hs = LinearEquation.segment_n()
+			if (Math.random() >= .5) {
+				// contains a factor
+				var lhsFactor = BaseQuestion.randomInt(2, 6) *(Math.random() >= .7 ? -1 : 1)
+				sides.push(`${lhsFactor}(${hs})`)
+			} else {
+				sides.push(`${hs}`)
+			}
+		}
+
+		this.qnReprString = `%%0%%`
+		this.qnLatexEqn = [sides.join("=")]
+	}
+}
+
 module.exports = {
 	Qriller,
 	FracToPerc,
@@ -2009,5 +2317,7 @@ module.exports = {
 	ModernAlgebra,
 
 	LawOfIndices,
-	StandardForm
+	StandardForm,
+	FactorisingPolynomial,
+	LinearEquation
 }

@@ -238,6 +238,38 @@ router.get("/:documentId/ans", (req, res) => {
 	})
 }
 
+{
+	presetRouter.get("/fump/0", (req, res) => {
+		const data = Utils.getDefaultProperties()
+
+		data.code = "2.0"
+		data.title = "Factoring Univariate Polynomials"
+		data.note = "Factor the polynomials with either known or unknown coefficients into the simplest form."
+
+		const q = new qriller.Qriller(data)
+		q.createQuestions(qriller.FactorisingPolynomial, 100)
+
+		res.write(Utils.populateDocument(q))
+		res.status(200).end()
+	})
+}
+
+{
+	presetRouter.get("/quad/0", (req, res) => {
+		const data = Utils.getDefaultProperties()
+
+		data.code = "3.0"
+		data.title = "Solving Linear Equations"
+		data.note = "Solve the linear equations by finding x."
+
+		const q = new qriller.Qriller(data)
+		q.createQuestions(qriller.LinearEquation, 100)
+
+		res.write(Utils.populateDocument(q))
+		res.status(200).end()
+	})
+}
+
 // presetRouter.get("/perctofrac", (req, res) => {
 // 	res.type("html")
 
