@@ -34,6 +34,27 @@ body {
 	page-break-after: always;
 }
 
+.page-container.coverpage {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
+#page-cover-title {
+	padding: 0 50px;
+
+	font-size: 3.5rem;
+	font-weight: 400;
+}
+
+#page-cover-branding {
+	margin-top: 45px;
+
+	font-size: 0.9rem;
+	font-weight: 300;
+}
+
 .page-content-container {
 /*	height: 100%;*/
 }

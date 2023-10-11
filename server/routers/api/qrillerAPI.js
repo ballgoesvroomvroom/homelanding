@@ -20,6 +20,7 @@ router.get("/db/:documentId/qns", (req, res) => {
 			var QRILLER_ID = "${req.params.documentId}";
 			var QRILLER_TITLE = "${qriller.title}";
 			var QRILLER_CODE = "${qriller.code}";
+			var QRILLER_CREATE_DATE = "${qriller.createDateRepr}";
 			var QUESTIONS = ${JSON.stringify(plaintextqns)};
 			var PAPER_SETUP = {"style": "workbook", "pageSize": "A4", "qnHtFactor": 1.25, "qnColumn": 2}`)
 		return res.status(200).end()

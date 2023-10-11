@@ -268,6 +268,106 @@ router.get("/:documentId/ans", (req, res) => {
 		res.write(Utils.populateDocument(q))
 		res.status(200).end()
 	})
+
+	presetRouter.get("/quad/1", (req, res) => {
+		const data = Utils.getDefaultProperties()
+
+		data.code = "3.1"
+		data.title = "Systems of Linear Equations"
+		data.note = "Solve the systems of linear equations."
+
+		const q = new qriller.Qriller(data)
+		q.createQuestions(qriller.SimultaneousEquation, 100)
+
+		res.write(Utils.populateDocument(q))
+		res.status(200).end()
+	})
+
+	presetRouter.get("/quad/2", (req, res) => {
+		const data = Utils.getDefaultProperties()
+
+		data.code = "3.2"
+		data.title = "Quadratic Equations (factorisation)"
+		data.note = "Solve the quadratic equation (polynomial degree 2) by factorisation."
+
+		const q = new qriller.Qriller(data)
+		q.createQuestions(qriller.QuadraticRootsByFactorisation, 100)
+
+		res.write(Utils.populateDocument(q))
+		res.status(200).end()
+	})
+
+	presetRouter.get("/quad/3", (req, res) => {
+		const data = Utils.getDefaultProperties()
+
+		data.code = "3.3"
+		data.title = "Quadratic Equations (quadratic formula)"
+		data.note = "Solve the quadratic equation (polynomial degree 2) by using the quadratic formula."
+
+		const q = new qriller.Qriller(data)
+		q.createQuestions(qriller.QuadraticRootsByFormula, 100)
+
+		res.write(Utils.populateDocument(q))
+		res.status(200).end()
+	})
+
+	presetRouter.get("/quad/4", (req, res) => {
+		const data = Utils.getDefaultProperties()
+
+		data.code = "3.4"
+		data.title = "Quadratic Equations (complete the square)"
+		data.note = "Solve the quadratic equation (polynomial degree 2) by completing the square method."
+
+		const q = new qriller.Qriller(data)
+		q.createQuestions(qriller.QuadraticRootsBySquare, 100)
+
+		res.write(Utils.populateDocument(q))
+		res.status(200).end()
+	})
+
+	presetRouter.get("/quad/5", (req, res) => {
+		const data = Utils.getDefaultProperties()
+
+		data.code = "3.5"
+		data.title = "Quadratic Equations (fractional)"
+		data.note = "Solve the quadratic equation (polynomial degree 2) that contains fractions."
+
+		const q = new qriller.Qriller(data)
+		q.createQuestions(qriller.QuadraticRootsWithFractions, 100)
+
+		res.write(Utils.populateDocument(q))
+		res.status(200).end()
+	})
+}
+
+{
+	presetRouter.get("/diff/0", (req, res) => {
+		const data = Utils.getDefaultProperties()
+
+		data.code = "4.0"
+		data.title = "Differentiating Univariate Polynomials (Power rule)"
+		data.note = "Differentiate the equations via the Power rule."
+
+		const q = new qriller.Qriller(data)
+		q.createQuestions(qriller.DifferentiatingPolynomialPowerRule, 100)
+
+		res.write(Utils.populateDocument(q))
+		res.status(200).end()
+	})
+
+	presetRouter.get("/diff/0", (req, res) => {
+		const data = Utils.getDefaultProperties()
+
+		data.code = "4.1"
+		data.title = "Differentiating Univariate Polynomials (Power rule)"
+		data.note = "Differentiate the equations via the Power rule."
+
+		const q = new qriller.Qriller(data)
+		q.createQuestions(qriller.DifferentiatingPolynomialPowerRule, 100)
+
+		res.write(Utils.populateDocument(q))
+		res.status(200).end()
+	})
 }
 
 // presetRouter.get("/perctofrac", (req, res) => {

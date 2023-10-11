@@ -1,7 +1,7 @@
 const crypto = require("crypto")
 const {rando, randoSequence} = require('@nastyox/rando.js');
 const mem = require("./qrillerMemory.js");
-const algEngine = require("./qrillerAlgebraEngine.js");
+const grain = require("./qrillerSolverEngine.js");
 
 class Qriller {
 	constructor(data) {
@@ -17,6 +17,7 @@ class Qriller {
 		this.id = crypto.randomBytes(16).toString("hex")
 
 		this.code = data.code
+		this.createDateRepr = (new Date()).toLocaleDateString("en-SG", {"year": "numeric", "month": "short", "day": "numeric"})
 		this.title = data.title
 		this.note = data.note
 		this.questions = []
@@ -74,9 +75,9 @@ class Units {
 
 		var a = this.units[from]
 		var b = this.units[to]
-		var factor = a /b
+		var factor = a / b
 
-		return this.num *factor
+		return this.num * factor
 	}
 }
 
@@ -163,7 +164,7 @@ class AlgebraicEqn {
 		// generate 2 parenthesis section
 		for (let i = 0; i < 2; i++) {
 			// generate a factor for parenthesis group
-			var factor = rando(1, 7) *(rando() >= .6 ? -1 : 1) // can be negative coefficient for parenthesis group
+			var factor = rando(1, 7) * (rando() >= .6 ? -1 : 1) // can be negative coefficient for parenthesis group
 
 			// expression content
 			var newExpr = new AlgebraicExpr(this.variables, polynomialDegree)
@@ -189,7 +190,7 @@ class AlgebraicEqn {
 			for (let j = 0; j < this.variables.length; j++) {
 				this.coefficients[j].sum = newExpr.coefficients[j].sum
 				for (let k = 0; k < newExpr.coefficients[j].degree.length; k++) {
-					this.coefficients[j].degree[k] = newExpr.coefficients[j].degree[k] *factor
+					this.coefficients[j].degree[k] = newExpr.coefficients[j].degree[k] * factor
 				}
 			}
 		}
@@ -219,7 +220,7 @@ class AlgebraicEqn {
 				var expo = "";
 				if (j >= 1) {
 					// j = 1, square term, j = 2, cubic term
-					expo = `^${j +1}`
+					expo = `^${j + 1}`
 				}
 
 				// build string
@@ -263,22 +264,22 @@ class JumbleAlgebraicExpr {
 					// mult operation
 					op = 2;
 
-					coeff = rando(1, Math.floor(initialN /3)) *((options.conainsNeg && rando() >= .85) ? -1 : 1)
-					base = nextBaseForceConstant ? "" : options.variableStyles[rando(0, options.variableStyles.length -1)]
+					coeff = rando(1, Math.floor(initialN / 3)) * ((options.conainsNeg && rando() >= .85) ? -1 : 1)
+					base = nextBaseForceConstant ? "" : options.variableStyles[rando(0, options.variableStyles.length - 1)]
 
 					nextBaseForceConstant = true // force constant
 					nextNegBaseEncapsulateInParenthesis = true // need to wrap neg with parenthesis
-				} else if (i < argsNo -1 && rando() >= 0.85) {
+				} else if (i < argsNo - 1 && rando() >= 0.85) {
 					// division (ONLY if this control loop is resp for generating next term)
 					op = 3
 
 					// generate a base
-					var varChoice = options.variableStyles[rando(0, options.variableStyles.length -1)]
-					nextCoeff = rando(1, initialN) *((options.conainsNeg && rando() >= .85) ? -1 : 1)
+					var varChoice = options.variableStyles[rando(0, options.variableStyles.length - 1)]
+					nextCoeff = rando(1, initialN) * ((options.conainsNeg && rando() >= .85) ? -1 : 1)
 					nextBase = varChoice
 					base = varChoice
 
-					coeff = nextCoeff *rando(1, 6) *((options.conainsNeg && rando() >= .85) ? -1 : 1) // random factor with negative factor
+					coeff = nextCoeff * rando(1, 6) * ((options.conainsNeg && rando() >= .85) ? -1 : 1) // random factor with negative factor
 
 					// make sure next term generated is a constant
 					nextBaseForceConstant = true
@@ -286,8 +287,8 @@ class JumbleAlgebraicExpr {
 				} else {
 					// op is 1, adition OR subtraction
 					op = 1;
-					coeff = rando(1, initialN) *((options.conainsNeg && rando() >= .85) ? -1 : 1)
-					base = nextBaseForceConstant ? "" : options.variableStyles[rando(0, options.variableStyles.length -1)]
+					coeff = rando(1, initialN) * ((options.conainsNeg && rando() >= .85) ? -1 : 1)
+					base = nextBaseForceConstant ? "" : options.variableStyles[rando(0, options.variableStyles.length - 1)]
 
 					nextBaseForceConstant = false // reset force constant
 					nextNegBaseEncapsulateInParenthesis = false // no need to wrap neg with parenthesis, will just drop the current prefix
@@ -323,7 +324,7 @@ class JumbleAlgebraicExpr {
 	}
 
 	result() {
-		return this.options.trimTrilingPrefix ? this.terms.slice(0, this.terms.length -1) : this.terms // exclude last prefix if options.trimTrilingPrefix is true
+		return this.options.trimTrilingPrefix ? this.terms.slice(0, this.terms.length - 1) : this.terms // exclude last prefix if options.trimTrilingPrefix is true
 	}
 }
 
@@ -338,18 +339,18 @@ class AlgebraicExpr {
 		this.coefficients = []
 		for (let i = 0; i < this.variables.length; i++) {
 			// generate a coefficient sum
-			var sum = rando(2, 199) *(rando() >= .6 ? -1 : 1) // can be a negative coefficient
+			var sum = rando(2, 199) * (rando() >= .6 ? -1 : 1) // can be a negative coefficient
 
 			// assign a coefficient to every degree variable
 			var remainingSum = sum // to be subtracted
 			var degree = []
 
 			for (let j = 0; j < this.polynomialDegree; j++) {
-				if (j >= this.polynomialDegree -1) {
+				if (j >= this.polynomialDegree - 1) {
 					// last degree
 					degree.push(remainingSum)
 				} else {
-					var degreeCoeffSum = rando(1, remainingSum) *(rando() >= .6 ? -1 : 1)
+					var degreeCoeffSum = rando(1, remainingSum) * (rando() >= .6 ? -1 : 1)
 
 					degree.push(degreeCoeffSum)
 					remainingSum -= degreeCoeffSum
@@ -393,7 +394,7 @@ class AlgebraicExpr {
 				// determine exponent value
 				var expo = "";
 				if (j >= 1) {
-					expo = `^${j +1}`
+					expo = `^${j + 1}`
 				}
 
 				// build string
@@ -422,7 +423,7 @@ class AlgebraicExpr {
 			// scramble the coefficient sum for every degree term
 			for (let j = 0; j < this.coefficients[i].degree.length; j++) {
 				// generate a number from 2-3 deteremined by minTerms and maxTerms
-				var termCount = minTerms +rando(maxTerms -minTerms)
+				var termCount = minTerms + rando(maxTerms - minTerms)
 
 				// create coefficients count
 				var coeffSumRemaining = this.coefficients[i].degree[j]; // will be subtracted to generate coefficients
@@ -431,10 +432,10 @@ class AlgebraicExpr {
 				var degreeTerms = []
 				for (let k = 0; k < termCount; k++) {
 					var coeff; // calculate coefficient for this specific term
-					if (k >= termCount -1) {
+					if (k >= termCount - 1) {
 						coeff = coeffSumRemaining
 					} else {
-						coeff = rando(1, Math.abs(coeffSumRemaining)) *(rando() >= .6 ? -1 : 1)
+						coeff = rando(1, Math.abs(coeffSumRemaining)) * (rando() >= .6 ? -1 : 1)
 					}
 
 					// subtract from remaining
@@ -447,8 +448,8 @@ class AlgebraicExpr {
 		}
 
 		// shuffle generatedTerms (Fisher-Yates shuffle)
-		for (let i = generatedTerms.length -1; i > 0; i--) {
-			var j = Math.floor(Math.random() *(i +1))
+		for (let i = generatedTerms.length - 1; i > 0; i--) {
+			var j = Math.floor(Math.random() * (i + 1))
 
 			// destructuring assignment
 			var a = generatedTerms[j]
@@ -480,7 +481,7 @@ class AlgebraicExpr {
 			// determine exponent
 			var expo = "";
 			if (degree >= 1) {
-				expo = `^${degree +1}`
+				expo = `^${degree + 1}`
 			}
 
 			// build string
@@ -540,17 +541,17 @@ class BaseQuestion {
 		if (a == 0) {
 			return b
 		}
-		return BaseQuestion.gcd(b %a, a)
+		return BaseQuestion.gcd(b % a, a)
 	}
 
 	static lcm(a, b) {
-		return (a *b) /gcd(a, b)
+		return (a * b) / gcd(a, b)
 	}
 
 	static getDecimalPlace(float) {
 		// returns a number representing the amount of decimal places float has
 		var dp = 0
-		while ((float *10 **dp) % 1 > 0.000001 && (float *10 **dp) % 1 < 0.999999) {
+		while ((float * 10 ** dp) % 1 > 0.000001 && (float * 10 ** dp) % 1 < 0.999999) {
 			// accept marginal error (floating point error)
 			dp++ // increment decimal places
 		}
@@ -567,10 +568,10 @@ class BaseQuestion {
 		var baseInt = rando(Math.floor(min), Math.floor(max))
 
 		// generate float
-		var float = rando(Math.floor(1 /step) -1) *(step)
+		var float = rando(Math.floor(1 / step) - 1) * (step)
 
 		// clamp result
-		var clamp = baseInt +(float)
+		var clamp = baseInt + (float)
 		if (clamp > max) {
 			clamp = max
 		} else if (clamp < min) {
@@ -587,17 +588,17 @@ class BaseQuestion {
 		// uses hashmap to store factors
 		var f = {}
 		var divisor = includeOwnFactor ? 1 : 2 // start from 2 if excluding 1 as its own factor
-		var lim = Math.floor(int /2)
+		var lim = Math.floor(int / 2)
 		var max = 0; // store max so can iterate through hashmap
 		while (divisor < lim) {
 			if (int % divisor === 0) {
 				// divisor is a multiple of int, hence can be divided
 				f[divisor] = true
-				f[Math.floor(int /divisor)] = true // int /divisor should be an integer
+				f[Math.floor(int / divisor)] = true // int /divisor should be an integer
 
 				// store max
-				if ((int /divisor) > max) {
-					max = Math.floor(int /divisor)
+				if ((int / divisor) > max) {
+					max = Math.floor(int / divisor)
 				} else if (divisor > max) {
 					// usually divisor is smaller than (int /divisor)
 					max = divisor
@@ -621,8 +622,9 @@ class BaseQuestion {
 	static randomInt(min, max) {
 		/*
 		 * generates a random number between min: int, and max: int (inclusive)
+		 * does not work for min = 1, max = 2
 		 */
-		return Math.floor(Math.random() *(max -min -1)) +min
+		return Math.floor(Math.random() * (max - min - 1)) + min
 	}
 }
 
@@ -650,18 +652,18 @@ class FracToPerc extends BaseQuestion {
 		super();
 
 		// compute the numerator and denominator to obtain a random fraction
-		var basearg = 1 +Math.floor(Math.random() *500)
-		var vararg = Math.floor(Math.random() *100) // variance between args
+		var basearg = 1 + Math.floor(Math.random() * 500)
+		var vararg = Math.floor(Math.random() * 100) // variance between args
 
-		var numer = basearg +Math.floor(Math.random() *vararg)
-		var denom = basearg +Math.floor(Math.random() *Math.abs(numer -vararg)) // guaranteed to be at least 1 with basearg
+		var numer = basearg + Math.floor(Math.random() * vararg)
+		var denom = basearg + Math.floor(Math.random() * Math.abs(numer - vararg)) // guaranteed to be at least 1 with basearg
 
 		// format question with equation
 		this.qnReprString = `Convert the following %%0%% to percentage.`
 		this.qnLatexEqn.push(`\\frac{${numer}}{${denom}}`)
 
 		// generate answer
-		var answer = parseFloat((numer /denom).toPrecision(3)) // BaseQuestion.roundOffSf(numer / denom, 3)
+		var answer = parseFloat((numer / denom).toPrecision(3)) // BaseQuestion.roundOffSf(numer / denom, 3)
 
 		this.answerObj = new BaseAnswer(true)
 		this.answerObj.set(`${answer}`)
@@ -676,25 +678,25 @@ class PercToFrac extends BaseQuestion {
 		var largeNum = rando()
 		var intPart;
 		if (largeNum > .95) {
-			intPart = 1 +rando(5000)
+			intPart = 1 + rando(5000)
 		} else if (largeNum > .85) {
-			intPart = 1 +rando(900)
+			intPart = 1 + rando(900)
 		} else {
-			intPart = 1 +rando(100)
+			intPart = 1 + rando(100)
 		}
 
 		var precision = 10 // 1 decimal places
 		var decimalPart = rando(0, 10)
-		var percVal = intPart +(decimalPart /precision)
+		var percVal = intPart + (decimalPart / precision)
 
 		// form the fractions
-		var num = intPart *precision +decimalPart
-		var den = precision *100 // 100 is to convert between percentage and fractions
+		var num = intPart * precision + decimalPart
+		var den = precision * 100 // 100 is to convert between percentage and fractions
 
 		// simplify it using gcd
 		var gcd = BaseQuestion.gcd(num, den)
-		num = Math.floor(num /gcd)
-		den = Math.floor(den /gcd)
+		num = Math.floor(num / gcd)
+		den = Math.floor(den / gcd)
 
 		// set fields
 		this.qnReprString = `Convert the following %%0%% to a fraction.`
@@ -717,7 +719,7 @@ class PercChange extends BaseQuestion {
 			switch (scenario) {
 				case 1:
 					// speed
-					var person = Database.people[Math.floor(Math.random() *Database.people.length)]
+					var person = Database.people[Math.floor(Math.random() * Database.people.length)]
 
 					var speedGauge = rando(1, 5) // decision making
 					var action, small, big
@@ -726,36 +728,36 @@ class PercChange extends BaseQuestion {
 						case 1:
 							// foot
 							small = rando(1, 600)
-							big = small +rando(390)
+							big = small + rando(390)
 							action = small < 400 ? "walks" : "runs" // determine action by walk speed (m/h)
 							unit = "m/h"
 							break
 						case 2:
 							// driving
-							small = rando(5, 80) +(rando(9) /10)
+							small = rando(5, 80) + (rando(9) / 10)
 							// small = rando(5, 80) +(Math.floor(rando() *10) /10) // speed up to 1 d.p.
-							big = small +rando(70) +(rando(9) /10)
+							big = small + rando(70) + (rando(9) / 10)
 
 							action = "drives a car"
 							break
 						case 3:
 							// cycling
-							small = rando(1, 5) +(rando(19) *5) /100
-							big = small +rando(30) +(rando(19) *5) /100
+							small = rando(1, 5) + (rando(19) * 5) / 100
+							big = small + rando(30) + (rando(19) * 5) / 100
 
 							action = "cycles"
 							break
 						case 4:
 							// rides a bus
-							small = rando(1, 5) +(rando(1, 9) /10)
-							big = small +rando(20) +(rando(9) /10)
+							small = rando(1, 5) + (rando(1, 9) / 10)
+							big = small + rando(20) + (rando(9) / 10)
 
 							action = "rides a bus which goes"
 							break
 						case 5:
 							// swimming
-							small = rando(1, 5) +(rando(19) *5) /100
-							big = small +rando(8) +(rando(19) *5) /100
+							small = rando(1, 5) + (rando(19) * 5) / 100
+							big = small + rando(8) + (rando(19) * 5) / 100
 
 							action = "swims"
 					}
@@ -791,7 +793,7 @@ class PercChange extends BaseQuestion {
 					this.qnLatexEqn.push(`${second.toFixed(2)} ${unit}`)
 
 					// answer
-					var answer = (second -first) /first *100 //BaseQuestion.roundOffSf((second -first) /first *100, 3)
+					var answer = (second - first) / first * 100 //BaseQuestion.roundOffSf((second -first) /first *100, 3)
 					this.answerObj = new BaseAnswer(false)
 					this.answerObj.set("%%0%%\%", [`${parseFloat(answer.toPrecision(3))}`])
 					break
@@ -803,20 +805,20 @@ class PercChange extends BaseQuestion {
 					switch (tempGauge) {
 						case 1:
 							// outside temperature
-							small = rando(1, 20) +(rando(9) /10)
-							big = small +rando(1, 20) +(rando(9) /10)
+							small = rando(1, 20) + (rando(9) / 10)
+							big = small + rando(1, 20) + (rando(9) / 10)
 
 							noun = "environment"
 						case 2:
 							// fridge temperature
-							small = rando(4, 10) +(rando(9) /10)
-							big = small +rando(1, 10) +(rando(9) /10)
+							small = rando(4, 10) + (rando(9) / 10)
+							big = small + rando(1, 10) + (rando(9) / 10)
 
 							noun = "fridge"
 						case 3:
 							// freezer
-							small = rando(0, 5) +(rando(1, 9) /10) // temp up to 1 d.p. (at least 0.1)
-							big = small +rando(1, 5) +(rando(9) /10)
+							small = rando(0, 5) + (rando(1, 9) / 10) // temp up to 1 d.p. (at least 0.1)
+							big = small + rando(1, 5) + (rando(9) / 10)
 
 							noun = "freezer"
 					}
@@ -852,21 +854,21 @@ class PercChange extends BaseQuestion {
 					this.qnLatexEqn.push(second.toFixed(2))
 
 					// answer
-					var answer = ((second -first) /first *100) // BaseQuestion.roundOffSf((second -first) /first *100, 3)
+					var answer = ((second - first) / first * 100) // BaseQuestion.roundOffSf((second -first) /first *100, 3)
 					this.answerObj = new BaseAnswer(false)
 					this.answerObj.set("%%0%%\%", [`${parseFloat(answer.toPrecision(3))}`])
 			}
 		} else {
 			var basearg = rando(1, 5000)
-			var a = basearg +rando(1, 100)
+			var a = basearg + rando(1, 100)
 			var b;
 
 			// include negatives?
 			var includeNegatives = rando() > .95
 			if (includeNegatives) {
-				b = -rando(1, 100 *Math.floor(basearg /5))
+				b = -rando(1, 100 * Math.floor(basearg / 5))
 			} else {
-				b = basearg +rando(1, 100 *Math.floor(basearg /2))
+				b = basearg + rando(1, 100 * Math.floor(basearg / 2))
 			}
 
 			// determine qn context mode (whether phrase is 'percentage change', 'percentage increase' or 'percentage decrease')
@@ -891,7 +893,7 @@ class PercChange extends BaseQuestion {
 				first = small
 				second = big
 
-				var answer = (big -small) /small *100 // BaseQuestion.roundOffSf((big -small) /small *100, 3)
+				var answer = (big - small) / small * 100 // BaseQuestion.roundOffSf((big -small) /small *100, 3)
 			} else if (determineIncrOrder === false || (determineIncrOrder == null && !increasingOrder)) {
 				// decreases
 				// big change to small (-ve % change)
@@ -899,7 +901,7 @@ class PercChange extends BaseQuestion {
 				first = big
 				second = small
 
-				var answer = (small -big) /big *100 // BaseQuestion.roundOffSf((small -big) /big *100, 3)
+				var answer = (small - big) / big * 100 // BaseQuestion.roundOffSf((small -big) /big *100, 3)
 			}
 
 			// set fields
@@ -929,7 +931,7 @@ class ExpressUnitPerc extends BaseQuestion {
 				// length
 
 				// generate 2 mnumbers in a unit
-				var baseUnitChoice = rando(0, LengthUnit.unitMap.length -1)
+				var baseUnitChoice = rando(0, LengthUnit.unitMap.length - 1)
 				var baseUnit = LengthUnit.unitMap[baseUnitChoice] // assume both a and b are this unit
 				aVal = BaseQuestion.genFloat(5, 100, .1)
 				bVal = BaseQuestion.genFloat(1, aVal, .1)
@@ -937,9 +939,9 @@ class ExpressUnitPerc extends BaseQuestion {
 				// generate targetUnit based on adjacentUnitsConversion
 				var targetUnitChoice;
 				if (adjacentUnitsConversion) {
-					targetUnitChoice = rando(baseUnitChoice >= 1 ? baseUnitChoice -1 : baseUnitChoice, baseUnitChoice < LengthUnit.unitMap.length -1 ? baseUnitChoice +1 : baseUnitChoice)
+					targetUnitChoice = rando(baseUnitChoice >= 1 ? baseUnitChoice - 1 : baseUnitChoice, baseUnitChoice < LengthUnit.unitMap.length - 1 ? baseUnitChoice + 1 : baseUnitChoice)
 				} else {
-					targetUnitChoice = rando(0, LengthUnit.unitMap.length -1)
+					targetUnitChoice = rando(0, LengthUnit.unitMap.length - 1)
 				}
 				var targetUnit = LengthUnit.unitMap[targetUnitChoice] // convert b to this unit
 
@@ -947,7 +949,7 @@ class ExpressUnitPerc extends BaseQuestion {
 				bRepr = new LengthUnit(bVal).convert(baseUnit, targetUnit)
 
 				// calculate percentage
-				percAns = (bVal /aVal) *100
+				percAns = (bVal / aVal) * 100
 
 				// store fields
 				aUnit = baseUnit
@@ -958,7 +960,7 @@ class ExpressUnitPerc extends BaseQuestion {
 				// mass
 
 				// generate 2 mnumbers in a unit
-				var baseUnitChoice = rando(0, Mass.unitMap.length -1)
+				var baseUnitChoice = rando(0, Mass.unitMap.length - 1)
 				var baseUnit = Mass.unitMap[baseUnitChoice] // assume both a and b are this unit
 				aVal = BaseQuestion.genFloat(5, 100, .1)
 				bVal = BaseQuestion.genFloat(1, aVal, .1)
@@ -966,9 +968,9 @@ class ExpressUnitPerc extends BaseQuestion {
 				// generate targetUnit based on adjacentUnitsConversion
 				var targetUnitChoice;
 				if (adjacentUnitsConversion) {
-					targetUnitChoice = rando(baseUnitChoice >= 1 ? baseUnitChoice -1 : baseUnitChoice, baseUnitChoice < Mass.unitMap.length -1 ? baseUnitChoice +1 : baseUnitChoice)
+					targetUnitChoice = rando(baseUnitChoice >= 1 ? baseUnitChoice - 1 : baseUnitChoice, baseUnitChoice < Mass.unitMap.length - 1 ? baseUnitChoice + 1 : baseUnitChoice)
 				} else {
-					targetUnitChoice = rando(0, Mass.unitMap.length -1)
+					targetUnitChoice = rando(0, Mass.unitMap.length - 1)
 				}
 				var targetUnit = Mass.unitMap[targetUnitChoice] // convert b to this unit
 
@@ -976,7 +978,7 @@ class ExpressUnitPerc extends BaseQuestion {
 				bRepr = new Mass(bVal).convert(baseUnit, targetUnit)
 
 				// calculate percentage
-				percAns = (bVal /aVal) *100
+				percAns = (bVal / aVal) * 100
 
 				// store fields
 				aUnit = baseUnit
@@ -987,7 +989,7 @@ class ExpressUnitPerc extends BaseQuestion {
 				// liquid volume
 
 				// generate 2 mnumbers in a unit
-				var baseUnitChoice = rando(0, LiquidVolume.unitMap.length -1)
+				var baseUnitChoice = rando(0, LiquidVolume.unitMap.length - 1)
 				var baseUnit = LiquidVolume.unitMap[baseUnitChoice] // assume both a and b are this unit
 				aVal = BaseQuestion.genFloat(5, 100, .1)
 				bVal = BaseQuestion.genFloat(1, aVal, .1)
@@ -995,9 +997,9 @@ class ExpressUnitPerc extends BaseQuestion {
 				// generate targetUnit based on adjacentUnitsConversion
 				var targetUnitChoice;
 				if (adjacentUnitsConversion) {
-					targetUnitChoice = rando(baseUnitChoice >= 1 ? baseUnitChoice -1 : baseUnitChoice, baseUnitChoice < LiquidVolume.unitMap.length -1 ? baseUnitChoice +1 : baseUnitChoice)
+					targetUnitChoice = rando(baseUnitChoice >= 1 ? baseUnitChoice - 1 : baseUnitChoice, baseUnitChoice < LiquidVolume.unitMap.length - 1 ? baseUnitChoice + 1 : baseUnitChoice)
 				} else {
-					targetUnitChoice = rando(0, LiquidVolume.unitMap.length -1)
+					targetUnitChoice = rando(0, LiquidVolume.unitMap.length - 1)
 				}
 				var targetUnit = LiquidVolume.unitMap[targetUnitChoice] // convert b to this unit
 
@@ -1005,7 +1007,7 @@ class ExpressUnitPerc extends BaseQuestion {
 				bRepr = new LiquidVolume(bVal).convert(baseUnit, targetUnit)
 
 				// calculate percentage
-				percAns = (bVal /aVal) *100
+				percAns = (bVal / aVal) * 100
 
 				// store fields
 				aUnit = baseUnit
@@ -1048,7 +1050,7 @@ class ReversePerc extends BaseQuestion {
 
 		// calculate percentage value
 		var percVal = BaseQuestion.genFloat(0.1, 100, .1)
-		var relnum = percVal /100 *num
+		var relnum = percVal / 100 * num
 
 		// // calculate the relative number then determine percentage
 		// var numFactors = BaseQuestion.getFactors(num, false) // get sorted array of factors (excluding 1 and itself)
@@ -1100,8 +1102,8 @@ class RelativePerc extends BaseQuestion {
 		var num = BaseQuestion.genFloat(1, 1000, 0.1)
 
 		// calculate answer and parse it accordingly (may have floating point, so round off to 3sf unless answer is exact)
-		var answer = percVal /100 *num
-		var isExact = ((answer /num) - (percVal /100)) < .00001 // determine if its exact (support for marginal error)
+		var answer = percVal / 100 * num
+		var isExact = ((answer / num) - (percVal / 100)) < .00001 // determine if its exact (support for marginal error)
 		if (!isExact) {
 			// not exact, round off to 3 significant figures
 			answer = parseFloat(answer.toPrecision(3))
@@ -1133,9 +1135,9 @@ class RelativePercManipulation extends BaseQuestion {
 		var answer;
 		var mode = "Increase"
 		if (increasingQn) {
-			answer = (100 +percVal) /100 *num
+			answer = (100 + percVal) / 100 * num
 		} else {
-			answer = (100 -percVal) /100 *num           
+			answer = (100 - percVal) / 100 * num
 			mode = "Decrease"
 		}
 
@@ -1177,8 +1179,8 @@ class FutureAlgebra extends BaseQuestion {
 		var eqn = "";
 		switch (difficultyLevel) {
 			case 1:
-				// only addition and subtraction, pos ints only, no parenthesis
-				// use options as is
+			// only addition and subtraction, pos ints only, no parenthesis
+			// use options as is
 			case 2:
 				// only addition and subtraction, with neg int, no parenthesis
 				paramsOptions.containsNeg = true
@@ -1207,14 +1209,14 @@ class FutureAlgebra extends BaseQuestion {
 						eqn += "+";
 					}
 
-					if (i === parenthesisPointer -1) {
+					if (i === parenthesisPointer - 1) {
 						// create parenthesis
 						paramsOptions.trimTrilingPrefix = true // trim trailing prefix
 						paramsOptions.argsRange[1] = 3
 						console.log("PARAMS", paramsOptions)
 
 						// generate factor
-						var factor = rando(0, 9) *(rando() >= .85 ? -1 : 1)
+						var factor = rando(0, 9) * (rando() >= .85 ? -1 : 1)
 						var factorPrefix = ""
 						if (factor === -1) {
 							factorPrefix = "-"
@@ -1227,7 +1229,7 @@ class FutureAlgebra extends BaseQuestion {
 
 						eqn += `${factorPrefix}${rando(1, 9)}(${new JumbleAlgebraicExpr(paramsOptions).result()})`
 					} else {
-						paramsOptions.trimTrilingPrefix = i === (terms -1) // only trim if its the last term
+						paramsOptions.trimTrilingPrefix = i === (terms - 1) // only trim if its the last term
 						paramsOptions.argsRange[1] = 4
 						eqn += `${new JumbleAlgebraicExpr(paramsOptions).result()}`
 					}
@@ -1287,8 +1289,8 @@ class SimplifyAlgebraic extends BaseQuestion {
 		// determine variable styles
 		var variableStyle = [["x", "y"], ["a", "b"]][rando(0, 1)]
 
-		var termsLength = rando(3, 4) +(difficultyLevel === 2 ? rando(1, 2) : 0)
-		var coeffUpperBound = 20 +(difficultyLevel >= 2 ? 30 : 0)
+		var termsLength = rando(3, 4) + (difficultyLevel === 2 ? rando(1, 2) : 0)
+		var coeffUpperBound = 20 + (difficultyLevel >= 2 ? 30 : 0)
 		if (difficultyLevel === 3) {
 			coeffUpperBound = 15 // parenthesis already acts as a tough option
 		}
@@ -1296,7 +1298,7 @@ class SimplifyAlgebraic extends BaseQuestion {
 		var containsParenthesisAlready = false
 		for (let i = 0; i < termsLength; i++) {
 			// generate parenthesis if valid
-			if ((difficultyLevel >= 3 && i === termsLength -1 && !containsParenthesisAlready) || (!containsParenthesisAlready && difficultyLevel >= 3 && rando() >= .8)) {
+			if ((difficultyLevel >= 3 && i === termsLength - 1 && !containsParenthesisAlready) || (!containsParenthesisAlready && difficultyLevel >= 3 && rando() >= .8)) {
 				// parenthesis
 				containsParenthesisAlready = true
 
@@ -1425,10 +1427,10 @@ class SimplifyAlgebraicLegacy extends BaseQuestion {
 		for (let i = 0; i < 2; i++) {
 			var termFactors = [] // to store all the coefficients for this term, and to be pushed into factors
 			var termSum = 0
-			var termsLength = 1 +rando(1, 3)
+			var termsLength = 1 + rando(1, 3)
 			var termsCoeffFactor = rando(2, 6) // to multiple all coeffs by a range of factor
 			for (let j = 0; j < termsLength; j++) {
-				var coeff = rando(1, 12) *rando(termsCoeffFactor -1, termsCoeffFactor +1)
+				var coeff = rando(1, 12) * rando(termsCoeffFactor - 1, termsCoeffFactor + 1)
 				var isNeg = rando(0, 1)
 				if (isNeg === 1) {
 					// coeff is negative
@@ -1471,7 +1473,7 @@ class SimplifyAlgebraicLegacy extends BaseQuestion {
 			}
 
 			// concat answer
-			answer += `${prefix}${coefficient}${variables[i]}` 
+			answer += `${prefix}${coefficient}${variables[i]}`
 		}
 
 		// spread them out
@@ -1539,7 +1541,7 @@ class OOPInt extends BaseQuestion {
 		// generate from the back
 		var result = ""; // stream terms into here to build results
 		var nextTerm = null;
-		for (let i = maxTerms -1; i >= 0; i--) {
+		for (let i = maxTerms - 1; i >= 0; i--) {
 			var base;
 			var negFactor = (rando() >= .85) ? -1 : 1
 			if (nextTerm) {
@@ -1547,7 +1549,7 @@ class OOPInt extends BaseQuestion {
 
 				nextTerm = null; // reset
 			} else {
-				base = rando(1, upperTermValueLim) *negFactor
+				base = rando(1, upperTermValueLim) * negFactor
 			}
 
 			// calculate operation if still generating next term (direction: rtl)
@@ -1571,14 +1573,14 @@ class OOPInt extends BaseQuestion {
 					}
 
 					// force next term so it is a whole number
-					nextTerm = base *rando(1, 2 +Math.floor(upperTermValueLim -base))
+					nextTerm = base * rando(1, 2 + Math.floor(upperTermValueLim - base))
 				} else {
 					// addition
 					op = base > 0 ? "+" : "";
 				}
 			}
 
-			result = `${op}${base}` +result
+			result = `${op}${base}` + result
 		}
 
 		return result;
@@ -1641,6 +1643,178 @@ class OOPInt extends BaseQuestion {
 	}
 }
 
+class Polynomial {
+	constructor(coeffArr) {
+		/*
+		 * constructs a polynomial object such that f(x) = sum(ai * xi) where i = 0 to deg(f)
+		 * coeffArr represents the coefficient of the term with the 0th index representing the constant
+		 * coeffArr accepts Fraction objects to represent rational numbers
+		 */
+		this.coefficients = coeffArr
+	}
+
+	bloat(factor, strictlyIntegers = true) {
+		/*
+		 * returns a string representation of the polynomial in its non-standard form
+		 * that is to introduce more terms to jumble it up
+		 * factor: float from 0-1 (inclusive), will introduce more terms the bigger the factor is
+		 * strictlyIntegers: boolean, if true, will only generate integer coefficients, otherwise will consider rationals with Fraction instances
+		 *	default value: true (iff all coefficients in this.coefficients are integers, otherwise false)
+		 * e.g. f(x) = 3x^2 + 3x - 5 will return '2x^2 - 4 + x^2 - 2x + 5x - 1'
+		 */
+
+		strictlyIntegers = strictlyIntegers && this.coefficients.every(r => r % 1 === 0)
+
+		// build a new coefficient array, but instead, each element is now an array itself consisting of the new terms to be spread out
+		var unpackedCoeffArr = []
+		var totalTerms = 0; // to be incremented
+		for (let i = 0; i < this.coefficients.length; i++) {
+			var sum = [] // represents the jumbled up coefficients for this term with power i, sum of this array should equate this.coefficients[i]
+			var targetCoeff = this.coefficients[i]
+			var termsCount = BaseQuestion.randomInt(2, 3 + Math.floor(2 * factor))
+			for (let j = 0; j < termsCount; j++) {
+				var r = BaseQuestion.randomInt(2, 19) * (Math.random() >= .5 ? -1 : 1)
+				if (!strictlyIntegers && Math.random() >= .6) {
+					// can generate a denominator to make it irratonal
+					var denominator = BaseQuestion.randomInt(1, 9)
+					r = new Fraction(r, denominator)
+				}
+
+				sum.push(r)
+			}
+
+			// balance it out to ensure sum matches
+			if (strictlyIntegers) {
+				// no fraction objects
+				var deficit = targetCoeff - sum.reduce((a, b) => a + b, 0) // sum
+				var equalSplit = Math.floor(deficit / termsCount)
+				for (let j = 0; j < termsCount; j++) {
+					sum[j] += equalSplit
+				}
+
+				sum[termsCount - 1] += (deficit - (equalSplit * termsCount)) // add the modulo to the last term
+
+				// check for zero terms and push into main array
+				unpackedCoeffArr.push(sum.filter(r => r != 0))
+			} else {
+				// dealing with fraction objects
+				var summation = sum.reduce((a, b) => { // sum
+					if (a instanceof Fraction && b instanceof Fraction) {
+						// working with fractions
+						return a.add(b)
+					} else if (b instanceof Fraction) {
+						// previous value is a constant, say 0 (initial value)
+						return b.addConstant(a)
+					} else if (a instanceof Fraction) {
+						// previous value is a fraction, whereas value now is a constant
+						return a.addConstant(b)
+					} else if (typeof a === "number" && typeof b === "number") {
+						return new Fraction(a + b, 1)
+					}
+				}, 0)
+
+				var deficit = targetCoeff
+				if (!(targetCoeff instanceof Fraction)) {
+					// number
+					deficit = summation.minusFromConstant(targetCoeff)
+				} else {
+					// targetCoeff is another fraction
+					deficit = targetCoeff.sub(summation)
+				}
+
+				// deficit should be a fraction instance by now
+				var equalSplit = deficit.divByConstant(termsCount) // should be used up since all are rationals
+				for (let j = 0; j < termsCount; j++) {
+					if (sum[j] instanceof Fraction) {
+						// fraction object already
+						sum[j] = sum[j].add(equalSplit)
+					} else {
+						// number
+						sum[j] = equalSplit.addConstant(sum[j])
+					}
+				}
+
+				// by now, all the elements in sum should be fraction objects
+				// check for zero terms and push into main array
+				unpackedCoeffArr.push(sum.filter(r => r.a !== 0)) // numerator === 0 (means zero term)
+			}
+
+			// increment tally counter
+			totalTerms += unpackedCoeffArr[i].length
+		}
+
+		// use unpackedCoeffArr to build a jumbled representation of the polynomial equation
+		var repr = "" // final representation
+		for (let i = 0; i < totalTerms; i++) {
+			var n = Math.floor(Math.random() * unpackedCoeffArr.length) // random integer between 0 - unpackedCoeffArr.length (inclusive start, exclusive end)
+			while (unpackedCoeffArr[n].length === 0) {
+				// pick a random number representing the power of the term
+				n = Math.floor(Math.random() * unpackedCoeffArr.length)
+			}
+
+			var coeff = unpackedCoeffArr[n].pop() // get the latest term, coeff should never be zero since filtered out
+			var base = ""
+			if (n >= 1) {
+				base = "x"
+			}
+			if (n >= 2) {
+				base += `^\{${n}}`
+			}
+
+			if (coeff instanceof Fraction) {
+				var prefix = "", numerator = Math.abs(coeff.a)
+				if (coeff.a < 0) {
+					// move minus sign to prefix
+					prefix = "-"
+				} else if (repr.length > 0) {
+					prefix = "+" // otherwise, empty prefix
+				}
+				if (n >= 1 && numerator[numerator.length -1] === "1") {
+					// omit coefficient if it is 1 (does not apply for constants)
+					numerator = ""
+				}
+
+				if (coeff.b === 1) {
+					// omit out fraction
+					repr += `${prefix}${numerator}${base}`
+				} else {
+					// has numerator and denominator portion
+					repr += `${prefix}\\frac{${numerator}${base}}{${coeff.b}}`
+				}
+			} else {
+				// normal number
+				var prefix = (coeff > 0 && repr.length > 0) ? "+" : "" // negative prefix will be contained in coeff value
+				repr += `${prefix}${coeff}${base}`
+			}
+		}
+
+		return repr
+	}
+
+	buildRepr() {
+		/*
+			 * returns the representation in standard form here
+		   */
+		var deg = this.coefficients.length - 1
+		var repr = ""
+		for (let i = deg; i >= 0; i--) {
+			console.log(this.coefficients, i)
+			if (this.coefficients[i] === 0) {
+				// empty for this term, skip
+				continue
+			}
+
+			var prefix = (i < deg && this.coefficients[i] > 0) ? "+" : ""
+			var coeff = (i > 0 && Math.abs(this.coefficients[i]) === 1) ? "" : this.coefficients[i]
+			var base = (i > 0 ? "x" : "") + (i >= 2 ? `^{${i}}` : "")
+
+			repr += `${prefix}${coeff}${base}`
+		}
+
+		return repr
+	}
+}
+
 class Fraction {
 	constructor(a, b) {
 		/*
@@ -1649,21 +1823,57 @@ class Fraction {
 		 * b is the denominator
 		 * where both are integers
 		 */
-		this.num = a
-		this.den = b
-		this.val = a /b
+		this.a = a
+		this.b = b
+		this.val = a / b
+
+		if (this.a < 0 && this.b < 0) {
+			// change their polarity to positive
+			this.a *= -1
+			this.b *= -1
+		}
 	}
 
 	simplify() {
 		/*
 		 * simplifies the numerator and denominator in place
 		 */
-		var prim = BaseQuestion.gcd(a, b)
+		var prim = BaseQuestion.gcd(Math.abs(this.a), Math.abs(this.b))
 
-		this.a = this.a /prim
-		this.b = this.b /prim // this.val should remain the same
+		this.a = this.a / prim
+		this.b = this.b / prim // this.val should remain the same
 
 		return this // for chaining
+	}
+
+	minusFromConstant(c) {
+		/*
+			 * c: number, representing the constant to be minus in the form C - fraction
+		   */
+		return new Fraction((c *this.b) -(this.a), this.b) // for chaining
+	}
+
+	minusBeforeConstant(c) {
+		/*
+			 * self explanatory name
+		   * c: constant to substract from this fraction, in the form, fraction - C
+		 */
+		
+		return new Fraction(this.a -(c *this.b), this.b)
+	}
+
+	addConstant(c) {
+		/*
+			 * c: number, constant to add to fraction in the form, fraction + C or C + fraction
+		   */
+		return new Fraction(this.a +(c *this.b), this.b)
+	}
+
+	divByConstant(c) {
+		/*
+			 * c: number, constant to divide this fraction by, in the form, fraction /c
+		   */
+		return new Fraction(this.a, this.b *c)
 	}
 
 	add(frac) {
@@ -1673,8 +1883,8 @@ class Fraction {
 		 * the sum of both fractions
 		 */
 
-		var a = this.a *frac.b + frac.a *this.b
-		var b = this.b *frac.b
+		var a = this.a * frac.b + frac.a * this.b
+		var b = this.b * frac.b
 
 		return new Fraction(a, b).simplify()
 	}
@@ -1686,8 +1896,8 @@ class Fraction {
 		 * the difference of both fractions, i.e. this - frac = return value
 		 */
 
-		var a = this.a *frac.b - frac.a *this.b
-		var b = this.b *frac.b
+		var a = this.a * frac.b - frac.a * this.b
+		var b = this.b * frac.b
 
 		return new Fraction(a, b).simplify()
 	}
@@ -1698,7 +1908,7 @@ class Fraction {
 		 * multiplies another fraction object and returns a new fraction object where
 		 * the product of both fractions
 		 */
-		return new Fraction(this.a *frac.a, this.b *frac.b).simplify()
+		return new Fraction(this.a * frac.a, this.b * frac.b).simplify()
 	}
 
 	div(frac) {
@@ -1707,7 +1917,7 @@ class Fraction {
 		 * divides another fraction object and returns a new fraction object where
 		 * the result of both fractions, i.e. this / fraction = return value
 		 */
-		return new Fraction(this.a *frac.b, this.b *frac.a).simplify()
+		return new Fraction(this.a * frac.b, this.b * frac.a).simplify()
 	}
 
 	repr() {
@@ -1737,7 +1947,7 @@ class LawOfIndices extends BaseQuestion {
 			var count = BaseQuestion.randomInt(1, baseArr.length)
 
 			for (let j = 0; j < count; j++) {
-				var n = BaseQuestion.randomInt(0, baseArr.length -1)
+				var n = BaseQuestion.randomInt(0, baseArr.length - 1)
 				if (baseArr[n] in singleHandTerms) {
 
 				} else {
@@ -1746,7 +1956,7 @@ class LawOfIndices extends BaseQuestion {
 			}
 
 			singleHandTerms.sort((a, b) => {
-				return a -b
+				return a - b
 			})
 
 			singleHandTerms.push(BaseQuestion.randomInt(1, 9)) // last index representing the constant coefficient
@@ -1755,13 +1965,13 @@ class LawOfIndices extends BaseQuestion {
 
 		var r = "" // final representation string
 		for (let i = 0; i < 2; i++) {
-			var coeff = terms[i][terms[i].length -1] // last element representing the constant coefficient
+			var coeff = terms[i][terms[i].length - 1] // last element representing the constant coefficient
 			if (coeff > 1) {
 				// omit coefficient of 1
 				r += coeff
 			}
 
-			for (let j = 0; j < terms[i].length -1; j++) { // exclude the last element
+			for (let j = 0; j < terms[i].length - 1; j++) { // exclude the last element
 				var exp = BaseQuestion.randomInt(2, 13) // exponent value
 				r += `${baseArr[terms[i][j]]}^\{${exp}}`
 			}
@@ -1807,26 +2017,26 @@ class LawOfIndices extends BaseQuestion {
 		var bases = []
 		var indices = [] // corresponds to the indices in bases
 		if (isNumericBases) {
-			bases.push(Math.floor(Math.random() *14) +2)
+			bases.push(Math.floor(Math.random() * 14) + 2)
 
 			if (isBloatedBase) {
 				bases[0] = BaseQuestion.randomInt(2, 5)
-				bases.push(bases[0] **BaseQuestion.randomInt(2, 7 -bases[0]))
+				bases.push(bases[0] ** BaseQuestion.randomInt(2, 7 - bases[0]))
 
 				if (isDualBloatedBase) {
-					bases[0] **= BaseQuestion.randomInt(2, 7 -bases[0])
+					bases[0] **= BaseQuestion.randomInt(2, 7 - bases[0])
 				}
 			} else if (isSameBase) {
 				bases.push(bases[0])
 			} else {
-				bases.push(Math.floor(Math.random() *14) +2)
+				bases.push(Math.floor(Math.random() * 14) + 2)
 			}
 		} else {
 			// algebraic base
-			bases.push(Unknowns.constants[Math.floor(Math.random() *Unknowns.constants.length)])
+			bases.push(Unknowns.constants[Math.floor(Math.random() * Unknowns.constants.length)])
 
 			if (!isSameBase) {
-				bases.push(Unknowns.constants[Math.floor(Math.random() *Unknowns.constants.length)])
+				bases.push(Unknowns.constants[Math.floor(Math.random() * Unknowns.constants.length)])
 			} else {
 				bases.push(bases[0])
 			}
@@ -1834,20 +2044,20 @@ class LawOfIndices extends BaseQuestion {
 
 		// determine indices
 		if (isNumericIndices) {
-			indices.push(Math.floor(Math.random() *70) +2)
+			indices.push(Math.floor(Math.random() * 70) + 2)
 
 			if (isSameIndices) {
 				indices.push(indices[0])
 			} else {
-				indices.push(Math.floor(Math.random() *70) +2)
+				indices.push(Math.floor(Math.random() * 70) + 2)
 			}
 		} else {
-			indices.push(Unknowns.indices[Math.floor(Math.random() *Unknowns.indices.length)])
+			indices.push(Unknowns.indices[Math.floor(Math.random() * Unknowns.indices.length)])
 
 			if (isSameIndices) {
 				indices.push(indices[0])
 			} else {
-				indices.push(Unknowns.indices[Math.floor(Math.random() *Unknowns.indices.length)])
+				indices.push(Unknowns.indices[Math.floor(Math.random() * Unknowns.indices.length)])
 			}
 		}
 
@@ -1866,12 +2076,12 @@ class LawOfIndices extends BaseQuestion {
 					constants[1] = BaseQuestion.randomInt(2, 9)
 				}
 			} else {
-				c = Unknowns.constants[Math.floor(Math.random() *Unknowns.constants.length)]
+				c = Unknowns.constants[Math.floor(Math.random() * Unknowns.constants.length)]
 
 				if (isDualConstant) {
 					// generate another constant
 					constants[0] = c
-					constants[1] = Unknowns.constants[Math.floor(Math.random() *Unknowns.constants.length)]
+					constants[1] = Unknowns.constants[Math.floor(Math.random() * Unknowns.constants.length)]
 				}
 			}
 
@@ -1935,7 +2145,7 @@ class StandardForm extends BaseQuestion {
 		if (isLeadingZeroes) {
 			// count zero places first
 			var leadingCount = BaseQuestion.randomInt(1, 6)
-			base = `0.${"0".repeat(leadingCount -1)}`
+			base = `0.${"0".repeat(leadingCount - 1)}`
 		}
 
 		var digitCount = small ? BaseQuestion.randomInt(4, 6) : BaseQuestion.randomInt(6, 13)
@@ -1944,7 +2154,7 @@ class StandardForm extends BaseQuestion {
 			var min = (isLeadingZeroes || i >= 1) ? 0 : 1 // start from 0 iff has leading zeroes or is the second digit to be generated
 			base += BaseQuestion.randomInt(min, 9)
 
-			if (!isWholeInteger && !hasDecimal && i >= 1 && i < digitCount -1 && Math.random() >= .6) {
+			if (!isWholeInteger && !hasDecimal && i >= 1 && i < digitCount - 1 && Math.random() >= .6) {
 				// is not a whole integer, and does not yet have a decimal place, not first/last digit in generation
 				// therefore, insert a decimal
 				base += "."
@@ -1967,7 +2177,7 @@ class StandardForm extends BaseQuestion {
 		if (isComputationNeeded) {
 			if (isPartiallyCompleted) {
 				// append a x10^n behind
-				var n = BaseQuestion.randomInt(1, 14) *(Math.random() >= .7 ? -1 : 1) // set polarity
+				var n = BaseQuestion.randomInt(1, 14) * (Math.random() >= .7 ? -1 : 1) // set polarity
 				digit += `\{\\times}10^\{${n}}`
 			} else {
 				// generate another number and choose mode of operation
@@ -1980,12 +2190,12 @@ class StandardForm extends BaseQuestion {
 				digit += `${op}${n}`
 			}
 		} else if (isInUnits) {
-			var rn = BaseQuestion.randomInt(0, BaseTenUnits.unitMap.length -1) // random index
+			var rn = BaseQuestion.randomInt(0, BaseTenUnits.unitMap.length - 1) // random index
 			unit = BaseTenUnits.unitMap[rn]
 			if (rn >= 4 && parseInt(digit[0]) > 1) {
 				// add one 's' suffix at the end if unit 10^n, where n is positive AND leading number is > 1
 				unit += "s"
-			} else if (unit === "one") { 
+			} else if (unit === "one") {
 				unit = ""; // omit one
 			}
 		}
@@ -2012,20 +2222,20 @@ class FactorisingPolynomial extends BaseQuestion {
 
 		var a = 1, c = 1
 		if (lhsHasCoefficient) {
-			a = BaseQuestion.randomInt(2, 9) *(lhsIsNegativeCoeff ? -1 : 1)
+			a = BaseQuestion.randomInt(2, 9) * (lhsIsNegativeCoeff ? -1 : 1)
 		}
 		if (rhsHasCoefficient) {
-			c = BaseQuestion.randomInt(2, 9) *(rhsIsNegativeCoeff ? -1 : 1)
+			c = BaseQuestion.randomInt(2, 9) * (rhsIsNegativeCoeff ? -1 : 1)
 		}
 
 		var b = 1, d = 1
-		b = BaseQuestion.randomInt(1, 9) *(isLHSRootNegative ? -1 : 1)
-		d = BaseQuestion.randomInt(1, 9) *(isRHSRootNegative ? -1 : 1)
+		b = BaseQuestion.randomInt(1, 9) * (isLHSRootNegative ? -1 : 1)
+		d = BaseQuestion.randomInt(1, 9) * (isRHSRootNegative ? -1 : 1)
 
 		// expand out this polynomial and simplify
 		// in the form f(x) = (a*c)x^2 + (-da -bc)x + bd
 		var lTerm = "", xTerm = "", constantTerm = ""
-		var lcoeff = a*c, xTermCoeff = -d*a -b*c, constant = b*d
+		var lcoeff = a * c, xTermCoeff = -d * a - b * c, constant = b * d
 		if (Math.abs(lcoeff) === 1) {
 			// can omit
 			lTerm = "x^2"
@@ -2066,16 +2276,16 @@ class FactorisingPolynomial extends BaseQuestion {
 			// both are numbers that are not 1
 			var lhsFactor = BaseQuestion.gcd(Math.abs(a), Math.abs(b))
 			if (lhsFactor !== 1) {
-				a = a /lhsFactor // should remain as a n integer since lhsFactor is an int that is a factor of both a and b
-				b = b /lhsFactor
+				a = a / lhsFactor // should remain as a n integer since lhsFactor is an int that is a factor of both a and b
+				b = b / lhsFactor
 			}
 		}
 		if (c !== -1 && c !== 1 && d !== -1 && d !== 1) {
 			// both are numbers that are not 1
 			rhsFactor = BaseQuestion.gcd(Math.abs(c), Math.abs(d))
 			if (rhsFactor !== 1) {
-				c = c /rhsFactor // should remain as a n integer since rhsFactor is an int that is a factor of both c and d
-				d = d /rhsFactor
+				c = c / rhsFactor // should remain as a n integer since rhsFactor is an int that is a factor of both c and d
+				d = d / rhsFactor
 			}
 		}
 
@@ -2083,7 +2293,7 @@ class FactorisingPolynomial extends BaseQuestion {
 		// converts a, b, c, d from integers to their string representations with value of 1 being omitted
 		// determine whether it has repeated roots
 		var isRepeatedRoots = a === c && b === d
-		var factor = lhsFactor *rhsFactor
+		var factor = lhsFactor * rhsFactor
 		var factorTerm = ""
 		if (Math.abs(factor) === 1) {
 			// omit digit
@@ -2099,7 +2309,7 @@ class FactorisingPolynomial extends BaseQuestion {
 		}
 		if (b < 0) {
 			// is already negative, change the sign to a positive
-			b = `+${b *-1}` // remove negative sign
+			b = `+${b * -1}` // remove negative sign
 		} else if (b === 0) {
 			// omit
 			b = ""
@@ -2109,7 +2319,7 @@ class FactorisingPolynomial extends BaseQuestion {
 		}
 		if (d < 0) {
 			// is already negative, change the sign to a positive
-			d = `+${d *-1}` // remove negative sign
+			d = `+${d * -1}` // remove negative sign
 		} else if (d === 0) {
 			// omit
 			d = ""
@@ -2139,8 +2349,8 @@ class FactorisingPolynomial extends BaseQuestion {
 
 		// generate two numbers
 		var a = 1, b = 1
-		a = BaseQuestion.randomInt(1, 13) *(isCoeffNeg ? -1 : 1)
-		b = BaseQuestion.randomInt(1, 24) *(isConstantNeg ? -1 : 1)
+		a = BaseQuestion.randomInt(1, 13) * (isCoeffNeg ? -1 : 1)
+		b = BaseQuestion.randomInt(1, 24) * (isConstantNeg ? -1 : 1)
 
 		// extract gcd as a factor
 		var gcd = BaseQuestion.gcd(Math.abs(a), Math.abs(b))
@@ -2150,7 +2360,7 @@ class FactorisingPolynomial extends BaseQuestion {
 		}
 
 		// generate a random integer to be used as the factor
-		var factor = BaseQuestion.randomInt(2, 13) *gcd // will never be 1 or 0 (no multiplicative inverses in Z)
+		var factor = BaseQuestion.randomInt(2, 13) * gcd // will never be 1 or 0 (no multiplicative inverses in Z)
 
 		// make factor negative if both coeff and constant are negative
 		if (isCoeffNeg && isConstantNeg) {
@@ -2161,11 +2371,11 @@ class FactorisingPolynomial extends BaseQuestion {
 
 		// build question representation
 		var prefix = ""
-		if (factor *b > 0) {
+		if (factor * b > 0) {
 			// include plus sign
 			prefix = "+"
 		}
-		var qn = `${factor *a}x${prefix}${factor *b}`
+		var qn = `${factor * a}x${prefix}${factor * b}`
 
 		// build answer representation
 		if (Math.abs(a) === 1) {
@@ -2198,12 +2408,31 @@ class LinearEquation extends BaseQuestion {
 	static segment_n() {
 		/*
 		 * generates a linear expression in the form ax + b
-		 * returns the string representation
+		 * returns the string representation along with the gradient of this equation
 		 */
 		var isCoeffNeg = Math.random() >= .7
 		var isConstantNeg = Math.random() >= .7
-		var a = BaseQuestion.randomInt(1, 13) *(isCoeffNeg ? -1 : 1)
-		var b = BaseQuestion.randomInt(1, 19) *(isConstantNeg ? -1 : 1)
+		var containsThirdTerm = Math.random() >= .6
+		var isThirdTermAlgebraic = containsThirdTerm && Math.random() >= .5
+		var isThirdTermNeg = containsThirdTerm && Math.random() >= .6
+		var a = BaseQuestion.randomInt(1, 13) * (isCoeffNeg ? -1 : 1)
+		var b = BaseQuestion.randomInt(1, 19) * (isConstantNeg ? -1 : 1)
+
+		// build third term for variety
+		var thirdTerm = ""
+		var thirdTermCoeff = 1
+		if (containsThirdTerm) {
+			thirdTerm = isThirdTermNeg ? "-" : "+"
+			thirdTermCoeff = BaseQuestion.randomInt(1, 19)
+			if (thirdTermCoeff === 1) {
+				thirdTerm += isThirdTermAlgebraic ? "x" : "1"
+			} else {
+				thirdTerm += `${thirdTermCoeff}${isThirdTermAlgebraic ? "x" : ""}`
+			}
+		}
+
+		// determine gradient of this line
+		var gradient = a * (thirdTermCoeff * (isThirdTermNeg ? -1 : 1))
 
 		// build representative string
 		if (Math.abs(a) === 1) {
@@ -2212,38 +2441,50 @@ class LinearEquation extends BaseQuestion {
 		if (!isConstantNeg) {
 			b = `+${b}`
 		}
-		var repr = `${a}x${b}`
+		var repr = `${a}x${b}${thirdTerm}`
 
-		return repr
+		return [repr, gradient]
 	}
 
-	static segment_f() {
+	static segment_f(scenario = null) {
 		/*
 		 * generates a linear equation with fractions as coefficients
+				 * if scenario is supplied as an argument, will use it instead of randomising it
 		 */
-		var scenario = BaseQuestion.randomInt(1, 3)
+		var scenario = scenario == null ? Math.floor(Math.random() + 0.5) + 1 : scenario // returns either 1 or 2
 		switch (scenario) {
 			case 1:
 				// simply denominator the both sides
-				var lhs = LinearEquation.segment_n()
-				var rhs = LinearEquation.segment_n()
+				var isInvalidEqn = true
+				while (isInvalidEqn) {
+					var [lhs, lgrad] = LinearEquation.segment_n()
+					var [rhs, rgrad] = LinearEquation.segment_n()
+
+					isInvalidEqn = lgrad === rgrad // same gradient will never have intersections, hence no solutions
+				}
 
 				var lhsFactorIsNeg = Math.random() >= .8
 				var rhsFactorIsNeg = Math.random() >= .8
 				var lhsFactor = BaseQuestion.randomInt(1, 9)
 				var rhsFactor = BaseQuestion.randomInt(1, 9)
 
+				if (lgrad * (lhsFactor * (lhsFactorIsNeg ? -1 : 1)) === (rgrad * (rhsFactor * (rhsFactorIsNeg ? -1 : 1)))) {
+					// both reesulting gradients will be the same, hence solutions
+					// add one to left hand side factor
+					lhsFactor += 1
+				}
+
 				var lhsTerm = lhsFactorIsNeg ? "-" : ""
 				var rhsTerm = rhsFactorIsNeg ? "-" : ""
 				if (Math.abs(lhsFactor) !== 1) {
-					lhsTerm += `\frac{${lhs}}{${lhsFactor}}`
+					lhsTerm += `\\frac{${lhs}}{${lhsFactor}}`
 				} else if (lhsFactor === -1) {
 					lhsTerm += `(${lhs})`
 				} else {
 					lhsTerm = lhs
 				}
 				if (Math.abs(rhsFactor) !== 1) {
-					rhsTerm += `\frac{${rhs}}{${rhsFactor}}`
+					rhsTerm += `\\frac{${rhs}}{${rhsFactor}}`
 				} else if (lhsFactor === -1) {
 					rhsTerm += `(${rhs})`
 				} else {
@@ -2254,52 +2495,239 @@ class LinearEquation extends BaseQuestion {
 			case 2:
 				// single terms over constant denominators
 				var sides = []
+				var gradients = []
 				var prevTermCount = 0;
 				for (let i = 0; i < 2; i++) {
 					var termCount = BaseQuestion.randomInt(1, 3)
 					termCount += prevTermCount // ensure no single terms on both sides
 					prevTermCount = termCount
 
+					var gradient = 0 // calculate gradient here, ensure both sides do not have the same gradient
+
 					var hasVariable = false // will be set to true when an algebraic numerator has been generated
+					var repr = "" // to build representation here
 					for (let j = 0; j < termCount; j++) {
-						var isNumeratorAlgebraic = (Math.random() >= .3 || (!hasVariable && j === termCount -1))
+						var isNumeratorAlgebraic = (Math.random() >= .3 || (!hasVariable && j === termCount - 1))
+						var isNegativeCoeff = Math.random() >= .6
 						var coeff = BaseQuestion.randomInt(1, 9)
-						var denominator = BaseQuestion.randInt(1, 9)
+						var denominator = BaseQuestion.randomInt(1, 9)
+
+						// calculate gradient if its an algebraic term
+						if (isNumeratorAlgebraic) {
+							gradient += (coeff / denominator) * (isNegativeCoeff ? -1 : 1)
+						}
 
 						// build fraction representation
-						var numerator = "", denominator = ""
+						var numerator = ""
 						if (isNumeratorAlgebraic && coeff === 1) {
 							// can omit the coeff
 							numerator = "x"
+						} else if (!isNumeratorAlgebraic) {
+							numerator = coeff
+						} else {
+							// is algebraic with coefficient more than 1
+							numerator = `${coeff}x`
 						}
 
-						var enclose = denominator === 1 ? "" : "\frac"
+						// build representation
+						var prefix = (!isNegativeCoeff && j > 0) ? "+" : "-"
+						if (denominator === 1) {
+							// no fractions
+							repr += `${prefix}${numerator}`
+						} else {
+							// wrap it in fractions
+							repr += `${prefix}\\frac{${numerator}}{${denominator}}`
+						}
 
-						if (j > 0) {
-							
+						if (isNumeratorAlgebraic) {
+							// set state
+							hasVariable = true
 						}
 					}
+
+					sides.push(repr)
+					if (gradients.length >= 1 && gradients[gradients.length - 1] === gradient) {
+						// same gradient, regenerate it
+						return LinearEquation.segment_f(2) // force scenario 2
+					}
 				}
+
+				return sides.join("=")
 		}
 	}
 
 	constructor() {
 		super();
 
-		var sides = []
-		for (let i = 0; i < 2; i++) {
-			var hs = LinearEquation.segment_n()
-			if (Math.random() >= .5) {
-				// contains a factor
-				var lhsFactor = BaseQuestion.randomInt(2, 6) *(Math.random() >= .7 ? -1 : 1)
-				sides.push(`${lhsFactor}(${hs})`)
-			} else {
-				sides.push(`${hs}`)
+		var isInvalidEqn = true
+		while (isInvalidEqn) {
+			var scenario = Math.floor(Math.random() + 0.5) + 1 // returns either 1 or 2
+			switch (scenario) {
+				case 1:
+					var sides = []
+					var gradients = [] // compare gradients of both sides, if it is the same, both lines will never intersect and hence have no solution
+					for (let i = 0; i < 2; i++) {
+						var [hs, grad] = LinearEquation.segment_n()
+						if (Math.random() >= .5) {
+							// contains a factor
+							var lhsFactor = BaseQuestion.randomInt(2, 6) * (Math.random() >= .7 ? -1 : 1)
+							sides.push(`${lhsFactor}(${hs})`)
+							gradients.push(grad * lhsFactor)
+						} else {
+							sides.push(`${hs}`)
+							gradients.push(grad)
+						}
+					}
+
+					// compare gradients
+					isInvalidEqn = grad[0] === grad[1]
+
+					this.qnReprString = `%%0%%`
+					this.qnLatexEqn = [sides.join("=")]
+					break
+				case 2:
+					this.qnReprString = `%%0%%`
+					this.qnLatexEqn = [LinearEquation.segment_f()]
+
+					isInvalidEqn = false // .segment_f() handles validating the equation at its own local scope
+			}
+		}
+	}
+}
+
+class SimultaneousEquation extends BaseQuestion {
+	static segment_b() {
+		/*
+			 * generates a segment where y + D1 = bx + c + D2, where D can be a constant or a determinant
+		   * generation is bloated, i.e. starts from y = bx + c to y + D = bx + c + D2 (possible third term in RHS)
+		   * returns the final gradient of the equation
+		 */
+		var isDAlgebraic = Math.random() >= .5
+		var isDNegative = Math.random() >= .5
+
+		var dCoeff = BaseQuestion.randomInt(1, 13)
+		var [n, grad] = LinearEquation.segment_n()
+
+		// calculate new gradient
+		if (isDAlgebraic) {
+			// to flip sign
+			grad += dCoeff * (isDNegative ? 1 : -1) // if D is negative, when adding to gradient, make it positive since y-D = bx + c is y = (b+D) + c
+		}
+
+		if (grad === 0) {
+			// regenerate
+			return SimultaneousEquation.segment_b()
+		}
+
+		// build representation
+		var prefix = isDNegative ? "-" : "+"
+		var dTerm = isDAlgebraic ? "x" : dCoeff
+		if (isDAlgebraic && dCoeff > 1) {
+			// add in coefficient prefix (can omit when coefficient is 1)
+			dTerm = `${dCoeff}x`
+		}
+		var repr = `y${prefix}${dTerm} = ${n}`
+
+		return [repr, grad]
+	}
+	constructor() {
+		super();
+
+		var [a, agrad] = SimultaneousEquation.segment_b()
+		while (true) {
+			var [b, bgrad] = SimultaneousEquation.segment_b()
+			if (agrad !== bgrad) {
+				break
 			}
 		}
 
-		this.qnReprString = `%%0%%`
-		this.qnLatexEqn = [sides.join("=")]
+		this.qnReprString = "\n%%0%%\n%%1%%"
+		this.qnLatexEqn = [a, b]
+	}
+}
+
+class QuadraticRootsByFactorisation extends BaseQuestion {
+	constructor() {
+		super();
+
+		var [qnRepr, ans] = FactorisingPolynomial.segment_r()
+
+		this.qnReprString = "%%0%%"
+		this.qnLatexEqn = [qnRepr]
+	}
+}
+
+class QuadraticRootsByFormula extends BaseQuestion {
+	constructor() {
+		super();
+
+		var [qnRepr, ans] = FactorisingPolynomial.segment_r()
+
+		this.qnReprString = "%%0%%"
+		this.qnLatexEqn = [qnRepr]
+	}
+}
+
+class QuadraticRootsBySquare extends BaseQuestion {
+	constructor() {
+		super();
+
+		var [qnRepr, ans] = FactorisingPolynomial.segment_r()
+
+		this.qnReprString = "%%0%%"
+		this.qnLatexEqn = [qnRepr]
+	}
+}
+
+class QuadraticRootsWithFractions extends BaseQuestion {
+	// involves fractions whose denominator is a linear term and its denominator is also a linear term
+	constructor() {
+		super();
+
+		var [qnRepr, ans] = FactorisingPolynomial.segment_r()
+
+		this.qnReprString = "%%0%%"
+		this.qnLatexEqn = [qnRepr]
+	}
+}
+
+class DifferentiatingPolynomialPowerRule extends BaseQuestion {
+	static segment_c(maxDegree=8) {
+		/*
+		 * uses the Polynomial class to construct a polynomial object and then bloats it
+		 * returns [bloated polynomial in string form, answer in string form too]
+		 */
+
+		// generate a random number representing the degree
+		var n = BaseQuestion.randomInt(2, 8)
+		var coeffArr = Array(n).fill(0) // build the coeffficient array
+		for (let i = 0; i < n; i++) {
+			var containsTermOfThisPower = Math.random() >= .1 // will ignore this term if false
+			var coeffIsNeg = containsTermOfThisPower && Math.random() >= .5
+
+			if (containsTermOfThisPower) {
+				coeffArr[i] = BaseQuestion.randomInt(2, 29) *(coeffIsNeg ? -1 : 1)
+			}
+		}
+
+		// construct the polynomial object and bloat it for the question string
+		var qnRepr = new Polynomial(coeffArr).bloat(1 -n /8, true) // bloat less if degree is higher (max 8)
+
+		// construct the polynomial object (grain) to generate the answer
+		var ansRepr = new grain.Polynomial(coeffArr).derivative().buildRepr()
+
+		return [qnRepr, ansRepr]
+	}
+	constructor() {
+		super();
+
+		var [qnRepr, ans] = DifferentiatingPolynomialPowerRule.segment_c()
+
+		this.qnReprString = "%%0%%\n%%1%%"
+		this.qnLatexEqn = [qnRepr, ans]
+
+		this.answerObj = new BaseAnswer(false)
+		this.answerObj.set("%%0%%", [ans])
 	}
 }
 
@@ -2316,8 +2744,17 @@ module.exports = {
 	SimplifyAlgebraic,
 	ModernAlgebra,
 
+	Polynomial,
+	Fraction,
+
 	LawOfIndices,
 	StandardForm,
 	FactorisingPolynomial,
-	LinearEquation
+	LinearEquation,
+	SimultaneousEquation,
+	QuadraticRootsByFactorisation,
+	QuadraticRootsByFormula,
+	QuadraticRootsBySquare,
+	QuadraticRootsWithFractions,
+	DifferentiatingPolynomialPowerRule
 }

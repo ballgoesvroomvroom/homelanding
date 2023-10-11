@@ -34,6 +34,31 @@ $(document).ready(e => {
 		return qnStr
 	}
 
+	function drawCoverPage() {
+		/*
+		 * draws a cover page and returns the jquery object (div) containing the cover page
+		 * to be appended to the DOM
+		 */
+		const $container = $("<div>", {
+			"class": "page-container coverpage"
+		})
+
+		const $title = $("<h1>", {
+			"id": "page-cover-title"
+		})
+
+		const $branding = $("<p>", {
+			"id": "page-cover-branding"
+		})
+
+		$title.text(`${QRILLER_CODE} | ${QRILLER_TITLE}`)
+		$branding.text(`Qriller | ${QRILLER_CREATE_DATE}`)
+		$title.appendTo($container)
+		$branding.appendTo($container)
+
+		return $container
+	}
+
 	function createNewPage($header, $footer) {
 		/*
 		 * creates and return a new page container (div tag with class 'page-container')
@@ -110,6 +135,10 @@ $(document).ready(e => {
 
 		// clear document
 		document.body.innerHTML = ""
+
+		// build cover page
+		var $coverPage = drawCoverPage();
+		$coverPage.appendTo($selectors.body);
 
 		// set style properties of page
 		document.body.className = "workbook"
