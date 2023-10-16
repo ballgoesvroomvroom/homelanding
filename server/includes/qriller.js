@@ -3,6 +3,8 @@ const {rando, randoSequence} = require('@nastyox/rando.js');
 const mem = require("./qrillerMemory.js");
 const grain = require("./qrillerSolverEngine.js");
 
+const Fraction = grain.Fraction
+
 class Qriller {
 	constructor(data) {
 		/*
@@ -1784,6 +1786,12 @@ class Polynomial {
 			} else {
 				// normal number
 				var prefix = (coeff > 0 && repr.length > 0) ? "+" : "" // negative prefix will be contained in coeff value
+				if (n >= 1 && Math.abs(coeff) === 1) {
+					// can omit coefficient
+					prefix = coeff < 0 ? "-" : prefix // but include negative signs
+					coeff = ""
+				}
+
 				repr += `${prefix}${coeff}${base}`
 			}
 		}
@@ -1812,119 +1820,6 @@ class Polynomial {
 		}
 
 		return repr
-	}
-}
-
-class Fraction {
-	constructor(a, b) {
-		/*
-		 * constructs a fraction representative object where,
-		 * a is the numerator,
-		 * b is the denominator
-		 * where both are integers
-		 */
-		this.a = a
-		this.b = b
-		this.val = a / b
-
-		if (this.a < 0 && this.b < 0) {
-			// change their polarity to positive
-			this.a *= -1
-			this.b *= -1
-		}
-	}
-
-	simplify() {
-		/*
-		 * simplifies the numerator and denominator in place
-		 */
-		var prim = BaseQuestion.gcd(Math.abs(this.a), Math.abs(this.b))
-
-		this.a = this.a / prim
-		this.b = this.b / prim // this.val should remain the same
-
-		return this // for chaining
-	}
-
-	minusFromConstant(c) {
-		/*
-			 * c: number, representing the constant to be minus in the form C - fraction
-		   */
-		return new Fraction((c *this.b) -(this.a), this.b) // for chaining
-	}
-
-	minusBeforeConstant(c) {
-		/*
-			 * self explanatory name
-		   * c: constant to substract from this fraction, in the form, fraction - C
-		 */
-		
-		return new Fraction(this.a -(c *this.b), this.b)
-	}
-
-	addConstant(c) {
-		/*
-			 * c: number, constant to add to fraction in the form, fraction + C or C + fraction
-		   */
-		return new Fraction(this.a +(c *this.b), this.b)
-	}
-
-	divByConstant(c) {
-		/*
-			 * c: number, constant to divide this fraction by, in the form, fraction /c
-		   */
-		return new Fraction(this.a, this.b *c)
-	}
-
-	add(frac) {
-		/*
-		 * frac: Fraction Object
-		 * adds another fraction object and returns a new fraction object where
-		 * the sum of both fractions
-		 */
-
-		var a = this.a * frac.b + frac.a * this.b
-		var b = this.b * frac.b
-
-		return new Fraction(a, b).simplify()
-	}
-
-	sub(frac) {
-		/*
-		 * frac: Fraction Object
-		 * subtracts another fraction object and returns a new fraction object where
-		 * the difference of both fractions, i.e. this - frac = return value
-		 */
-
-		var a = this.a * frac.b - frac.a * this.b
-		var b = this.b * frac.b
-
-		return new Fraction(a, b).simplify()
-	}
-
-	mult(frac) {
-		/*
-		 * frac: Fraction Object
-		 * multiplies another fraction object and returns a new fraction object where
-		 * the product of both fractions
-		 */
-		return new Fraction(this.a * frac.a, this.b * frac.b).simplify()
-	}
-
-	div(frac) {
-		/*
-		 * frac: Fraction Object
-		 * divides another fraction object and returns a new fraction object where
-		 * the result of both fractions, i.e. this / fraction = return value
-		 */
-		return new Fraction(this.a * frac.b, this.b * frac.a).simplify()
-	}
-
-	repr() {
-		/*
-		 * returns a string where it represents the fraction object within latex's syntax
-		 */
-		return `\\frac{${this.a}}{${this.b}}`
 	}
 }
 
@@ -2598,9 +2493,9 @@ class LinearEquation extends BaseQuestion {
 class SimultaneousEquation extends BaseQuestion {
 	static segment_b() {
 		/*
-			 * generates a segment where y + D1 = bx + c + D2, where D can be a constant or a determinant
-		   * generation is bloated, i.e. starts from y = bx + c to y + D = bx + c + D2 (possible third term in RHS)
-		   * returns the final gradient of the equation
+		 * generates a segment where y + D1 = bx + c + D2, where D can be a constant or a determinant
+		 * generation is bloated, i.e. starts from y = bx + c to y + D = bx + c + D2 (possible third term in RHS)
+		 * returns the final gradient of the equation
 		 */
 		var isDAlgebraic = Math.random() >= .5
 		var isDNegative = Math.random() >= .5

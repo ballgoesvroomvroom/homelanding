@@ -122,7 +122,7 @@ class Fraction {
 		return new Fraction(EuclidTools.gcd(a.a, b.a), EuclidTools.lcm(a.b, b.b))
 	}
 
-	constructor(a, b=1) {
+	constructor(a=0, b=1) {
 		/*
 		 * constructs a fraction representative object where,
 		 * a is the numerator,
@@ -137,6 +137,10 @@ class Fraction {
 			// change their polarity to positive
 			this.a *= -1
 			this.b *= -1
+		} else if (this.a > 0 && this.b < 0) {
+			// change numerator to take positive
+			this.a *= -1
+			this.b *= -1
 		}
 	}
 
@@ -144,7 +148,7 @@ class Fraction {
 		/*
 		 * simplifies the numerator and denominator in place
 		 */
-		var prim = BaseQuestion.gcd(Math.abs(this.a), Math.abs(this.b))
+		var prim = EuclidTools.gcd(Math.abs(this.a), Math.abs(this.b))
 
 		this.a = this.a / prim
 		this.b = this.b / prim // this.val should remain the same
@@ -244,7 +248,17 @@ class Fraction {
 		/*
 		 * returns a string where it represents the fraction object within latex's syntax
 		 */
-		return `\\frac{${this.a}}{${this.b}}`
+		if (this.b === 1) {
+			return `${this.a}`
+		} else {
+			var prefix = ""
+
+			if (this.a < 0) {
+				prefix = "-"
+			}
+
+			return `${prefix}\\frac{${Math.abs(this.a)}}{${this.b}}` // this.b will never be negative
+		}
 	}
 
 	toString() {
@@ -342,7 +356,7 @@ class Exact {
 			console.warn(`[warn]: unimplemented, currentNode is of type ${currentNode[0][1]}`)
 		}
 
-		if (a instanceof of Exact) {
+		if (a instanceof Exact) {
 			currentNode[2] = a.tree // any modifications onward to a outside of this function will reflect here
 		} else {
 			currentNode[2] = a
@@ -364,7 +378,7 @@ class Exact {
 			console.warn(`[warn]: unimplemented, currentNode is of type ${currentNode[0][1]}`)
 		}
 
-		if (a instanceof of Exact) {
+		if (a instanceof Exact) {
 			currentNode[2] = a.tree // any modifications onward to a outside of this function will reflect here
 		} else {
 			currentNode[2] = a
@@ -404,8 +418,8 @@ class Exact {
 class Polynomial {
 	/* domains enum */
 	static domain = {
-		ZZ: 1 // integers
-		RR: 2 // real numbers
+		'ZZ': 1, // integers
+		'RR': 2 // real numbers
 	}
 
 	constructor(coefficients, domain=Polynomial.domain.RR) {
@@ -451,6 +465,15 @@ class Polynomial {
 					return new Fraction(Math.floor(r))
 				}
 			})
+		}
+	}
+
+	getAdditionIdentity() {
+		// returns 0 depending on the domain
+		if (this.domain === Polynomial.domain.ZZ) {
+			return 0
+		} else if (this.domain === Polynomial.domain.RR) {
+			return new Fraction(0)
 		}
 	}
 
@@ -626,11 +649,11 @@ class Polynomial {
 			return this.multiplyConstant(Poly.coefficients[0])
 		}
 		var deg = this.degree +Poly.degree // highest degree
-		var coefficients = Array(deg +1).fill(0)
+		var coefficients = Array(deg +1).fill(this.getAdditionIdentity())
 
 		for (let i = 0; i < deg; i++) {
 		// generate the coefficient for the i-th term
-			coefficients[i] = 0 // initialise value
+			coefficients[i] = this.getAdditionIdentity() // initialise value
 			for (let j = 0; j <= i; j++) {
 				var a = this.coefficients[j]
 				if (a == null) {
@@ -645,6 +668,7 @@ class Polynomial {
 				if (this.domain === Polynomial.domain.ZZ) {
 					coefficients[i] += a *b
 				} else if (this.domain === Polynomial.domain.RR) {
+					console.log(".. run", coefficients)
 					coefficients[i] = coefficients[i].add(a.mult(b))
 				}
 			}
@@ -992,23 +1016,7 @@ class Polynomial {
 			return [[this.content()], this.primitive()]
 		} else if (this.degree === 2) {
 			// find both roots, factor in the form (x-a)(x-b), where a and b are roots
-			var content = this.content()
-			var primitive = this.primitive()
-
-			var [a, b] = primitive.roots()
-			console.log("ROOTS", a, b)
-			if (a != null && a % 1 === 0 && b % 1 === 0) {
-				// roots found (a = 0 is a falsey value, take note!)
-				// roots are rational
-				if (content !== 1) {
-					// has a content part
-					return [[content], [-a, 1], [-b, 1]]
-				} else {
-					return [[-a, 1], [-b, 1]]
-				}
-			}
-
-			return [[content], primitive.coefficients]
+			// take into account when leading coeff is not 0
 		}
 	}
 
@@ -1020,31 +1028,41 @@ class Polynomial {
 		return new Polynomial(this.coefficients.toReversed())
 	}
 
-	gcd(Poly) {
-		// returns the greatest common divisor between this and Poly object
-		// using the modular GCD algorithm
-		// f: this, g: Poly
-		var n = Math.max(this.degree, Poly.degree)
+	// gcd(Poly) {
+	// 	// returns the greatest common divisor between this and Poly object
+	// 	// using the modular GCD algorithm
+	// 	// f: this, g: Poly
+	// 	var n = Math.max(this.degree, Poly.degree)
 
-		var lcf = this.coefficients[this.degree]
-		var lcg = Poly.coefficients[Poly.degree]
-		var b = EuclidTools.gcd(lcf, lcg)
+	// 	var lcf = this.coefficients[this.degree]
+	// 	var lcg = Poly.coefficients[Poly.degree]
+	// 	var b
+	// 	var A, B
+	// 	if (this.domain === Polynomial.domain.ZZ) {
+	// 		b = EuclidTools.gcd(lcf, lcg)
 
-		var A = Math.max(this.supremumNorm, Poly.supremumNorm)
-		var B = ((n + 1)**(1/2)) *(2**n) *(A*b)
+	// 		A = Math.max(this.supremumNorm, Poly.supremumNorm)
+	// 		B = ((n + 1)**(1/2)) *(2**n) *(A*b)
+	// 	} else if (this.domain === Polynomial.domain.RR) {
+	// 		b = Fraction.gcd(lcf, lcg)
 
-		// choose a random prime
-		var lowerLim = 2*B
-		var upperLim = 4*B
-		var sieve = EuclidTools.buildSieve(4*B +1) // build a sieve for reference
-		for (let i = 2*B; i <= 4*B; i++) {
-			if (sieve[i] === true) {
-				// is a prime
-				var p = i
-			}
-		}
-		var p = EuclidTools.sieveOfEratosthenes(2*B)
-	}
+	// 		var sn1 = this.supremumNorm, sn2 = Poly.supremumNorm
+	// 		A = sn1 ? sn1 > sn2 // fraction objects
+	// 		B = A.mult(b).multByConstant(((n + 1)**(1/2)) *(2**n))
+	// 	}
+
+	// 	// choose a random prime
+	// 	var lowerLim = 2*B
+	// 	var upperLim = 4*B
+	// 	var sieve = EuclidTools.buildSieve(4*B +1) // build a sieve for reference
+	// 	for (let i = 2*B; i <= 4*B; i++) {
+	// 		if (sieve[i] === true) {
+	// 			// is a prime
+	// 			var p = i
+	// 		}
+	// 	}
+	// 	var p = EuclidTools.sieveOfEratosthenes(2*B)
+	// }
 
 	derivative() {
 		// returns the derivative of this polynomial
@@ -1053,7 +1071,11 @@ class Polynomial {
 		var coefficients = []
 		for (let i = 0; i < this.degree; i++) {
 			// construct a new coefficient array
-			coefficients.push(this.coefficients[i +1] *(i +1))
+			if (this.domain === Polynomial.domain.ZZ) {
+				coefficients.push(this.coefficients[i +1] *(i +1))
+			} else if (this.domain === Polynomial.domain.RR) {
+				coefficients.push(this.coefficients[i +1].multByConstant(i +1))
+			}
 		}
 
 		return new Polynomial(coefficients)
@@ -1092,7 +1114,20 @@ class Polynomial {
 			var p = Poly.raiseToPower(i)
 
 			for (let j = 0; j <= p.degree; j++) {
-				h.coefficients[j] += this.coefficients[i] *p.coefficients[j] // multiply by coefficient of term in f (this)
+				if (this.domain === Polynomial.domain.ZZ && Poly.domain === Polynomial.domain.ZZ) {
+					// both exists in ZZ
+					h.coefficients[j] += this.coefficients[i] *p.coefficients[j] // multiply by coefficient of term in f (this)
+				} else if (this.domain === Polynomial.domain.RR || Poly.domain === Polynomial.domain.RR) {
+					// either exists in RR
+					var actor = this.domain === Polynomial.domain.RR ? this.coefficients[i] : p.coefficients[j]
+					var extra = this.domain === Polynomial.domain.ZZ ? this.coefficients[i] : p.coefficients[j]
+					if (this.domain === Polynomial.domain.RR && Poly.domain === Polynomial.domain.RR) {
+						// both exists in RR
+						h.coefficients[j] = h.coefficients[j].add(this.coefficients[i].mult(p.coefficients[j]))
+					} else {
+						h.coefficients[j] = h.coefficients[j].add(actor.multByConstant(extra))
+					}
+				}
 			}
 		}
 
@@ -1129,26 +1164,49 @@ class Polynomial {
 		for (let i = this.degree; i >= 0; i--) {
 			var coeff = this.coefficients[i]
 
-			if (coeff === 0) {
-				// empty term
-				continue
+			var prefix = "", coeffRepr = ""
+
+			if (this.domain === Polynomial.domain.ZZ) {
+				// integers only
+				if (coeff === 0) {
+					// empty term
+
+					continue
+				}
+
+				if (i >= 1 && coeff === 1) {
+					// can omit coefficient
+					coeffRepr = ""
+				} else if (i >= 1 && coeff === -1) {
+					// can also omit
+					coeffRepr = "-"
+				}
+
+				if (r.length >= 2 && coeff > 0) {
+					prefix = "+"
+				}
+
+				r += `${prefix}${coeffRepr}`
+			} else if (this.domain === Polynomial.domain.RR) {
+				// coefficients are fractions object
+				if (coeff.a === 0) {
+					// empty term
+
+					continue
+				}
+
+				coeffRepr = coeff.repr() // fraction object
+				if (r.length >= 2 && coeffRepr[0] !== "-") { // r.length >= 2 to be true only when there are already terms since there is one character during initialisation of r, i.e. '('
+					// coefficient object, prefix to take plus sign
+					prefix = "+"
+				}
+
+				r += `${prefix}${coeffRepr}`
 			}
 
-			var coeffRepr = coeff
-			var prefix = i < this.degree && coeff > 0 ? "+" : ""
-			if (i >= 1 && coeff === 1) {
-				// can omit coefficient
-				coeffRepr = ""
-			} else if (i >= 1 && coeff === -1) {
-				// can omit too
-				coeffRepr = "-"
-			}
-
-			r += `${prefix}${coeffRepr}`
 			if (i >= 1) {
 				r += `${this.indeterminant}`
 			}
-
 			if (i >= 2) {
 				r += `^${i}` // exponent
 			}
@@ -2525,5 +2583,6 @@ var npoly = poly.dQuotientRule(spoly)
 console.log("FINAL OUTPUT:", npoly)
 
 module.exports = {
-	Polynomial
+	Polynomial,
+	Fraction
 }

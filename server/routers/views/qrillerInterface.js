@@ -355,12 +355,12 @@ router.get("/:documentId/ans", (req, res) => {
 		res.status(200).end()
 	})
 
-	presetRouter.get("/diff/0", (req, res) => {
+	presetRouter.get("/diff/1", (req, res) => {
 		const data = Utils.getDefaultProperties()
 
 		data.code = "4.1"
-		data.title = "Differentiating Univariate Polynomials (Power rule)"
-		data.note = "Differentiate the equations via the Power rule."
+		data.title = "Differentiating Univariate Polynomials (Product rule)"
+		data.note = "Differentiate the equations via the Product rule."
 
 		const q = new qriller.Qriller(data)
 		q.createQuestions(qriller.DifferentiatingPolynomialPowerRule, 100)
