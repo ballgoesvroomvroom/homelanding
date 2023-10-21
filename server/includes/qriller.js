@@ -2688,7 +2688,10 @@ class DifferentiatingPolynomialQuotientRule extends BaseQuestion {
 		var b = DifferentiatingPolynomialProductRule.segment_p(maxDegree)
 
 		var qnRepr = `\\frac{${a.buildRepr()}}{${b.buildRepr()}}`
-		var ansRepr = new grain.Polynomial(a.coefficients).dQuotientRule(new grain.Polynomial(b.coefficients)).buildRepr()
+
+		var denom = new grain.Polynomial(b.coefficients)
+		var qRule = new grain.Polynomial(a.coefficients).dQuotientRule(denom)
+		var ansRepr = `\\frac{${qRule[0].buildRepr()}}{${denom.buildRepr()}^{2}}`
 
 		return [qnRepr, ansRepr]
 	}
@@ -2720,7 +2723,7 @@ class DifferentiatingPolynomialChainRule extends BaseQuestion {
 
 		var b = new Polynomial(coeffArr)
 
-		var qnRepr = `{${a.buildRepr()}}^{${n}}`
+		var qnRepr = `{(${a.buildRepr()})}^{${n}}`
 		var ansRepr = new grain.Polynomial(b.coefficients).dChainRule(new grain.Polynomial(a.coefficients), false) // h(x) = a(b(x)), order matters
 
 		return [qnRepr, ansRepr]

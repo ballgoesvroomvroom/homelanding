@@ -363,7 +363,35 @@ router.get("/:documentId/ans", (req, res) => {
 		data.note = "Differentiate the equations via the Product rule."
 
 		const q = new qriller.Qriller(data)
-		q.createQuestions(qriller.DifferentiatingPolynomialPowerRule, 100)
+		q.createQuestions(qriller.DifferentiatingPolynomialProductRule, 100)
+
+		res.write(Utils.populateDocument(q))
+		res.status(200).end()
+	})
+
+	presetRouter.get("/diff/2", (req, res) => {
+		const data = Utils.getDefaultProperties()
+
+		data.code = "4.2"
+		data.title = "Differentiating Univariate Polynomials (Quotient rule)"
+		data.note = "Differentiate the equations via the Quotient rule."
+
+		const q = new qriller.Qriller(data)
+		q.createQuestions(qriller.DifferentiatingPolynomialQuotientRule, 100)
+
+		res.write(Utils.populateDocument(q))
+		res.status(200).end()
+	})
+
+	presetRouter.get("/diff/3", (req, res) => {
+		const data = Utils.getDefaultProperties()
+
+		data.code = "4.3"
+		data.title = "Differentiating Univariate Polynomials (Chain rule)"
+		data.note = "Differentiate the equations via the Chain rule."
+
+		const q = new qriller.Qriller(data)
+		q.createQuestions(qriller.DifferentiatingPolynomialChainRule, 100)
 
 		res.write(Utils.populateDocument(q))
 		res.status(200).end()
