@@ -168,7 +168,7 @@ class Fraction {
 		 * self explanatory name
 		 * c: constant to substract from this fraction, in the form, fraction - C
 		 */
-		
+
 		return new Fraction(this.a -(c *this.b), this.b)
 	}
 
@@ -438,6 +438,27 @@ class Polynomial {
 
 		// convert this.coefficients
 		this._normaliseInDomain()
+
+		// special properties
+		var triggered = false
+		for (let r of this.coefficients) {
+			if (this.domain === Polynomial.domain.ZZ) {
+				if (r !== 0) {
+					triggered = !triggered
+					if (triggered === false) {
+						break // triggered twice, there exists two terms in this polynomial object
+					}
+				}
+			} else if (this.domain === Polynomial.domain.RR) {
+				if (r.val !== 0) {
+					triggered = !triggered
+					if (triggered === false) {
+						break // triggered twice, there exists two terms in this polynomial object
+					}
+				}
+			}
+		}
+		this.isMonoTerm = triggered // triggered will only take the value of true once when it encounters a non-zero coefficient, otherwise will default back to false on the second hit
 	}
 
 	_normaliseInDomain() {
@@ -623,17 +644,20 @@ class Polynomial {
 		// f = a0 + a1x + a2x2 + a3x3...
 		// returns a new polynomial object such that
 		// q = (a0*constant) + (a1*constant)x + (a2*constant)x2 + (a3*constant)x3
-		console.log(constant, `* ${this.buildRepr()}`)
-		return new Polynomial(
+		var ret = new Polynomial(
 			this.coefficients.map(c => {
 				if (this.domain === Polynomial.domain.ZZ) {
 					return c *constant
 				} else if (this.domain === Polynomial.domain.RR) {
-					return c.multByConstant(constant)
+					return constant.multByConstant(c)
 				}
 			}),
 			this.domain
 		)
+
+		console.log(constant, `* ${this.buildRepr()}`)
+		console.log("=", ret.buildRepr())
+		return ret
 	}
 
 	multiplyPoly(Poly, cfOnly=false) {
@@ -657,18 +681,17 @@ class Polynomial {
 			for (let j = 0; j <= i; j++) {
 				var a = this.coefficients[j]
 				if (a == null) {
-					a = 0 // there does not exist a term with power (j) in this
+					a = this.getAdditionIdentity() // there does not exist a term with power (j) in this
 				}
 
 				var b = Poly.coefficients[i -j]
 				if (b == null) {
-					b = 0 // there does not exist a term with power (i -j) in Poly
+					b = this.getAdditionIdentity() // there does not exist a term with power (i -j) in Poly
 				}
 
 				if (this.domain === Polynomial.domain.ZZ) {
 					coefficients[i] += a *b
 				} else if (this.domain === Polynomial.domain.RR) {
-					console.log(".. run", coefficients)
 					coefficients[i] = coefficients[i].add(a.mult(b))
 				}
 			}
@@ -811,13 +834,14 @@ class Polynomial {
 		}
 
 		var gcd
-		if (this.domain === this.domain.ZZ) {
+		if (this.domain === Polynomial.domain.ZZ) {
 			gcd = EuclidTools.gcd(this.coefficients[0], this.coefficients[1])
 			for (let i = 2; i <= this.degree; i++) {
 				gcd = EuclidTools.gcd(gcd, this.coefficients[i])
 			}
-		} else if (this.domain === this.domain.RR) {
+		} else if (this.domain === Polynomial.domain.RR) {
 			gcd = Fraction.gcd(this.coefficients[0], this.coefficients[1])
+			console.log("STEP 1", gcd)
 			for (let i = 2; i <= this.degree; i++) {
 				gcd = Fraction.gcd(gcd, this.coefficients[i])
 			}
@@ -826,7 +850,7 @@ class Polynomial {
 		return gcd
 	}
 
-	primitive() {
+	primitive(precalculatedContent=null) {
 		// returns the primitive part of the polynomial
 		// >>> 3x^2 + 6x + 9
 		// x^2 + 2x + 3
@@ -837,10 +861,15 @@ class Polynomial {
 		}
 
 		// find gcd of all the coefficients (degree >= 1)
-		var gcd = this.content();
+		var gcd = precalculatedContent
+		if (precalculatedContent == null) {
+			gcd = this.content();
+			console.log("GCD CALC RETURNED", gcd)
+		}
 
-		if (gcd !== 1) {
+		if ((this.domain === Polynomial.domain.ZZ && gcd !== 1) || (this.domain === Polynomial.domain.RR && gcd.val !== 1)) {
 			// there exists a primitive part of 'this' polynomial
+			console.log("GCD FOUND", gcd, precalculatedContent, this.coefficients)
 			if (this.domain === Polynomial.domain.ZZ) {
 				return this.multiplyConstant(1 /gcd)
 			} else if (this.domain === Polynomial.domain.RR) {
@@ -967,7 +996,7 @@ class Polynomial {
 	ddFactorisation() {
 		// factors polynomial with the distinct degree factorisation algorithm
 		// with repeated squaring implemented for the calculate x^M mod f
-		
+
 	}
 
 	roots() {
@@ -1084,13 +1113,13 @@ class Polynomial {
 	raiseToPower(i) {
 		// raises this to power i
 		// i.e. returns f(x)^i
-		// uses repeated squaring to minimuse squaring operations
+		// uses repeated squaring to minimise squaring operations
 		var l = Math.floor(Math.log2(i)) +1
 		var g = this
 
 		for (let j = 0; j < l -1; j++) {
 			g = g.square()
-			if (i & (1 << (i -j -2)) !== 0) {
+			if ((i & (1 << (l -j -2))) !== 0) {
 				// has a bit, multiply by itself
 				g = g.multiplyPoly(this)
 			}
@@ -1105,11 +1134,16 @@ class Polynomial {
 		// i.e. function decomposition
 		// h = f o g
 		// returns h, where f = this, g = Poly
-		var h = new Polynomial(Array(this.degree *Poly.degree +1).fill(0))
+		var h = new Polynomial(Array(this.degree *Poly.degree +2).fill(0))
 		h.coefficients[0] = this.coefficients[0]
 
 		// skip the constant
 		for (let i = 1; i <= this.degree; i++) {
+			if (this.coefficients[i] == 0 || (this.domain === Polynomial.domain.RR && this.coefficients[i].val === 0)) {
+				// nothing to substitute in here, big optimisation instead of having to calculate the square of Poly for every iteration of degree this
+				continue;
+			}
+
 			// use repeated squaring to raise g to the power of i
 			var p = Poly.raiseToPower(i)
 
@@ -1123,6 +1157,7 @@ class Polynomial {
 					var extra = this.domain === Polynomial.domain.ZZ ? this.coefficients[i] : p.coefficients[j]
 					if (this.domain === Polynomial.domain.RR && Poly.domain === Polynomial.domain.RR) {
 						// both exists in RR
+						console.log("NIHAO", i, j, h.coefficients, this.buildRepr(), this.degree, p.buildRepr(), p.degree, Poly.buildRepr(), Poly.degree)
 						h.coefficients[j] = h.coefficients[j].add(this.coefficients[i].mult(p.coefficients[j]))
 					} else {
 						h.coefficients[j] = h.coefficients[j].add(actor.multByConstant(extra))
@@ -1134,11 +1169,45 @@ class Polynomial {
 		return h
 	}
 
-	dChainRule(Poly) {
+	dChainRule(Poly, returnExpandedForm=true) {
 		// differentiates h(x) = this(Poly(x)) with respect to x
 		// h = f o g
 		// h'(x) = f'(g(x))*g'(x)
-		return this.derivative().substitute(Poly).multiplyPoly(Poly.derivative())
+		// returnExpandedForm: boolean, will return fully expanded form if returnExpandedForm is true
+		console.log("[CHAINING]:", this.buildRepr(), Poly.buildRepr())
+		if (returnExpandedForm) {
+			return this.derivative().substitute(Poly).multiplyPoly(Poly.derivative())
+		} else {
+			// return in the form f'(g(x))*g'(x), without expanding
+
+			if (this.isMonoTerm) {
+				// only consists of one term, e.g. x^4
+				return `${this.degree}${Poly.buildRepr()}^{${this.degree -1}}${Poly.derivative().buildRepr()}`
+			}
+
+			var fPrime = this.derivative().substitute(Poly)
+			var gPrime = Poly.derivative()
+
+			// factor out the content
+			var content = 1
+			// var content = fPrime.content()
+			// if (content !== 1) {
+			// 	fPrime = fPrime.primitive(content) // supply the content value to prevent redundant calculations
+			// }
+
+			// var gPrimeContent = gPrime.content()
+			// if (gPrimeContent !== 1) {
+			// 	content *= gPrimeContent
+			// 	gPrime = Poly.primitive(gPrimeContent)	
+			// }
+
+			if (content === 1) {
+				// no factorisation
+				return `${fPrime.buildRepr()}${gPrime.buildRepr()}`
+			} else {
+				return `${content}${fPrime.buildRepr()}${gPrime.buildRepr()}`
+			}
+		}
 	}
 
 	dProductRule(Poly) {
@@ -1201,6 +1270,11 @@ class Polynomial {
 					prefix = "+"
 				}
 
+				if (i >= 1 && Math.abs(coeff.val) === 1) {
+					// omit coefficient
+					coeffRepr = coeff.val < 0 ? "-" : ""
+				}
+
 				r += `${prefix}${coeffRepr}`
 			}
 
@@ -1208,7 +1282,7 @@ class Polynomial {
 				r += `${this.indeterminant}`
 			}
 			if (i >= 2) {
-				r += `^${i}` // exponent
+				r += `^{${i}}` // exponent
 			}
 		}
 
@@ -1274,7 +1348,7 @@ class ASTTree {
 		console.log("PARENT NODE", selection)
 		return selection
 	}
-	
+
 	ascendNode() {
 		// moves up the hierarchy
 		if (this.treeCurrentPath.length >= 1) {
@@ -1284,28 +1358,28 @@ class ASTTree {
 			console.log("CANNOT ASCEND, AT THE ROOT")
 		}
 	}
-	
+
 	addLeftNode(setToCurrent=false) {
 		var node = this._newNode(this._getCurrentParentNode()); // create a new node
 		this.currentNode[1] = node
-		
+
 		if (setToCurrent) {
 			this.currentNode = node
 			this.treeCurrentPath.push(0) // 0 to represent left leave node
 		}
-		
+
 		return node;
 	}
-	
+
 	addRightNode(setToCurrent=false) {
 		var node = this._newNode(this._getCurrentParentNode()); // create a new node
 		this.currentNode[2] = node
-		
+
 		if (setToCurrent) {
 			this.currentNode = node
 			this.treeCurrentPath.push(1) // 1 to represent right leave node
 		}
-		
+
 		return node;
 	}
 }
@@ -1989,7 +2063,7 @@ class ASTTreeOperations {
 			node[2] = a[2]
 		} else if (a[0][3] === 2 && a[0][2] === "+" && b[0][3] === 2 && b[0][2] === "+") {
 			// both are additions
-			
+
 		} else {
 			console.log("UNCAPTURED?", a, b)
 		}
@@ -2142,7 +2216,7 @@ class AlgebraicExpr {
 				}
 			}
 		}
-		
+
 		if (this.tokens.hasToken()) {
 			// push last token
 			this.tokens.next();
@@ -2150,18 +2224,18 @@ class AlgebraicExpr {
 
 		return this // to chain
 	}
-	
+
 	treelise() {
 		// generates the AST tree based on this.tokens
 		if (this.tokens == null) {
 			// not tokenised yet
 			return false
 		}
-		
+
 		// generate nodes
 		this.tree = new ASTTree()
 		console.log("INIT", this.tree)
-		
+
 		var idx = 0;
 		for (const token of this.tokens.contents) {
 			console.log("\n", idx, token)

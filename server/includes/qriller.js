@@ -19,7 +19,7 @@ class Qriller {
 		this.id = crypto.randomBytes(16).toString("hex")
 
 		this.code = data.code
-		this.createDateRepr = (new Date()).toLocaleDateString("en-SG", {"year": "numeric", "month": "short", "day": "numeric"})
+		this.createDateRepr = (new Date()).toLocaleDateString("en-SG", { "year": "numeric", "month": "short", "day": "numeric" })
 		this.title = data.title
 		this.note = data.note
 		this.questions = []
@@ -627,6 +627,13 @@ class BaseQuestion {
 		 * does not work for min = 1, max = 2
 		 */
 		return Math.floor(Math.random() * (max - min - 1)) + min
+	}
+
+	static randomEInt(min, max) {
+		/*
+		 * returns a random number between min (inclusive) and max (exclusive)
+   		 */
+		return Math.floor(Math.random() *(max -min)) +min
 	}
 }
 
@@ -1771,7 +1778,7 @@ class Polynomial {
 				} else if (repr.length > 0) {
 					prefix = "+" // otherwise, empty prefix
 				}
-				if (n >= 1 && numerator[numerator.length -1] === "1") {
+				if (n >= 1 && numerator[numerator.length - 1] === "1") {
 					// omit coefficient if it is 1 (does not apply for constants)
 					numerator = ""
 				}
@@ -2587,7 +2594,7 @@ class QuadraticRootsWithFractions extends BaseQuestion {
 }
 
 class DifferentiatingPolynomialPowerRule extends BaseQuestion {
-	static segment_c(maxDegree=8) {
+	static segment_c(maxDegree = 8) {
 		/*
 		 * uses the Polynomial class to construct a polynomial object and then bloats it
 		 * returns [bloated polynomial in string form, answer in string form too]
@@ -2601,12 +2608,12 @@ class DifferentiatingPolynomialPowerRule extends BaseQuestion {
 			var coeffIsNeg = containsTermOfThisPower && Math.random() >= .5
 
 			if (containsTermOfThisPower) {
-				coeffArr[i] = BaseQuestion.randomInt(2, 29) *(coeffIsNeg ? -1 : 1)
+				coeffArr[i] = BaseQuestion.randomInt(2, 29) * (coeffIsNeg ? -1 : 1)
 			}
 		}
 
 		// construct the polynomial object and bloat it for the question string
-		var qnRepr = new Polynomial(coeffArr).bloat(1 -n /8, true) // bloat less if degree is higher (max 8)
+		var qnRepr = new Polynomial(coeffArr).bloat(1 - n / 8, true) // bloat less if degree is higher (max 8)
 
 		// construct the polynomial object (grain) to generate the answer
 		var ansRepr = new grain.Polynomial(coeffArr).derivative().buildRepr()
@@ -2623,6 +2630,112 @@ class DifferentiatingPolynomialPowerRule extends BaseQuestion {
 
 		this.answerObj = new BaseAnswer(false)
 		this.answerObj.set("%%0%%", [ans])
+	}
+}
+
+class DifferentiatingPolynomialProductRule extends BaseQuestion {
+	static segment_p(maxDegree=8) {
+		/*
+  		 * returns a polynomial segment
+		 */
+		var n = BaseQuestion.randomEInt(2, maxDegree)
+		var coeffArr = Array(n +1).fill(0)
+
+		coeffArr[n] = BaseQuestion.randomEInt(1, 21) *(Math.random() >= .5 ? -1 : 1)
+		var maxTerms = BaseQuestion.randomEInt(2, 4)
+		for (let i = 1; i < maxTerms; i++) { // start from i = 1 since leading coefficient (term with highest power) has already been determined
+			var deg = BaseQuestion.randomEInt(0, n) // will never be n
+			coeffArr[deg] += BaseQuestion.randomEInt(1, 21) *(Math.random() >= .5 ? -1 : 1)
+		}
+
+		return new Polynomial(coeffArr)
+	}
+
+	static segment_c(maxDegree=8) {
+		/*
+		 * chains two polynomial returned by segment_p() to obtain their product
+		 * returns [chained polynomial (with parentheses) in string form, answer in string form too]
+		 */
+		var a = DifferentiatingPolynomialProductRule.segment_p(maxDegree)
+		var b = DifferentiatingPolynomialProductRule.segment_p(maxDegree)
+
+		var qnRepr = `(${a.buildRepr()})(${b.buildRepr()})`
+		var ansRepr = new grain.Polynomial(a.coefficients).dProductRule(new grain.Polynomial(b.coefficients)).buildRepr()
+
+		return [qnRepr, ansRepr]
+	}
+
+	constructor() {
+		super();
+
+		var [qnRepr, ansRepr] = DifferentiatingPolynomialProductRule.segment_c()
+
+		this.qnReprString = "%%0%%\n%%1%%"
+		this.qnLatexEqn = [qnRepr, ansRepr]
+
+		this.answerObj = new BaseAnswer(false)
+		this.answerObj.set("%%0%%", [ansRepr])
+	}
+}
+
+class DifferentiatingPolynomialQuotientRule extends BaseQuestion {
+	static segment_c(maxDegree=8) {
+		/*
+		 * chains two polynomial returned by segment_p() to obtain their product
+		 * returns [chained polynomial (with fractions in latex) as a string, answer representation in string too]
+		 */
+		var a = DifferentiatingPolynomialProductRule.segment_p(maxDegree)
+		var b = DifferentiatingPolynomialProductRule.segment_p(maxDegree)
+
+		var qnRepr = `\\frac{${a.buildRepr()}}{${b.buildRepr()}}`
+		var ansRepr = new grain.Polynomial(a.coefficients).dQuotientRule(new grain.Polynomial(b.coefficients)).buildRepr()
+
+		return [qnRepr, ansRepr]
+	}
+
+	constructor() {
+		super();
+
+		var [qnRepr, ansRepr] = DifferentiatingPolynomialQuotientRule.segment_c()
+
+		this.qnReprString = "%%0%%\n%%1%%"
+		this.qnLatexEqn = [qnRepr, ansRepr]
+
+		this.answerObj = new BaseAnswer(false)
+		this.answerObj.set("%%0%%", [ansRepr])
+	}
+}
+
+class DifferentiatingPolynomialChainRule extends BaseQuestion {
+	static segment_c(maxDegree=8) {
+		/*
+		 * chains raise polynomial returned by segment_p() to obtain their product
+		 * returns [chained polynomial (with fractions in latex) as a string, answer representation in string too]
+		 */
+		var a = DifferentiatingPolynomialProductRule.segment_p(maxDegree) // (a)^n; represents a
+
+		var n = BaseQuestion.randomEInt(2, 10) // up to 9 (inclusive); represents n in (a)^n
+		var coeffArr = Array(n +1).fill(0)
+		coeffArr[n] = 1 // x^n
+
+		var b = new Polynomial(coeffArr)
+
+		var qnRepr = `{${a.buildRepr()}}^{${n}}`
+		var ansRepr = new grain.Polynomial(b.coefficients).dChainRule(new grain.Polynomial(a.coefficients), false) // h(x) = a(b(x)), order matters
+
+		return [qnRepr, ansRepr]
+	}
+
+	constructor() {
+		super();
+
+		var [qnRepr, ansRepr] = DifferentiatingPolynomialChainRule.segment_c()
+
+		this.qnReprString = "%%0%%\n%%1%%"
+		this.qnLatexEqn = [qnRepr, ansRepr]
+
+		this.answerObj = new BaseAnswer(false)
+		this.answerObj.set("%%0%%", [ansRepr])
 	}
 }
 
@@ -2651,5 +2764,8 @@ module.exports = {
 	QuadraticRootsByFormula,
 	QuadraticRootsBySquare,
 	QuadraticRootsWithFractions,
-	DifferentiatingPolynomialPowerRule
+	DifferentiatingPolynomialPowerRule,
+	DifferentiatingPolynomialProductRule,
+	DifferentiatingPolynomialQuotientRule,
+	DifferentiatingPolynomialChainRule
 }
