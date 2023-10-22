@@ -2241,55 +2241,58 @@ class FactorisingPolynomial extends BaseQuestion {
 
 	static segment_l() {
 		/*
-		 * generates a linear expression to be factored
+		 * generates a linear expression to be factored (e.g. 18x - 135)
 		 * returns [string representation of the polynomial, factored answer]
 		 */
 
-		// build expression in the form ax + b
-		var isCoeffNeg = Math.random() >= .7
-		var isConstantNeg = Math.random() >= .7
+		// generation states
+		var isFactorNeg = Math.random() >= .5
+		var isCoeffNeg = Math.random() >= .5
+		var isConstantNeg = !isCoeffNeg && Math.random() >= .5 // only one term can be negative
 
-		// generate two numbers
-		var a = 1, b = 1
-		a = BaseQuestion.randomInt(1, 13) * (isCoeffNeg ? -1 : 1)
-		b = BaseQuestion.randomInt(1, 24) * (isConstantNeg ? -1 : 1)
+		// generate the factor first (e.g. n(ax + b), referring to n)
+		var n = BaseQuestion.randomEInt(2, 13) *(isFactorNeg ? -1 : 1) // up to 12
 
-		// extract gcd as a factor
+		// generate the two numbers, a and b (e.g. n(ax + b))
+		var a = BaseQuestion.randomEInt(1, 21) *(isCoeffNeg ? -1 : 1)
+		var b = BaseQuestion.randomEInt(1, 21) *(isConstantNeg ? -1 : 1)
+
+		// can build question representation at this point
+		var coeff = a *n, constant = b *n
+		if (Math.abs(coeff) === 1) {
+			coeff = coeff < 0 ? "-" : "" // omit coefficient
+		}
+		if (constant === 0) {
+			constant = "" // omit constant
+		} else if (constant > 0) {
+			// prepend "+" operator
+			constant = `+${constant}`
+		}
+		var qnRepr = `${coeff}x${constant}`
+
+		// finalise n, compute gcd of a and b
 		var gcd = BaseQuestion.gcd(Math.abs(a), Math.abs(b))
 		if (gcd !== 1) {
+			n *= gcd
+
 			a /= gcd
 			b /= gcd
 		}
 
-		// generate a random integer to be used as the factor
-		var factor = BaseQuestion.randomInt(2, 13) * gcd // will never be 1 or 0 (no multiplicative inverses in Z)
-
-		// make factor negative if both coeff and constant are negative
-		if (isCoeffNeg && isConstantNeg) {
-			factor *= -1
-			a *= -1
-			b *= -1
+		// buid answer representation
+		var ansCoeff = a, ansConstant = b
+		if (Math.abs(ansCoeff) === 1) {
+			ansCoeff = ansCoeff < 0 ? "-" : "" // omit coefficient
 		}
-
-		// build question representation
-		var prefix = ""
-		if (factor * b > 0) {
-			// include plus sign
-			prefix = "+"
+		if (ansConstant === 0) {
+			ansConstant = "" // omit constant
+		} else if (constant > 0) {
+			// prepend "+" operator
+			ansConstant = `+${ansConstant}`
 		}
-		var qn = `${factor * a}x${prefix}${factor * b}`
+		var ansRepr = `${n}(${ansCoeff}x${ansConstant})`
 
-		// build answer representation
-		if (Math.abs(a) === 1) {
-			a = a < 0 ? "-" : ""
-		}
-		if (b > 0) {
-			// include plus sign
-			b = `+${b}`
-		}
-		var answer = `${factor}(${a}x${b})`
-
-		return [qn, answer]
+		return [qnRepr, ansRepr]
 	}
 
 	constructor() {
