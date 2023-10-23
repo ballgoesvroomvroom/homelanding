@@ -1,115 +1,6 @@
-body {
-	--horizontal-padding: 150px;
-
-	position: relative;
-	width: 100%;
-
-	font-family: "Roboto Condensed", sans-serif;
-}
-
 .sgd-reference {
 	font-weight: 700;
 	color: #8ab07d;
-}
-
-#topbar-container {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
-
-	position: fixed;
-	top: 0;
-
-	width: calc(100% - var(--horizontal-padding) * 2);
-	height: 28px;
-
-	padding: 15px var(--horizontal-padding);
-	margin-bottom: 1px;
-
-	border-bottom-style: solid;
-	border-bottom-width: 1px;
-	border-bottom-color: #c0c0c0;
-
-	background-color: #ffffff;
-
-	z-index: 2;
-}
-
-#topbar-container > h1 {
-	font-size: 24px;
-}
-
-#topbar-action-container {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-
-	color: #2b2b2b;
-}
-
-.topbar-action-btn {
-	padding: 15px 30px;
-
-	transition-property: background-color;
-	transition-duration: 150ms;
-	transition-timing-function: linear;
-}
-
-.topbar-action-btn:hover {
-	background-color: #ede6cc;
-}
-
-#buy-btn {
-	margin-left: 10px;
-	font-weight: 700;
-
-	background-color: #e8daa7;
-}
-
-#buy-btn:hover {
-	background-color: #ede6cc;
-}
-
-#topbar-bottom-container {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-
-	position: fixed;
-	top: calc(29px + 30px);
-
-	width: calc(100% - var(--horizontal-padding) * 2);
-
-	padding: 12px var(--horizontal-padding);
-
-	font-size: 13px;
-
-	border-bottom-style: solid;
-	border-bottom-width: 1px;
-	border-bottom-color: #c0c0c0;
-
-	background-color: #ffffff;
-
-	z-index: 2;
-}
-
-#topbar-bottom-container > p {
-	flex-grow: 1;
-}
-
-#topbar-bottom-action-container {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-}
-
-#topbar-bottom-action-container > div {
-	padding-left: 10px;
-}
-
-#topbar-bottom-action-container > div > a {
-	color: #0c0c0c;
 }
 
 #series-selector-container {
@@ -118,7 +9,7 @@ body {
 	align-items: center;
 
 	position: fixed;
-	top: calc(28px + 30px + 24px + 13px);
+	top: var(--page-start-offset);
 
 	width: 100%;
 
@@ -339,10 +230,6 @@ body {
 }
 
 @media (max-width: 920px) {
-	body {
-		--horizontal-padding: 50px;
-	}
-
 	.product-showcase-section {
 		aspect-ratio: unset;
 	}
@@ -362,17 +249,7 @@ body {
 		--horizontal-padding: 15px;
 	}
 
-	.topbar-action-btn {
-		padding: 8px 10px;
-	}
-
 	.product-showcase-section-thumbnail {
 		position: relative;
-	}
-}
-
-@media (max-width: 410px) {
-	#topbar-bottom-action-container {
-		display: none;
 	}
 }

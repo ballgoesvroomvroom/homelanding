@@ -28,6 +28,7 @@ class Qriller {
 	static homePage = path.join(html, "views/qriller/landing_page.html")
 	static seriesPage = path.join(html, "views/qriller/series_page.html")
 	static listingPage = path.join(html, "views/qriller/listing_page.html")
+	static purchasePage = path.join(html, "views/qriller/purchase_page.html")
 }
 
 class Views {

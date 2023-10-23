@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=10.0, minimum-scale=.25, user-scalable=yes"/>
+		<meta name="description" content="Worksheets grandmaster"/>
+
+		<link rel="stylesheet" href="/css/includes/reset.css">
+		<link rel="stylesheet" href="/css/includes/qriller/default.css">
+		<link rel="stylesheet" href="/css/includes/qriller/topbar.css">
+		<link rel="stylesheet" href="/css/views/qriller/qriller_purchasepage.css">
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap" rel="stylesheet">
+
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+		<title>Qriller | Buy</title>
+	</head>
+	<body>
+		<div id="topbar-container">
+			<h1>Qriller</h1>
+			<div id="topbar-action-container">
+				<button id="contactus-btn" class="topbar-action-btn">
+					Support
+				</button>
+				<button id="contactus-btn" class="topbar-action-btn">
+					Contact Us
+				</button>
+				<button id="buy-btn" class="topbar-action-btn">
+					BUY
+				</button>
+			</div>
+		</div>
+		<div id="topbar-bottom-container">
+			<p>Conceptual learning | worksheets grandmaster</p>
+			<div id="topbar-bottom-action-container">
+				<div><a href="/qriller">Home</a></div>
+				<div><a href="/qriller/series">Series</a></div>
+				<div><a href="/qriller/topic-list">Topic List</a></div>
+			</div>
+		</div>
+		<div id="container">
+			<h1>Purchase</h1>
+			<div id="lr-container">
+				<div id="topics-selection-container">
+					<div id="topics-search-menu">
+						<input id="search-query-inp" name="searchquery" type="text" placeholder="SEARCH TITLE">
+						<button id="search-query-btn">SEARCH</button>
+					</div>
+					<div id="topics-choice-menu">
+						<div id="topics-choice-selection">
+							<div class="topic-element-container">
+								<div class="topic-element-details-container">
+									<button class="topic-element-dropdown-btn"><img src="/static/dropdown_collapsed_arrow_icon.svg"></button>
+									<p>1 | Indices</p>
+									<button class="topic add-btn">ADD</button>
+								</div>
+								<div class="subtopic-element-list-container">
+									<div class="subtopic-element-container">
+										<p>1.0 | Law of Indices (Part I)</p>
+										<button class="subtopic add-btn">ADD</button>
+									</div>
+									<div class="subtopic-element-container">
+										<p>1.1 | Law of Indices (Part II)</p>
+										<button class="subtopic add-btn">ADD</button>
+									</div>
+									<div class="subtopic-element-container">
+										<p>1.2 | Law of Indices (Final)</p>
+										<button class="subtopic add-btn">ADD</button>
+									</div>
+									<div class="subtopic-element-container">
+										<p>1.3 | Express in Standard Form</p>
+										<button class="subtopic add-btn">ADD</button>
+									</div>
+								</div>
+							</div>
+							<div class="topic-element-container">
+								<div class="topic-element-details-container">
+									<button class="topic-element-dropdown-btn"><img src="/static/dropdown_arrow_icon.svg"></button>
+									<p>2 | Factoring</p>
+									<button class="topic add-btn">ADD</button>
+								</div>
+								<div class="subtopic-element-list-container active">
+									<div class="subtopic-element-container">
+										<p>2.0 | Factoring Univariate Polynomials</p>
+										<button class="subtopic add-btn">ADD</button>
+									</div>
+									<div class="subtopic-element-container">
+										<p>2.1 | Factoring Univariate Polynomials with Exponents</p>
+										<button class="subtopic add-btn">ADD</button>
+									</div>
+									<div class="subtopic-element-container">
+										<p>2.2 | Factoring Multivariate Polynomials</p>
+										<button class="subtopic add-btn">ADD</button>
+									</div>
+								</div>
+							</div>
+							<div class="topic-element-container">
+								<div class="topic-element-details-container">
+									<button class="topic-element-dropdown-btn"><img src="/static/dropdown_arrow_icon.svg"></button>
+									<p>3 | Quadratics</p>
+									<button class="topic add-btn">ADD</button>
+								</div>
+								<div class="subtopic-element-list-container active">
+									<div class="subtopic-element-container">
+										<p>3.0 | Solving Linear Equations</p>
+										<button class="subtopic add-btn">ADD</button>
+									</div>
+									<div class="subtopic-element-container">
+										<p>3.1 | Solving Systems of Linear Equations</p>
+										<button class="subtopic add-btn">ADD</button>
+									</div>
+									<div class="subtopic-element-container">
+										<p>3.2 | Solving Quadratic Equations by Factorisation</p>
+										<button class="subtopic add-btn">ADD</button>
+									</div>
+									<div class="subtopic-element-container">
+										<p>3.3 | Solving Quadratic Equations with the Quadratic Formula</p>
+										<button class="subtopic add-btn">ADD</button>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div id="topics-display-demo">
+							<h2>DEMO</h2>
+							<p>A few questions from the selected topics will appear here.</p>
+						</div>
+					</div>
+				</div>
+				<div id="shopping-cart-container">
+					<h3>Cart</h3>
+					<div id="shopping-list-summary">
+						<div id="shopping-list-summary-headers">
+							<p class="type-col">Type</p>
+							<p class="title-col">Title</p>
+							<p class="qty-col">Qty</p>
+							<p class="price-col">Price</p>
+						</div>
+						<div class="shopping-list-entry">
+							<p class="type-col">MO</p>
+							<p class="title-col">3.5 | Solving Equations Involving Fractions</p>
+							<p class="qty-col">1</p>
+							<p class="price-col">5.00</p>
+							<div class="action-col">
+								<button class="delete-btn"><img src="/static/trash_icon.svg"></button>
+							</div>
+						</div>
+						<div class="shopping-list-entry">
+							<p class="type-col">ST</p>
+							<p class="title-col">1 | Indices</p>
+							<p class="qty-col">1</p>
+							<p class="price-col">5.00</p>
+							<div class="action-col">
+								<button class="delete-btn"><img src="/static/trash_icon.svg"></button>
+							</div>
+						</div>
+						<div class="shopping-list-entry">
+							<p class="type-col">MO</p>
+							<p class="title-col">3.5 | Solving Equations Involving Fractions</p>
+							<p class="qty-col">1</p>
+							<p class="price-col">5.00</p>
+							<div class="action-col">
+								<button class="delete-btn"><img src="/static/trash_icon.svg"></button>
+							</div>
+						</div>
+					</div>
+					<div id="total-summary">
+						<p class="total-col">Total</p>
+						<p class="qty-col">3</p>
+						<p class="totalprice-col">SGD 15.00</p>
+					</div>
+					<div id="checkout-container">
+						<button id="checkout-btn">
+							CHECKOUT
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

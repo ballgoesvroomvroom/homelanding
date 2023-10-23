@@ -521,7 +521,7 @@ class PolynomialExpression {
 			var containTerms = Math.random() >= (currTermsCount /totalTermsCount) // at i=0, where currTermsCount === 0, a coefficient will definitely be generated; as more terms get generated, the lesser probability
 			if (containTerms || (i === (totalTermsCount -currTermsCount))) {
 				// there is need to start generating more terms else it would fit the termsCount
-				coeffArr[i] = BaseQuestion.randomEInt(...coeffRange)
+				coeffArr[i] = BaseQuestion.randomEInt(...coeffRange, true)
 			}
 		}
 
@@ -664,11 +664,22 @@ class BaseQuestion {
 		return Math.floor(Math.random() * (max - min - 1)) + min
 	}
 
-	static randomEInt(min, max) {
+	static randomEInt(min, max, excludeZero=false) {
 		/*
+		 * excludeZero: boolean, if true will never return 0 unless min === 0
 		 * returns a random number between min (inclusive) and max (exclusive)
    		 */
-		return Math.floor(Math.random() *(max -min)) +min
+		if (excludeZero && min < 0) {
+			// determine cardinality
+			if (Math.random() >= .5) {
+				// negative portion
+				return BaseQuestion.randomEInt(min, 0)
+			} else {
+				return BaseQuestion.randomEInt(1, max)
+			}
+		} else {
+			return Math.floor(Math.random() *(max -min)) +min
+		}
 	}
 }
 
@@ -1848,7 +1859,6 @@ class Polynomial {
 		var deg = this.coefficients.length - 1
 		var repr = ""
 		for (let i = deg; i >= 0; i--) {
-			console.log(this.coefficients, i)
 			if (this.coefficients[i] === 0) {
 				// empty for this term, skip
 				continue
@@ -2630,15 +2640,15 @@ class QuadraticRootsWithFractions extends BaseQuestion {
 		 * denominatorOnlyConstant: boolean, true if the generated fraction's denominator can only be a denominator
 		 * returns [numerator object, denominator object], object: Polynomial|number
 		 */
-		var poly = new PolynomialExpression(minTerm=1, maxTerm=3, maxDegree=numeratorMaxDeg, coeffRange=[-13, 22], absoluteDeg=false)
+		var poly = new PolynomialExpression(1, 3, numeratorMaxDeg, [-13, 22], false)
 
 		if (denominatorOnlyConstant === false && Math.random() >= .5) {
-			// constant as denominator
-			return [poly, BaseQuestion.randomEInt(2, 10)]
-		} else {
 			// another polynomial as denominator
-			var dPoly = new PolynomialExpression(minTerm=1, maxTerm=2, maxDegree=1, coeffRange=[-13, 21], absoluteDeg=true)
+			var dPoly = new PolynomialExpression(1, 2, 1, [-13, 21], true)
 			return [poly, dPoly]
+		} else {
+			// constant as denominator
+			return [poly, BaseQuestion.randomEInt(-10, 10, true)]
 		}
 	}
 
@@ -2673,10 +2683,15 @@ class QuadraticRootsWithFractions extends BaseQuestion {
 			// denominator is either a polynomial or has a constant denominator that is not 1 or -1
 			if (typeof a[1] === "number") {
 				// constant as denominator
-				aRepr = `\\frac{${a[0].buildRepr()}}{${a[1].buildRepr}}`
+				if (a[1] < 0) {
+					// append negative sign at the front
+					aRepr = `-\\frac{${a[0].buildRepr()}}{${Math.abs(a[1])}}`
+				} else {
+					aRepr = `\\frac{${a[0].buildRepr()}}{${a[1]}}`
+				}
 			} else {
 				// polynomial as denominator
-				aRepr = `\\frac{${a[0].buildRepr()}}{${a[1]}}`
+				aRepr = `\\frac{${a[0].buildRepr()}}{${a[1].buildRepr()}}`
 			}
 		}
 		if (typeof b[1] === "number" && Math.abs(b[1]) === 1) {
@@ -2692,10 +2707,15 @@ class QuadraticRootsWithFractions extends BaseQuestion {
 			// denominator is either a polynomial or has a constant denominator that is not 1 or -1
 			if (typeof b[1] === "number") {
 				// constant as denominator
-				bRepr = `\\frac{${b[0].buildRepr()}}{${b[1].buildRepr}}`
+				if (b[1] < 0) {
+					// append negative sign at the front
+					bRepr = `-\\frac{${b[0].buildRepr()}}{${Math.abs(b[1])}}`
+				} else {
+					bRepr = `\\frac{${b[0].buildRepr()}}{${b[1]}}`
+				}
 			} else {
 				// polynomial as denominator
-				bRepr = `\\frac{${b[0].buildRepr()}}{${b[1]}}`
+				bRepr = `\\frac{${b[0].buildRepr()}}{${b[1].buildRepr()}}`
 			}
 		}
 

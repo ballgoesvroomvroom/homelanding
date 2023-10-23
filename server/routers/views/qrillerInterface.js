@@ -148,6 +148,12 @@ router.get("/coverpage", (req, res) => {
 	res.type("html")
 	res.sendFile(views.qriller.worksheetCoverPage)
 })
+
+router.get("/buy", (req, res) => {
+	res.type("html")
+	res.sendFile(views.qriller.purchasePage)
+})
+
 // load a specific document
 router.get("/:documentId", (req, res) => {
 	// hydrate html document with qriller properties (fields)
@@ -329,7 +335,7 @@ router.get("/:documentId/ans", (req, res) => {
 		const data = Utils.getDefaultProperties()
 
 		data.code = "3.5"
-		data.title = "Quadratic Equations (fractional)"
+		data.title = "Quadratic Equations (Fractional)"
 		data.note = "Solve the quadratic equation (polynomial degree 2) that contains fractions."
 
 		const q = new qriller.Qriller(data)
