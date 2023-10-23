@@ -494,6 +494,41 @@ class AlgebraicExpr {
 	}
 }
 
+class PolynomialExpression {
+	constructor(minTerm=1, maxTerm=3, maxDegree=2, coeffRange=[-10, 10], absoluteDeg=false) {
+		/*
+		 * maxTerm: number, the tota number of terms can exist in the generated polynomial; values exceeding computed degree will be clamped (not possible to generate more terms than the degree + constant)
+		 * maxDegree: number, the generated polynomial's max degree (inclusive)
+		 * absouteDeg: boolean, if true, will not generate a random n to be the degree, but instead take the maxDegree
+		 *	false: will generate n from (1-maxDegree) inclusive both ends to be the degree of the generated polynomial
+		 * coeffRange: number[], inclusive start and exclusive end
+		 * returns a polynomial object with randomly generated coefficients
+		 */
+		var deg = maxDegree
+		if (absoluteDeg === false) {
+			deg = BaseQuestion.randomEInt(1, maxDegree +1)
+		}
+
+		var coeffArr = Array(deg +1).fill(0)
+		var totalTermsCount = BaseQuestion.randomEInt(minTerm, maxTerm)
+		var currTermsCount = 0 // to be incremented
+		for (let i = deg; i >= 0; i--) { // generate from the leading coefficient, since polynomial will hold the degree that has been generated (a term is guaranteed to be generated on the first iteration)
+			if (currTermsCount === totalTermsCount) {
+				// no more terms to generate
+				break
+			}
+
+			var containTerms = Math.random() >= (currTermsCount /totalTermsCount) // at i=0, where currTermsCount === 0, a coefficient will definitely be generated; as more terms get generated, the lesser probability
+			if (containTerms || (i === (totalTermsCount -currTermsCount))) {
+				// there is need to start generating more terms else it would fit the termsCount
+				coeffArr[i] = BaseQuestion.randomEInt(...coeffRange)
+			}
+		}
+
+		return new Polynomial(coeffArr)
+	}
+}
+
 class BaseQuestion {
 	/*
 	 * base class to be inherited
@@ -2586,13 +2621,86 @@ class QuadraticRootsBySquare extends BaseQuestion {
 
 class QuadraticRootsWithFractions extends BaseQuestion {
 	// involves fractions whose denominator is a linear term and its denominator is also a linear term
+	static segment_d(numeratorMaxDeg=1, denominatorOnlyConstant=false) {
+		/*
+		 * generates a polynomial for the numerator
+		 * generates either a constant or another polynomial for the denominator, or not at all (return value of 1 in the last case)
+		 * numerator's polynomial's max degree is determined by numeratorMaxDeg
+		 * denominator's polynomial (if any) max degree is 1 always
+		 * denominatorOnlyConstant: boolean, true if the generated fraction's denominator can only be a denominator
+		 * returns [numerator object, denominator object], object: Polynomial|number
+		 */
+		var poly = new PolynomialExpression(minTerm=1, maxTerm=3, maxDegree=numeratorMaxDeg, coeffRange=[-13, 22], absoluteDeg=false)
+
+		if (denominatorOnlyConstant === false && Math.random() >= .5) {
+			// constant as denominator
+			return [poly, BaseQuestion.randomEInt(2, 10)]
+		} else {
+			// another polynomial as denominator
+			var dPoly = new PolynomialExpression(minTerm=1, maxTerm=2, maxDegree=1, coeffRange=[-13, 21], absoluteDeg=true)
+			return [poly, dPoly]
+		}
+	}
+
 	constructor() {
 		super();
 
-		var [qnRepr, ans] = FactorisingPolynomial.segment_r()
+		// params
+		var lhsNumerMaxDeg = BaseQuestion.randomEInt(1, 3) // returns either 1 or 2 (since exclusive end)
+		var rhsDenomConstantOnly = lhsNumerMaxDeg === 2 // entire equation when expanded out cannot exceed degree 2
+
+		// generate both sides of the equation
+		var a = QuadraticRootsWithFractions.segment_d(lhsNumerMaxDeg)
+
+		var rhsNumerMaxDeg = 1 // if a's denominator is a polynomial
+		if (typeof a[1] === "number") {
+			rhsNumerMaxDeg = 2
+		}
+		var b = QuadraticRootsWithFractions.segment_d(rhsNumerMaxDeg, rhsDenomConstantOnly)
+
+		// build the representations
+		var aRepr = "", bRepr = ""
+		if (typeof a[1] === "number" && Math.abs(a[1]) === 1) {
+			// denominator is 1
+			if (a[1] < 0) {
+				// denominator === -1
+				aRepr = `-(${a[0].buildRepr()})`
+			} else {
+				// denominator === 1
+				aRepr = a[0].buildRepr()
+			}
+		} else {
+			// denominator is either a polynomial or has a constant denominator that is not 1 or -1
+			if (typeof a[1] === "number") {
+				// constant as denominator
+				aRepr = `\\frac{${a[0].buildRepr()}}{${a[1].buildRepr}}`
+			} else {
+				// polynomial as denominator
+				aRepr = `\\frac{${a[0].buildRepr()}}{${a[1]}}`
+			}
+		}
+		if (typeof b[1] === "number" && Math.abs(b[1]) === 1) {
+			// denominator is 1
+			if (b[1] < 0) {
+				// denominator === -1
+				bRepr = `-(${b[0].buildRepr()})`
+			} else {
+				// denominator === 1
+				bRepr = b[0].buildRepr()
+			}
+		} else {
+			// denominator is either a polynomial or has a constant denominator that is not 1 or -1
+			if (typeof b[1] === "number") {
+				// constant as denominator
+				bRepr = `\\frac{${b[0].buildRepr()}}{${b[1].buildRepr}}`
+			} else {
+				// polynomial as denominator
+				bRepr = `\\frac{${b[0].buildRepr()}}{${b[1]}}`
+			}
+		}
 
 		this.qnReprString = "%%0%%"
-		this.qnLatexEqn = [qnRepr]
+		this.qnLatexEqn = [`${aRepr}=${bRepr}`]
 	}
 }
 
