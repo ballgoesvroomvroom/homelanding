@@ -1,3 +1,7 @@
+html {
+	background-color: #dad0c6;
+}
+
 .sgd-reference {
 	font-weight: 700;
 	color: #8ab07d;
@@ -212,7 +216,6 @@
 }
 
 #footer-purchase-btn {
-	width: calc(100% - 60px);
 	padding: 10px 20px;
 
 	font-weight: 700;
@@ -221,8 +224,11 @@
 	text-align: center;
 	text-decoration: none;
 
-	color: black;
-	background-color: #e8daa7;
+	color: #dad0c6;
+	background-color: #775639;
+	border-style: solid;
+	border-width: 1px;
+	border-color: #434343;
 }
 
 #footer-purchase-btn:hover {
