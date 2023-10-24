@@ -21,7 +21,7 @@
 
 	margin-top: 60px;
 
-	height: 400px;
+	height: 600px;
 
 	border-style: solid;
 	border-width: 1px;
@@ -458,5 +458,24 @@
 	.totalprice-col {
 		flex-basis: 74px;
 		flex-grow: 0;
+	}
+}
+
+@media (max-width: 720px) {
+	#topics-selection-container {
+		height: 700px;
+	}
+
+	#topics-choice-menu {
+		flex-direction: column;
+	}
+
+	#topics-choice-selection {
+		flex-basis: 350px;
+	}
+
+	#topics-display-demo {
+		border-left-style: none;
+		border-top-style: solid;
 	}
 }

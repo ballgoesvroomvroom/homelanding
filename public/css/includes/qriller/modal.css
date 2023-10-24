@@ -28,6 +28,10 @@
 	border-color: black;
 	border-bottom-width: 2px;
 	background-color: white;
+
+	transition-property: width, height;
+	transition-duration: 150ms;
+	transition-timing-function: linear;
 }
 
 #modal-dialogue-header {
@@ -77,4 +81,11 @@
 	margin-left: 10px;
 
 	background-color: #ff6565;
+}
+
+@media (max-width: 420px) {
+	#modal-dialogue-container {
+		width: 250px;
+		height: 200px;
+	}
 }
