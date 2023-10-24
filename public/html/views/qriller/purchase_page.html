@@ -8,6 +8,7 @@
 		<link rel="stylesheet" href="/css/includes/reset.css">
 		<link rel="stylesheet" href="/css/includes/qriller/default.css">
 		<link rel="stylesheet" href="/css/includes/qriller/topbar.css">
+		<link rel="stylesheet" href="/css/includes/qriller/modal.css">
 		<link rel="stylesheet" href="/css/views/qriller/qriller_purchasepage.css">
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,8 +20,20 @@
 		<title>Qriller | Buy</title>
 	</head>
 	<body>
+		<div id="modal-window">
+			<div id="modal-dialogue-container">
+				<h2 id="modal-dialogue-header">
+				</h2>
+				<p id="modal-dialogue-details">
+				</p>
+				<div id="modal-dialogue-action-container">
+					<button id="modal-dialogue-confirm-btn" title="reset cart">YES</button>
+					<button id="modal-dialogue-cancel-btn" title="keep cart">CANCEL</button>
+				</div>
+			</div>
+		</div>
 		<div id="topbar-container">
-			<h1>Qriller</h1>
+			<a id="topbar-logo" href="/qriller">Qriller</a>
 			<div id="topbar-action-container">
 				<button id="contactus-btn" class="topbar-action-btn">
 					Support
@@ -28,9 +41,9 @@
 				<button id="contactus-btn" class="topbar-action-btn">
 					Contact Us
 				</button>
-				<button id="buy-btn" class="topbar-action-btn">
+				<a id="buy-btn" class="topbar-action-btn" href="/qriller/buy">
 					BUY
-				</button>
+				</a>
 			</div>
 		</div>
 		<div id="topbar-bottom-container">
@@ -59,7 +72,12 @@
 					</div>
 				</div>
 				<div id="shopping-cart-container">
-					<h3>Cart</h3>
+					<div id="shopping-cart-header-container">
+						<h3>Cart</h3>
+						<button id="shopping-cart-reset-btn" title="reset cart">
+							<img src="/static/refresh_icon.svg">
+						</button>
+					</div>
 					<div id="shopping-list-summary">
 						<div id="shopping-list-summary-headers">
 							<p class="type-col">Type</p>

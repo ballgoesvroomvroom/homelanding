@@ -70,8 +70,19 @@ class Session {
 		return [container, fieldInp, decrBtn, incrBtn]
 	}
 
-	constructor() {
+	constructor(data=null) {
+		/*
+		 * data: [topicRoute, qty][], saved data from previous session, if exists preload it into this.cart map
+		 */
 		this.cart = new Map() // contains the mapping between the topic route and the quantity ordered
+
+		if (data != null) {
+			console.log(data)
+			for (let i = data.length -1; i >= 0; i--) {
+				this.cart.set(...data[i])
+				console.log(this.cart)
+			}
+		}
 	}
 
 	registerTopic(topicRoute, buyBtn) {
@@ -81,11 +92,21 @@ class Session {
 		 * handles the adding of cart of topics
 		 * deals with changing the DOM and 'backend' logic (i.e. actually adding to cart and keeping track of the quantity counter)
 		 */
+		var initialiseState = true
 		buyBtn.addEventListener("click", e => {
-			if (this.cart.has(topicRoute)) {
+			if (initialiseState === false && this.cart.has(topicRoute)) {
 				// already added to cart
 				console.log('CONTAINS')
 				return
+			}
+
+			// toggle initial state
+			initialiseState = false
+
+			// cart logic
+			if (this.cart.has(topicRoute) === false) {
+				// first time adding, NOT a pre-loaded data
+				this.cart.set(topicRoute, 1)
 			}
 
 			// create cart visual entry
@@ -94,8 +115,13 @@ class Session {
 
 			// change buy button to a quantity ticker (to be destroyed whenever item is removed out of cart i.e. qty === 0)
 			var [container, fieldInp, decrBtn, incrBtn] = Session.createQuantityCounter()
+			fieldInp.value = this.cart.get(topicRoute) // might have a pre-loaded value instead of default 1
+
 			buyBtn.style.display = "none" // hide the buy button
 			buyBtn.parentElement.appendChild(container)
+
+			// save data
+			this.saveToLocalStorage()
 
 			fieldInp.addEventListener("keydown", e => {
 				if (e.key === "+" || e.key === "-") {
@@ -134,6 +160,9 @@ class Session {
 
 				this.cart.set(topicRoute, c)
 				this.updateItemCartVisual(topicRoute, containerInCart) // update cart count
+
+				// save data
+				this.saveToLocalStorage()
 			})
 			incrBtn.addEventListener("click", e => {
 				var c = this.cart.get(topicRoute)
@@ -141,6 +170,9 @@ class Session {
 				fieldInp.value = c +1
 
 				this.updateItemCartVisual(topicRoute, containerInCart) // update cart count
+
+				// save data
+				this.saveToLocalStorage()
 			})
 			decrBtn.addEventListener("click", e => {
 				var c = this.cart.get(topicRoute)
@@ -168,6 +200,9 @@ class Session {
 				this.cart.set(topicRoute, c -1)
 				fieldInp.value = c -1 // update input
 				this.updateItemCartVisual(topicRoute, containerInCart) // update cart count
+
+				// save data
+				this.saveToLocalStorage()
 			})
 			deleteBtn.addEventListener("click", e => {
 				// delete operation
@@ -186,8 +221,16 @@ class Session {
 
 				// update total cart summary
 				this.updateCartTotalVisuals()
+
+				// save data
+				this.saveToLocalStorage()
 			})
 		})
+
+		if (this.cart.has(topicRoute)) {
+			// already exists, simulate click
+			buyBtn.click();
+		}
 	}
 
 	addToCart(topicRoute) {
@@ -196,7 +239,6 @@ class Session {
 		 * will update visuals in the cart checkout page
 		 * returns the container element (dom element, containing the columns and buttons)
 		 */
-		this.cart.set(topicRoute, 1)
 
 		// update cart view in DOM
 		var path = topicRoute.split(".")
@@ -209,7 +251,7 @@ class Session {
 			// mono, length 2
 			title += DATA[parseInt(path[0]) -1][3][parseInt(path[1])][1]
 		}
-		var qty = 1
+		var qty = this.cart.get(topicRoute)
 		var price = "5.00"
 
 		return this.addItemToCartVisuals(type, title, qty, price)
@@ -296,12 +338,140 @@ class Session {
 
 		return container
 	}
+
+	emptyCart() {
+		/*
+		 * called when cart is to be resetted
+		 */
+		this.cart.clear()
+
+		this.updateCartTotalVisuals(); // update total summary
+
+		this.saveToLocalStorage() // save to localStorage
+
+		// un-hide back all the add buttons
+		var addBtns = document.getElementsByClassName("add-btn")
+		var addBtnsLen = addBtns.length
+		for (let i = 0; i < addBtnsLen; i++) {
+			addBtns.item(i).style.removeProperty("display")
+		}
+
+		// remove all the qty input counters
+		var qtyInpCounters = document.getElementsByClassName("add-qty-inp-container")
+		var qtyInpCountersLen = qtyInpCounters.length
+		for (let i = 0; i < qtyInpCountersLen; i++) {
+			qtyInpCounters.item(0).remove()
+		}
+
+		// remove cart visuals
+		var shoppingListEntries = document.getElementsByClassName("shopping-list-entry")
+		var shoppingListEntriesLen = shoppingListEntries.length
+		for (let i = 0; i < shoppingListEntriesLen; i++) {
+			shoppingListEntries.item(0).remove()
+		}
+	}
+
+	saveToLocalStorage() {
+		/*
+		 * saves this.cart into localstorage as a JSON array (so insert position still holds)
+		 */
+		var arr = []
+		for (let [topic, qty] of this.cart) {
+			arr.push([topic, qty])
+		}
+
+		localStorage.setItem("cartData", JSON.stringify(arr))
+	}
+}
+
+class Modal {
+	constructor() {
+		this.window = document.getElementById("modal-window")
+		this.header = document.getElementById("modal-dialogue-header")
+		this.details = document.getElementById("modal-dialogue-details")
+
+		this.currentlyActive = false // state
+
+		this.currentPendingConfirmationCallbackFunction = null // callback function to be binded
+		document.getElementById("modal-dialogue-confirm-btn").addEventListener("click", e => {
+			if (this.currentPendingConfirmationCallbackFunction) {
+				this.currentPendingConfirmationCallbackFunction(true)
+				this.currentPendingConfirmationCallbackFunction = null // remove reference
+			}
+		})
+		document.getElementById("modal-dialogue-cancel-btn").addEventListener("click", e => {
+			if (this.currentPendingConfirmationCallbackFunction) {
+				this.currentPendingConfirmationCallbackFunction(false)
+				this.currentPendingConfirmationCallbackFunction = null // remove reference
+			}
+		})
+	}
+
+	toggle() {
+		this.currentlyActive = !this.currentlyActive
+		this.window.classList.toggle("active")
+	}
+
+	resetPromptContents() {
+		/*
+		 * clear contents of header and details
+		 */
+		this.header.innerHTML = ""
+		this.details.innerHTML = ""
+	}
+
+	showConfirmationPrompt(title, details) {
+		/*
+		 * title: string
+		 * details: string
+		 * returns a promise where chained value will be true on confirmation, false otherwise
+		 */
+
+		this.header.innerHTML = title
+		this.details.innerHTML = details
+
+		return new Promise(res => {
+			this.currentPendingConfirmationCallbackFunction = res; // to be called
+		})
+	}
 }
 
 document.addEventListener("DOMContentLoaded", e => {
 	const topicChoiceSelectionContainer = document.getElementById("topics-choice-selection")
 
-	const session = new Session();
+	var preloadData = localStorage.getItem("cartData")
+	if (preloadData != null) {
+		preloadData = JSON.parse(preloadData)
+	}
+	const session = new Session(preloadData);
+
+	const modal = new Modal()
+
+	function resetCart() {
+		/*
+		 * triggered when shopping-cart-refresh-btn click event is triggered
+		 * handles the confirmation prompt
+		 */
+		console.log("HELLO")
+		if (modal.currentlyActive) {
+			// attempt to open another modal
+			return
+		}
+
+		modal.toggle() // show modal
+		modal.showConfirmationPrompt("Confirm?", "You are about to reset your cart.").then(r => {
+			if (r === true) {
+				// empty cart
+				session.emptyCart()
+			} else {
+				// no confirmation
+				// empty modal prompt contents
+				modal.resetPromptContents()
+			}
+
+			modal.toggle()
+		})
+	}
 
 	function loadSelections() {
 		/*
@@ -444,5 +614,11 @@ document.addEventListener("DOMContentLoaded", e => {
 		} else {
 			applyFilterToSelection(searchBarInp.value, containerMappings)
 		}
+	})
+
+	// reset cart button
+	document.getElementById("shopping-cart-reset-btn").addEventListener("click", e => {
+		console.log("FIRST")
+		resetCart()
 	})
 })

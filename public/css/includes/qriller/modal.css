@@ -1,0 +1,80 @@
+#modal-window {
+	position: fixed;
+	top: 0;
+	left: 0;
+
+	display: none;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+
+	width: 100svw;
+	height: 100svh;
+
+	z-index: 3;
+	background-color: rgba(180, 180, 180, .4);
+}
+
+#modal-window.active {
+	display: flex;
+}
+
+#modal-dialogue-container {
+	width: 420px;
+	height: 300px;
+
+	border-style: solid;
+	border-width: 1px;
+	border-color: black;
+	border-bottom-width: 2px;
+	background-color: white;
+}
+
+#modal-dialogue-header {
+	padding: 10px;
+
+	border-bottom-style: solid;
+	border-width: 1px;
+	border-color: black;
+}
+
+#modal-dialogue-details {
+	width: calc(100% - 20px);
+
+	padding: 10px;
+	margin-top: 15%;
+
+	text-align: center;
+}
+
+#modal-dialogue-action-container {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+}
+
+#modal-dialogue-action-container > button {
+	flex-basis: 100px;
+
+	padding: 10px 20px;
+
+	font-weight: 700;
+
+	border-style: solid;
+	border-width: 1px;
+	border-color: black;
+	border-bottom-width: 2px;
+	border-right-width: 2px;
+}
+
+#modal-dialogue-confirm-btn {
+	margin-right: 10px;
+
+	background-color: #b3d7b3;
+}
+
+#modal-dialogue-cancel-btn {
+	margin-left: 10px;
+
+	background-color: #ff6565;
+}

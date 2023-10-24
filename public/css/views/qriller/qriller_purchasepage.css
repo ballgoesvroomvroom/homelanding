@@ -285,6 +285,38 @@
 	border-bottom-width: 2px;
 }
 
+#shopping-cart-header-container {
+	display: flex;
+	flex-direction: row;
+}
+
+#shopping-cart-reset-btn {
+	position: relative;
+
+	width: 26px;
+	height: 26px;
+
+	margin-left: auto;
+
+	border-radius: .4rem;
+	border-style: solid;
+	border-width: 1px;
+	border-color: grey;
+	background-color: black;
+
+	transform-origin: center;
+	transform: scale(.9);
+
+	transition-property: transform;
+	transition-duration: 50ms;
+	transition-timing-function: linear;
+}
+
+#shopping-cart-reset-btn:hover,
+#shopping-cart-reset-btn:focus {
+	transform: scale(1);
+}
+
 #shopping-list-summary {
 	min-height: 250px;
 	margin-top: 20px;
