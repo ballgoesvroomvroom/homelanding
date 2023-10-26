@@ -5,10 +5,30 @@
  */
 
 // GOOGLE PAY'S API PAYLOAD
+let paymentsClient = null // initialised payments client instance from google api js, or null if not set yet
 const baseRequest = {
 	apiVersion: 2,
 	apiVersionMinor: 0
 };
+
+// const tokenizationSpecification = {
+// 	type: "PAYMENT_GATEWAY",
+// 	parameters: {
+// 		"gateway": "stripe",
+// 		"stripe:version": "2018-10-31",
+// 		"stripe:publishableKey": "YOUR_PUBLIC_STRIPE_KEY"
+// 	}
+// }
+const tokenizationSpecification = {
+	type: 'PAYMENT_GATEWAY',
+	parameters: {
+		'gateway': 'example',
+		'gatewayMerchantId': 'exampleGatewayMerchantId'
+	}
+};
+
+const allowedCardNetworks = ["AMEX", "JCB", "MASTERCARD", "VISA"];
+const allowedCardAuthMethods = ["PAN_ONLY", "CRYPTOGRAM_3DS"]; // https://stripe.com/docs/payments/cards/supported-card-brands#online-card-brand-capabilities
 
 const baseCardPaymentMethod = { // required fields
 	type: 'CARD',
@@ -55,27 +75,51 @@ let outstandingInvoice = fetch(`/api/qriller/shop/getTotal`, {
 	isAbleToProcessPayment = false // block any potential events from occurring
 })
 
+function getGPaymentsClient() {
+	/**
+	 * generates a new payments client instance from google pay js if not yet instantiated
+	 * returns a payments client instance
+	 */
+	if (paymentsClient == null) {
+		paymentsClient = new google.payments.api.PaymentsClient({environment: "TEST"});
+	}
+
+	return paymentsClient
+}
+
 function completeGPay() {
 	/**
 	 * to send payment payload to google's api upon click event on google pay button
 	 * triggered by 'click' event of mounted google pay button
 	 */
+	console.log("PAYING")
 	if (clickedGPayBtn) {
 		return
 	}
 
 	clickedGPayBtn = true
 	const paymentDataRequest = Object.assign({}, baseRequest);
-	paymentDataRequest.allowedPaymentMethods = [baseCardPaymentMethod]
+	paymentDataRequest.allowedPaymentMethods = [cardPaymentMethod]
 	paymentDataRequest.merchantInfo = {
-		merchantName: 'Example Merchant'
+		merchantName: 'Example Merchant',
 		merchantId: '12345678901234567890'
 	};
 	outstandingInvoice.then(data => {
+		console.log("PASSED")
 		paymentDataRequest.transactionInfo = {
 			totalPrice: data.totalPrice,
-			currencyCode: "SGD"
+			currencyCode: "SGD",
+			totalPriceStatus: "FINAL",
+			totalPriceLabel: "Total"
 		}
+
+		// call loadPaymentData method of payments client
+		return getGPaymentsClient().loadPaymentData(paymentDataRequest)
+	}).then(paymentData => {
+		var paymentToken = paymentData.paymentMethodData.tokenizationData.token
+		console.log("SUCCESS")
+	}).catch(err => {
+		console.error(err)
 	})
 }
 
@@ -87,40 +131,19 @@ function createGPayBtn() {
 
 	// initiate a PaymentsClient object
 	// https://developers.google.com/pay/api/web/reference/client#PaymentsClient
-	const paymentsClient = new google.payments.api.PaymentsClient({environment: 'TEST'});
+	console.log("LOADING TEST ENV")
 
-	// const tokenizationSpecification = {
-	// 	type: "PAYMENT_GATEWAY",
-	// 	parameters: {
-	// 		"gateway": "stripe",
-	// 		"stripe:version": "2018-10-31",
-	// 		"stripe:publishableKey": "YOUR_PUBLIC_STRIPE_KEY"
-	// 	}
-	// }
-
-	const tokenizationSpecification = {
-		type: 'PAYMENT_GATEWAY',
-		parameters: {
-			'gateway': 'example',
-			'gatewayMerchantId': 'exampleGatewayMerchantId'
-		}
-	};
-
-	const allowedCardNetworks = ["AMEX", "JCB", "MASTERCARD", "VISA"];
-	const allowedCardAuthMethods = ["PAN_ONLY", "CRYPTOGRAM_3DS"]; // https://stripe.com/docs/payments/cards/supported-card-brands#online-card-brand-capabilities
-
-	const isReadyToPayRequest = Object.assign({}, baseRequest);
-	isReadyToPayRequest.allowedPaymentMethods = [baseCardPaymentMethod];
-	paymentsClient.isReadyToPay(isReadyToPayRequest).then(function(response) {
+	const isReadyToPayRequest = Object.assign({allowedPaymentMethods: [baseCardPaymentMethod]}, baseRequest);
+	getGPaymentsClient().isReadyToPay(isReadyToPayRequest).then(function(response) {
 		if (response.result) {
 			// add a Google Pay payment button
-			const button = paymentsClient.createButton({
+			const button = getGPaymentsClient().createButton({
 				onClick: () => completeGPay,
 				allowedPaymentMethods: [baseCardPaymentMethod]
 			}); // same payment methods as for the loadPaymentData() API call
 
 			// append button
-			document.getElementById('container').appendChild(button);
+			document.getElementById("container").appendChild(button);
 		}
 	}).catch(function(err) {
 		// show error in developer console for debugging

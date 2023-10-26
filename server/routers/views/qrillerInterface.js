@@ -154,6 +154,11 @@ router.get("/buy", (req, res) => {
 	res.sendFile(views.qriller.purchasePage)
 })
 
+router.get("/checkout", (req, res) => {
+	res.type("html")
+	res.sendFile(views.qriller.checkoutPage)
+})
+
 // load a specific document
 router.get("/:documentId", (req, res) => {
 	// hydrate html document with qriller properties (fields)

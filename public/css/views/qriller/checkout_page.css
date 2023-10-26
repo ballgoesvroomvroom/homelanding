@@ -1,0 +1,5 @@
+#container {
+	margin-top: var(--page-start-offset);
+
+	padding: 10px var(--horizontal-padding);
+}

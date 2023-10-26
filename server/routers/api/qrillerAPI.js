@@ -59,6 +59,20 @@ router.get("/db/:documentId/ans", (req, res) => {
 	return res.status(404).end() // 404 status to minimise information that is going out
 })
 
+
+// SHOP
+router.get("/shop/getTotal", (req, res) => {
+	/**
+	 * returns a JSON object with the following keys:
+	 *	totalPrice: string
+	 *	itemNames: [[topicName: string, qtyOrdered: number], ...]
+	 */
+	return res.status(200).json({
+		totalPrice: "15.00",
+		itemNames: [["1 | Indices", 3]]
+	})
+})
+
 module.exports = { // export router object and authenticated middleware
 	baseURL, router
 }
