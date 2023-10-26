@@ -84,11 +84,7 @@ function processPayment(token) {
 	 * promise rejects with the error object with keys, 'reason', 'message', 'intent'
 	 */
 	return new Promise((res, rej) => {
-		rej({
-			reason: "OTHER_ERROR",
-			message: "HELLO",
-			intent: "PAYMENT_AUTHORIZATION"
-		})
+		res()
 	})
 }
 
