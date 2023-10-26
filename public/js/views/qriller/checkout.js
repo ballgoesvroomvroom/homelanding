@@ -40,8 +40,7 @@ const baseCardPaymentMethod = { // required fields
 
 const cardPaymentMethod = Object.assign( // with optional fields
 	{
-		tokenizationSpecification: tokenizationSpecification,
-		allowPrepaidCards: true
+		tokenizationSpecification: tokenizationSpecification
 	},
 	baseCardPaymentMethod
 );
@@ -68,6 +67,7 @@ let outstandingInvoice = fetch(`/api/qriller/shop/getTotal`, {
  	 *	itemNames: [["1.0 | Topic 1", 3], ["1.2 | Topic 1.2", 2]]
 	 * }
 	 */
+	console.log("FETCHED DATA", data)
 	return data
 }).catch(httpErrStatusCode => {
 	// refrain this page from doing anything in the first place
@@ -75,16 +75,71 @@ let outstandingInvoice = fetch(`/api/qriller/shop/getTotal`, {
 	isAbleToProcessPayment = false // block any potential events from occurring
 })
 
+function processPayment(token) {
+	/**
+	 * token: string, supplied by google's api to be supplied into Stripe's API
+	 * master function that ultimately gets called whenever payment has been made from all payment options supported
+	 * connects with server to process the payment
+	 * returns a promise that eithers resolves upon confirmation from server (i.e. user got his goods), or rejects when user fails to get his goods (unable to grant, etc)
+	 * promise rejects with the error object with keys, 'reason', 'message', 'intent'
+	 */
+	return new Promise((res, rej) => {
+		rej({
+			reason: "OTHER_ERROR",
+			message: "HELLO",
+			intent: "PAYMENT_AUTHORIZATION"
+		})
+	})
+}
+
+function completePayment() {
+	/**
+	 * called when entire transaction is finished and items have been granted
+	 */
+	return true
+}
+
 function getGPaymentsClient() {
 	/**
 	 * generates a new payments client instance from google pay js if not yet instantiated
 	 * returns a payments client instance
 	 */
 	if (paymentsClient == null) {
-		paymentsClient = new google.payments.api.PaymentsClient({environment: "TEST"});
+		paymentsClient = new google.payments.api.PaymentsClient({
+			environment: "TEST",
+			paymentDataCallbacks: {
+				onPaymentAuthorized: paymentAuthorisedGPay
+			}
+		});
 	}
 
 	return paymentsClient
+}
+
+function paymentAuthorisedGPay(paymentData) {
+	/**
+	 * handles authorise payments callbacks (response)
+	 * resolves with object with a differentiating field, 'transactionState', with values of either "SUCCESS" and "ERROR" for both success and failures respectively
+	 */
+	return new Promise((res, rej) => {
+		console.log("CALLBACK FINAL SUCCESS", paymentData)
+		processPayment(paymentData.paymentMethodData.tokenizationData.token).then(() => {
+			res({"transactionState": "SUCCESS"})
+		}).catch(errObj => {
+			/**
+			 * errObj: {
+		 	 *	reason: "OFFER_INVALID"|"PAYMENT_DATA_INVALID"|"SHIPPING_ADDRESS_INVALID"|"SHIPPING_ADDRESS_UNSERVICEABLE"|"SHIPPING_OPTION_INVALID"|"OTHER_ERROR"
+		 	 *	message: string, (e.g. "This shipping option is invalid for the given address")
+		 	 *	intent: "OFFER"|"PAYMENT_AUTHORIZATION"|"SHIPPING_ADDRESS"|"SHIPPING_OPTION", (must be present in paymentDataRequest.callbackIntents)
+			 * }
+			 */
+			console.log("CATCHING")
+			res({
+				transactionState: "ERROR",
+				error: errObj
+			})
+		})
+	})
 }
 
 function completeGPay() {
@@ -98,12 +153,15 @@ function completeGPay() {
 	}
 
 	clickedGPayBtn = true
+
 	const paymentDataRequest = Object.assign({}, baseRequest);
 	paymentDataRequest.allowedPaymentMethods = [cardPaymentMethod]
 	paymentDataRequest.merchantInfo = {
 		merchantName: 'Example Merchant',
 		merchantId: '12345678901234567890'
 	};
+	paymentDataRequest.callbackIntents = ["PAYMENT_AUTHORIZATION"]
+
 	outstandingInvoice.then(data => {
 		console.log("PASSED")
 		paymentDataRequest.transactionInfo = {
@@ -116,9 +174,15 @@ function completeGPay() {
 		// call loadPaymentData method of payments client
 		return getGPaymentsClient().loadPaymentData(paymentDataRequest)
 	}).then(paymentData => {
-		var paymentToken = paymentData.paymentMethodData.tokenizationData.token
-		console.log("SUCCESS")
+		var paymentToken = paymentData.paymentMethodData.tokenizationData.token // token already dealt with in paymentAuthorisedGPay
+
+		completePayment();
+		console.log("SUCCESS", paymentData, paymentToken)
 	}).catch(err => {
+		// payment prompt did not go through (user most likely exitted)
+		clickedGPayBtn = false // reset debounce
+
+		console.log("FAILED NOT CAUGHT")
 		console.error(err)
 	})
 }
@@ -138,7 +202,7 @@ function createGPayBtn() {
 		if (response.result) {
 			// add a Google Pay payment button
 			const button = getGPaymentsClient().createButton({
-				onClick: () => completeGPay,
+				onClick: completeGPay,
 				allowedPaymentMethods: [baseCardPaymentMethod]
 			}); // same payment methods as for the loadPaymentData() API call
 
