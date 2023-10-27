@@ -111,6 +111,11 @@ router.get("/perms", (req, res) => {
 })
 
 router.post("/login", (req, res) => {
+	/**
+	 * authenticate user with the basic authorisation scheme
+	 * accepts 'application/json' or 'application/octet-stream' as the request's content type
+	 * on successful authentication (comparison of credentials), will send a response with content type 'application/json' with body containing a string-encoded JSON object with field 'usernmae' set to the username
+	 */
 	// authenticate based on username and password (plain/text)
 	let authSuccess = false;
 
@@ -140,9 +145,9 @@ router.post("/login", (req, res) => {
 			}
 			let [username, password] = creds;
 
-			if (username.length < 5 || username.length > 25) {
+			if (username.length < 3 || username.length > 23) {
 				throw new Error(errmsg.invalid);
-			} else if (password.length != 6) {
+			} else if (password.length < 3 || password.length > 25) {
 				throw new Error(errmsg.invalid);
 			}
 
@@ -171,7 +176,7 @@ router.post("/login", (req, res) => {
 	}
 
 	if (authSuccess) {
-		req.session.isAuthenticated = true;
+		req.session.isAuthenticated = true; // set state
 		res.json({"username": req.session.username, "uid": req.session.uid})
 	} else {
 		// return 401

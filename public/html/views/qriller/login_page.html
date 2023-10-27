@@ -15,10 +15,9 @@
 		<link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap" rel="stylesheet">
 
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-		<script src="/js/views/qriller/checkout.js"></script>
-		<script async src="https://pay.google.com/gp/p/js/pay.js" onload="createGPayBtn()"></script>
+		<script src="/js/views/qriller/login.js"></script>
 
-		<title>Qriller | Checkout</title>
+		<title>Qriller | Login</title>
 	</head>
 	<body>
 		<div id="modal-window">
@@ -56,7 +55,14 @@
 			</div>
 		</div>
 		<div id="container">
-			<h1>Checkout</h1>
+			<form id="login">
+				<label for="username">Username</label>
+				<input id="username-inp" name="username" type="text">
+				<label for="password">Password</label>
+				<input id="password-inp" name="password" type="password">
+
+				<button id="formSubmitBtn" type="submit">SUBMIT</button>
+			</form>
 		</div>
 	</body>
 </html>

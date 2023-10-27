@@ -59,7 +59,6 @@ router.get("/db/:documentId/ans", (req, res) => {
 	return res.status(404).end() // 404 status to minimise information that is going out
 })
 
-
 // SHOP
 router.get("/shop/getTotal", (req, res) => {
 	/**

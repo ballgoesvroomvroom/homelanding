@@ -127,6 +127,15 @@ router.get("/", (req, res) => {
 	res.sendFile(views.qriller.homePage)
 })
 
+// login page
+router.get("/login", (req, res) => {
+	/**
+	 * returns the login page with status 200
+	 */
+	res.type("html")
+	res.sendFile(views.qriller.loginPage)
+})
+
 router.get("/series", (req, res) => {
 	// series page
 	res.type("html")
