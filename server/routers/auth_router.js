@@ -7,7 +7,7 @@ const sessions = require("../includes/sessions.js");
 const errmsg = require("../includes/err_msgs.js")
 
 const databaseInterface = require("../database/interface.js");
-const auth_keysDB = databaseInterface.auth_keys
+const qrillerDB = databaseInterface.qriller_users
 // const databaseinst = require("../../base/database.js");
 
 // const userDB = databaseinst.user;
@@ -151,21 +151,19 @@ router.post("/login", (req, res) => {
 				throw new Error(errmsg.invalid);
 			}
 
-			var hashed_password = auth_keysDB.mask.hash(password +auth_keysDB.properties.salt)
-			if (hashed_password in auth_keysDB.data) {
-				var userData = auth_keysDB.data[hashed_password];
-				req.session.username = userData.username;
+			var userdata = qrillerDB.data[username]
+			if (userdata == null) {
+				// no user found
+				throw new Error(errmsg.missing)
+			}
+
+			var hashed_password = qrillerDB.mask.hash(password)
+			if (hashed_password === userdata.password) {
+				req.session.username = userdata.username;
 				console.log("[DEBUG]: user logged in as", req.session.username)
-				req.session.uid = userData.uid
-				req.session.isAdmin = true // set privileges last (AFTER setting profiling details)
+				req.session.uid = userdata.username
 
 				authSuccess = true;
-
-				// set perms
-				req.session.perms = {
-					"upload": userData.perms.upload,
-					"delete": userData.perms.delete
-				};
 			}
 		} else {
 			throw new Error(errmsg.missing);

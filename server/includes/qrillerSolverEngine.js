@@ -2651,10 +2651,10 @@ class AlgebraicExpr {
 // var poly = new Polynomial([-1, 0, 1])
 // console.log("FACTORISATION", poly.simpleFactorisation())
 
-var poly = new Polynomial([1, 5])
-var spoly = new Polynomial([-4, 3])
-var npoly = poly.dQuotientRule(spoly)
-console.log("FINAL OUTPUT:", npoly)
+// var poly = new Polynomial([1, 5])
+// var spoly = new Polynomial([-4, 3])
+// var npoly = poly.dQuotientRule(spoly)
+// console.log("FINAL OUTPUT:", npoly)
 
 module.exports = {
 	Polynomial,

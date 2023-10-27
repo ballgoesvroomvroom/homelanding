@@ -6,6 +6,12 @@ const fs = require("fs");
 const path = require("path");
 const dotenv = require("dotenv").config({path: path.join(__dirname, "./.env")});
 
+const https = require("https");
+const optionSSL = {
+	key: fs.readFileSync("C:\\Users\\Chong\\certificates\\server.key"),
+	cert: fs.readFileSync("C:\\Users\\Chong\\certificates\\server.crt")
+};
+
 // set root path
 global.root = path.resolve(path.join(__dirname, "../"));
 console.log(global.root);
@@ -21,9 +27,9 @@ const databaseInterface = require("./database/interface.js");
 const images_db = databaseInterface.images_db
 // database.autosave = -1; // disable autosave
 
-const PORT = 5004;
+const PORT = 443;
 const app = express();
-const httpServer = http.createServer(app);
+const httpsServer = https.createServer(optionSSL, app);
 
 app.use(express.static("public"));
 app.use(cors());
@@ -71,6 +77,6 @@ function exitHandler() {
 process.on("SIGHUP", exitHandler);
 process.on("SIGINT", exitHandler);
 
-httpServer.listen(PORT, () => {
+httpsServer.listen(PORT, () => {
 	console.log("listening at", PORT);
 })

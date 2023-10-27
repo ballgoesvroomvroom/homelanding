@@ -30,37 +30,6 @@ router.get(`/${encodeURIComponent("<3")}`, (req, res) => {
 	}
 })
 
-// SECRET CREATE PATHS
-router.get("/secret-upload-path", (req, res) => {
-	if (req.session.username === "admin") {
-		let keys = serverDB.getBaseField("keys");
-		while (true) {
-			// generate a random hex string of 30 characters; 1 byte - 2 hex characters
-			var r = crypto.randomBytes(15).toString("hex");
-			if (keys[r] == null) {
-				// generated string doesn't exist in keys table
-				keys[r] = [false, ""]; // add it into the server database
-				return res.json({"key": r});
-			} else {
-				// duplicate; do nothing; regenerate key
-			}
-		}
-	} else {
-		return res.status(403).end();
-	}
-})
-
-// SECRET GET PATH
-router.get("/secret-get-path", (req, res) => {
-	if (req.session.username === "admin") {
-		let keys = serverDB.getBaseField("keys");
-		res.type("json");
-		res.json(keys);
-	} else {
-		res.status(403).end();
-	}
-})
-
 router.use(articleViewRouter.baseURL, articleViewRouter.router)
 router.use(hotelViewRouter.baseURL, hotelViewRouter.router)
 router.use(qrillerInterfaceViewRouter.baseURL, qrillerInterfaceViewRouter.router)

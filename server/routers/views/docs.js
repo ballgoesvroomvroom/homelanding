@@ -21,8 +21,6 @@ class Template {
 	static loopMatch = /{{%LOOP (?<loopid>[A-Z]*)\s*?(?<element>.*?)\s*?%ENDLOOP}}/m
 }
 
-console.log(Skeleton.article)
-
 // home page
 router.get("/", (req, res) => {
 	res.type("html")
