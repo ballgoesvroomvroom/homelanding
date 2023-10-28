@@ -11,6 +11,8 @@ const mem = require("../../includes/qrillerMemory.js");
 const router = express.Router()
 const presetRouter = express.Router()
 
+const auth_router = require(path.join(__dirname, "../auth_router.js"));
+
 // cache skeleton pages
 class Skeleton {
 	static document = () => fs.readFileSync(views.qriller.document, {encoding: "utf8", flag: "r"})
@@ -163,7 +165,7 @@ router.get("/buy", (req, res) => {
 	res.sendFile(views.qriller.purchasePage)
 })
 
-router.get("/checkout", (req, res) => {
+router.get("/checkout", auth_router.authenticated, (req, res) => {
 	res.type("html")
 	res.sendFile(views.qriller.checkoutPage)
 })

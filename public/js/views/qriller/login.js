@@ -47,6 +47,10 @@ document.addEventListener("DOMContentLoaded", () => {
 		}).then(userDetails => {
 			// store username in localStorage
 			localStorage.setItem("username", userDetails.username)
+
+			// redirect to route determined by server
+			console.log("REPLACING", `${window.location.origin}${userDetails.returnTo}`)
+			window.location.replace(`${window.location.origin}${userDetails.returnTo}`)
 		}).catch(errcode => {
 			console.warn("[WARN] auth login request to /auth/login failed with HTTP status code", errcode)
 		})

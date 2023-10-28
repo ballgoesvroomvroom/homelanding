@@ -65,11 +65,11 @@ class Client {
 	constructor() {
 		this.id = randomBytes(16)
 		this.isAuthenticated = false;
-		this.isAdmin = false;
-		this.perms = {
-			"upload": false,
-			"delete": false
-		}
+		this._returnTo = null // contains the path (req.originalUrl) after successful login, to be set back to null once used up
+
+		// storage containers
+		this.cartItems = [] // contains the cart information whose elements are arrays with length 2 (see /server/routers/api/qrillerAPI.js)
+		this.cartItemsRepresentative = [] // similar to .cartItems but instead of the uniquecode, it is represented by the topic's title in the format, '1.0 | Indices Part I'
 
 		// metadaata
 		this._createdAt = (new Date()).getTime();

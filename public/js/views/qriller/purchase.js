@@ -107,7 +107,7 @@ class Session {
 			if (this.cart.has(topicRoute) === false) {
 				// first time adding, NOT a pre-loaded data
 				this.cart.set(topicRoute, 1)
-			}
+			} // otherwise, use currently default since click event triggered for buy btn when previously added to cart (on refresh)
 
 			// create cart visual entry
 			var containerInCart = this.addToCart(topicRoute)
@@ -252,7 +252,7 @@ class Session {
 			title += DATA[parseInt(path[0]) -1][3][parseInt(path[1])][1]
 		}
 		var qty = this.cart.get(topicRoute)
-		var price = "5.00"
+		var price = 5 *qty
 
 		return this.addItemToCartVisuals(type, title, qty, price)
 	}
@@ -381,6 +381,45 @@ class Session {
 		}
 
 		localStorage.setItem("cartData", JSON.stringify(arr))
+	}
+
+	saveToServer() {
+		/**
+		 * formats the cart data and then sends it to the server
+		 * calls fetch with the backend route and returns the fetch response
+		 */
+
+		// server accepts the unique code followed by the index in the format,
+		// UNIQUECODE-INDEX
+		// e.g. topicRoute = "1.0", serverCode = "TC001-0"
+		// e.g. topicRoute = "1", serverCode = "TC001"
+		if (this.cart.size === 0) {
+			// nothing
+			return new Promise((res, rej) => {
+				rej("Empty cart.")
+			})
+		}
+
+		var arr = []
+		for (let [topic, qty] of this.cart) {
+			var split = topic.split(".")
+			var topicData = DATA[parseInt(split[0]) -1]
+
+			var uniqueCode = `${topicData[2]}`
+			if (split.length === 2) {
+				// a mono series
+				uniqueCode += `-${split[1]}`
+			}
+			arr.push([uniqueCode, qty])
+		}
+
+		return fetch(`/api/qriller/cart/overwrite`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify({'suppliedArr': arr})
+		})
 	}
 }
 
@@ -620,5 +659,31 @@ document.addEventListener("DOMContentLoaded", e => {
 	document.getElementById("shopping-cart-reset-btn").addEventListener("click", e => {
 		console.log("FIRST")
 		resetCart()
+	})
+
+	// checkout button
+	var messageBoxAboveCheckoutBtn = document.getElementById("checkout-msg")
+	document.getElementById("checkout-btn").addEventListener("click", e => {
+		if (session.cart.size === 0) {
+			// empty cart
+			messageBoxAboveCheckoutBtn.innerHTML = "Your cart is empty."
+			return
+		}
+
+		session.saveToServer().then(r => {
+			console.log("STATUS", r.status)
+			if (r.status === 200) {
+				// succcess
+				return
+			} else {
+				return Promise.reject(`Failed to upload to cart with HTTP status ${r.status}`)
+			}
+		}).then(() => {
+			// redirect user to /checkout page
+			window.location.href = "/qriller/checkout"
+		}).catch(errMsg => {
+			// display error message
+			messageBoxAboveCheckoutBtn.innerHTML = `Error checking out cart with errror message:<br>${errMsg}<br><br>If the error persists, please reach out to us for near-immediate assistance at help@qriller.com`
+		})
 	})
 })

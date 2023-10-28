@@ -4,13 +4,13 @@ const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
 const path = require("path");
-const dotenv = require("dotenv").config({path: path.join(__dirname, "./.env")});
+const dotenv = require("dotenv").config({ path: path.join(__dirname, "./.env") });
 
-const https = require("https");
-const optionSSL = {
-	key: fs.readFileSync("C:\\Users\\Chong\\certificates\\server.key"),
-	cert: fs.readFileSync("C:\\Users\\Chong\\certificates\\server.crt")
-};
+// const https = require("https");
+// const optionSSL = {
+// 	key: fs.readFileSync("C:\\Users\\Chong\\certificates\\server.key"),
+// 	cert: fs.readFileSync("C:\\Users\\Chong\\certificates\\server.crt")
+// };
 
 // set root path
 global.root = path.resolve(path.join(__dirname, "../"));
@@ -29,7 +29,7 @@ const images_db = databaseInterface.images_db
 
 const PORT = 443;
 const app = express();
-const httpsServer = https.createServer(optionSSL, app);
+const httpServer = http.createServer(app);
 
 app.use(express.static("public"));
 app.use(cors());
@@ -77,6 +77,6 @@ function exitHandler() {
 process.on("SIGHUP", exitHandler);
 process.on("SIGINT", exitHandler);
 
-httpsServer.listen(PORT, () => {
+httpServer.listen(PORT, () => {
 	console.log("listening at", PORT);
 })

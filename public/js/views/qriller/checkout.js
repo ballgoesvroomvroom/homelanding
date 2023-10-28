@@ -68,11 +68,16 @@ let outstandingInvoice = fetch(`/api/qriller/shop/getTotal`, {
 	 * }
 	 */
 	console.log("FETCHED DATA", data)
+	isAbleToProcessPayment = true // continue checkout flow
+
 	return data
 }).catch(httpErrStatusCode => {
 	// refrain this page from doing anything in the first place
 	// show warning modal, and redirect thereafter
 	isAbleToProcessPayment = false // block any potential events from occurring
+
+	// REDIRECT OUT ASAP
+	window.location.href = "/qriller/buy"
 })
 
 function processPayment(token) {
@@ -194,7 +199,10 @@ function createGPayBtn() {
 	console.log("LOADING TEST ENV")
 
 	const isReadyToPayRequest = Object.assign({allowedPaymentMethods: [baseCardPaymentMethod]}, baseRequest);
-	getGPaymentsClient().isReadyToPay(isReadyToPayRequest).then(function(response) {
+	outstandingInvoice.then((data) => {
+		// only create the button when the cart data is available, else don't accept any form of payments if redirection to other page fails
+		return getGPaymentsClient().isReadyToPay(isReadyToPayRequest)
+	}).then(function(response) {
 		if (response.result) {
 			// add a Google Pay payment button
 			const button = getGPaymentsClient().createButton({
