@@ -78,6 +78,9 @@ let outstandingInvoice = fetch(`/api/qriller/shop/getTotal`, {
 
 	// REDIRECT OUT ASAP
 	window.location.href = "/qriller/buy"
+
+	// dont run subsequent .then() chains
+	return Promise.reject()
 })
 
 function processPayment(token) {

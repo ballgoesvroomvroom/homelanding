@@ -97,6 +97,99 @@ router.get("/perms", (req, res) => {
 	res.json(req.session.perms);
 })
 
+router.get("/unexists", (req, res) => {
+	/**
+	 * username supplied in req.body.username
+	 * returns {exists: boolean} with content-type: application/json
+	 * returns status 400 on malformed input
+	 */
+	if (req.body.hasOwn("username")) {
+		return res.status(200).json({exists: qrillerDB.data.users[req.body.username] != null})
+	} else {
+		return res.status(400)
+	}
+})
+
+router.get("/emailexists", (req, res) => {
+	/**
+	 * email address supplied in req.body.email
+	 * returns {exists: boolean} with content-type: application/json
+	 * returns status 400 on malformed input
+	 */
+	if (req.body.hasOwn("email")) {
+		return res.status(200).json({exists: qrillerDB.data.emails[qrillerDB.mask.hash(req.body.email)] != null})
+	} else {
+		return res.status(400)
+	}
+})
+
+router.post("/create", (req, res) => {
+	/**
+	 * creates the user with credentials supplied in body as fields, 'username', 'email', 'pw'
+	 * responds with status 200 if successful
+	 * otherwise status 400 if invalid request (username already exists, password and email failed formatting)
+	 */
+
+	// validate credentials first
+	var un = req.body.username,
+		email = req.body.email,
+		pw = req.body.pw
+	if (un == null || typeof un != "string") {
+		return res.status(400).json({error: "Username is not supplied or is of the wrong type."})
+	} else if (email == null || typeof email != "string") {
+		return res.status(400).json({error: "Email address is not supplied or is of the wrong type."})
+	} else if (pw == null || typeof pw != "string") {
+		return res.status(400).json({error: "Password is not supplied or is of the wrong type."})
+	}
+	console.log("FLAG A")
+
+	if (un.length < 3 || un.length > 23) {
+		return res.status(400).json({error: "Username does not fit length requirements."})
+	} else if (pw.length < 3 || pw.length > 23) {
+		return res.status(400).json({error: "Password does not fit length requirements."})
+	} else if (email.length === 0 || email.length >= 999) {
+		return res.status(400).json({error: "Email address does not fit length requirements."})
+	}
+
+	var emailSplit = email.split("@")
+	if (emailSplit.length !== 2) {
+		return res.status(400).json({error: "Email address is not formatted correctly."})
+	} else if (emailSplit[0].length === 0) {
+		return res.status(400).json({error: "Name portion of email address cannot be empty."})
+	}
+	var domain = emailSplit[1].split(".")
+	if (domain.length <= 1) {
+		// missing domain, e.g 'google' instead of 'google.com'
+		return res.status(400).json({error: "Domain portion of email address is not a domain."})
+	} else if (!domain.every(r => r.length >= 1)) {
+		// domain got missing fields following '.' delimiter
+		return res.status(400).json({error: "Domain portion of email address is not a valid domain, check for excess period characters."})
+	}
+
+	// determine if username and email address already exists
+	var hashedEmail = qrillerDB.mask.hash(email)
+	if (qrillerDB.data.users[un] != null) {
+		return res.status(400).json({error: "Username already exists."})
+	} else if (qrillerDB.data.emails[hashedEmail] != null) {
+		return res.status(400).json({error: "Email address already in use."})
+	}
+
+	// create a new user with hashed password and hashed email reference
+	qrillerDB.data.users[un] = {
+		"username": un,
+		"password": qrillerDB.mask.hash(pw),
+		"loginMethod": "password",
+		"email": email,
+
+		"pendingAccountCreationConfirmation": true // to be set to false once user verifies email address
+	}
+	qrillerDB.data.emails[hashedEmail] = { // create map between used email and username
+		"username": un
+	}
+
+	res.status(200).end()
+})
+
 router.post("/login", (req, res) => {
 	/**
 	 * authenticate user with the basic authorisation scheme
@@ -139,7 +232,7 @@ router.post("/login", (req, res) => {
 				throw new Error(errmsg.invalid);
 			}
 
-			var userdata = qrillerDB.data[username.toLowerCase()]
+			var userdata = qrillerDB.data.users[username.toLowerCase()]
 			if (userdata == null) {
 				// no user found
 				throw new Error(errmsg.missing)

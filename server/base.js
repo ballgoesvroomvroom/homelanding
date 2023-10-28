@@ -25,6 +25,7 @@ const main_router = require(path.join(router_path, "main_router.js"));
 const views = require("./includes/views.js");
 const databaseInterface = require("./database/interface.js");
 const images_db = databaseInterface.images_db
+const qrillerDB = databaseInterface.qrillerDB
 // database.autosave = -1; // disable autosave
 
 const PORT = 443;
@@ -67,6 +68,7 @@ app.use((req, res, next) => {
 function exitHandler() {
 	console.log("EXITING");
 	const p = new Promise(res => {
+		qrillerDB.pushIntoFile();
 		images_db.pushIntoFile(res);
 	}).then(() => {
 		console.log("EXITING 2")

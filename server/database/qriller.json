@@ -1,6 +1,15 @@
 {
-	"jayden": {
-		"username": "jayden",
-		"password": "3e23c8eb3eeb0037323d675d0e598429a7fb6cc2ca34bedf61a8209ffe9d902e023c91ac8bd9aa43b7a12aefe502204c8319107e68cdd0245c6592eca19b28f5"
+	"users": {
+		"jayden": {
+			"username": "jayden",
+			"loginMethod": "password",
+			"email": "chongjayden07@gmail.com",
+			"password": "3e23c8eb3eeb0037323d675d0e598429a7fb6cc2ca34bedf61a8209ffe9d902e023c91ac8bd9aa43b7a12aefe502204c8319107e68cdd0245c6592eca19b28f5"
+		}
+	},
+	"emails": {
+		"5d9df2c8dd43d42c18976cfcb16430b3a85472f60f91fe366aec5571e4e26301b66e886f5b0f95c60a76aa939330524c0b395fd10f01f4c776e8ceed86299a0e": {
+			"username": "jayden"
+		}
 	}
 }
