@@ -73,7 +73,7 @@ const authenticated = (req, res, next) => { // actual authentication
 	// validate if session object exists
 	let sessionobj = req.session;
 	if (sessionobj == null) {
-		// maybe got timed out;
+		// unlikely to happen, could be that it got timed out the exact instance;
 		// return a 400 error
 		return router.status(400).end();
 	}
@@ -82,26 +82,13 @@ const authenticated = (req, res, next) => { // actual authentication
 	if (sessionobj.isAuthenticated) {
 		next(); // authenticated
 	} else {
-		res.sendFile(views.login); // send login page
-	}
-}
+		if (req.method != "GET") {
+			// api method, reutrn 401 unauthorised (403 forbidden for valid credentials but not enough privileges)
+			return res.status(401)
+		}
 
-const admin_authenticated = (req, res, next) => { // actual authentication
-	// validate if session object exists
-	let sessionobj = req.session;
-	if (sessionobj == null) {
-		// maybe got timed out;
-		// return a 400 error
-		return router.status(400).end();
-	}
-
-	// check authentication status
-	if (sessionobj.isAuthenticated && sessionobj.isAdmin) {
-		next(); // authenticated
-	} else {
-		// deny request
-		res.status(401).end();
-		// res.sendFile(views.login); // send login page
+		req.session._returnTo = req.originalUrl
+		res.sendFile(views.qriller.loginPage); // send login page
 	}
 }
 
@@ -114,7 +101,8 @@ router.post("/login", (req, res) => {
 	/**
 	 * authenticate user with the basic authorisation scheme
 	 * accepts 'application/json' or 'application/octet-stream' as the request's content type
-	 * on successful authentication (comparison of credentials), will send a response with content type 'application/json' with body containing a string-encoded JSON object with field 'usernmae' set to the username
+	 * on successful authentication (comparison of credentials), will send a response with content type 'application/json' with body containing a string-encoded JSON object with field 'username' set to the username
+	* return json will also contain redirection paths, via the 'returnTo' field
 	 */
 	// authenticate based on username and password (plain/text)
 	let authSuccess = false;
@@ -151,7 +139,7 @@ router.post("/login", (req, res) => {
 				throw new Error(errmsg.invalid);
 			}
 
-			var userdata = qrillerDB.data[username]
+			var userdata = qrillerDB.data[username.toLowerCase()]
 			if (userdata == null) {
 				// no user found
 				throw new Error(errmsg.missing)
@@ -175,7 +163,15 @@ router.post("/login", (req, res) => {
 
 	if (authSuccess) {
 		req.session.isAuthenticated = true; // set state
-		res.json({"username": req.session.username, "uid": req.session.uid})
+
+		// determine next route for user
+		var redirectTo = "/"
+		if (req.session._returnTo != null) {
+			redirectTo = req.session._returnTo
+			req.session._returnTo = null
+		}
+
+		res.json({"username": req.session.username, "uid": req.session.uid, returnTo: redirectTo})
 	} else {
 		// return 401
 		// following spec
@@ -185,5 +181,5 @@ router.post("/login", (req, res) => {
 })
 
 module.exports = { // export router object and authenticated middleware
-	baseURL, router, parseCookie, baseSession, authenticated, admin_authenticated
+	baseURL, router, parseCookie, baseSession, authenticated
 }
