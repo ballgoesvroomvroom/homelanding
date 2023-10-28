@@ -201,6 +201,7 @@ function createGPayBtn() {
 	const isReadyToPayRequest = Object.assign({allowedPaymentMethods: [baseCardPaymentMethod]}, baseRequest);
 	outstandingInvoice.then((data) => {
 		// only create the button when the cart data is available, else don't accept any form of payments if redirection to other page fails
+		console.log("GPAY BUTTON READY", data)
 		return getGPaymentsClient().isReadyToPay(isReadyToPayRequest)
 	}).then(function(response) {
 		if (response.result) {
@@ -211,10 +212,41 @@ function createGPayBtn() {
 			}); // same payment methods as for the loadPaymentData() API call
 
 			// append button
-			document.getElementById("container").appendChild(button);
+			document.getElementById("payment-container").appendChild(button);
 		}
 	}).catch(function(err) {
 		// show error in developer console for debugging
 		console.error(err);
 	});
 }
+
+document.addEventListener("DOMContentLoaded", e => {
+	outstandingInvoice.then(dataArr => {
+		/** 
+		 * dataArr.itemNames: [topicTitleRepr: string, qty: number][]
+		 * build the DOM elements for the itemised bill
+		 */
+		var listContainer = document.getElementById("itemised-list")
+		for (let i = 0; i < dataArr.itemNames.length; i++) {
+			const li = document.createElement("li")
+			const counterPTag = document.createElement("p")
+			const titlePTag = document.createElement("p")
+			const priceColPTag = document.createElement("p")
+
+			priceColPTag.className = "total-price-col"
+
+			counterPTag.innerHTML = `${i +1}.`
+			titlePTag.innerHTML = `${dataArr.itemNames[i][0]}<br><span class="itemised-bill-qty-counter">Qty: ${dataArr.itemNames[i][1]}</span></p>`
+			priceColPTag.innerHTML = `${dataArr.itemNames[i][1] *5}`
+
+			li.appendChild(counterPTag)
+			li.appendChild(titlePTag)
+			li.appendChild(priceColPTag)
+
+			listContainer.appendChild(li)
+		}
+
+		// update total price display in DOM too
+		document.getElementById("total-price-summary").innerHTML = `${dataArr.totalPrice} SGD`
+	})
+})

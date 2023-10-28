@@ -1,5 +1,140 @@
+body {
+	height: 100svh;
+	position: absolute;
+}
+
 #container {
-	margin-top: var(--page-start-offset);
+	height: calc(100% - 20px - var(--page-start-offset));
 
 	padding: 10px var(--horizontal-padding);
+	margin-top: var(--page-start-offset);
+}
+
+#back-btn {
+	display: inline-block;
+	padding: 5px;
+	margin-right: 10px;
+
+	text-decoration: none;
+
+	color: #363636;
+	border-style: solid;
+	border-width: 1px;
+	border-bottom-width: 2px;
+	border-color: black;
+	background-color: #f8f8f8;
+}
+
+#back-btn:hover,
+#back-btn:focus {
+	outline-style: solid;
+	outline-width: 1px;
+	outline-color: black;
+}
+
+#back-btn > img {
+	width: 16px;
+	height: 16px;
+
+	object-fit: cover;
+}
+
+#lr-container {
+	display: flex;
+	flex-direction: row;
+
+	height: 90%;
+}
+
+#itemised-bill-container {
+	flex-grow: 1;
+
+	margin-top: 10px;
+	margin-right: 25px;
+}
+
+#itemised-list-header {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+
+	padding: 10px 0;
+
+	font-weight: 700;
+
+	border-bottom-style: solid;
+	border-bottom-width: 1px;
+	border-bottom-color: black;
+}
+
+#itemised-list-header > p:first-child {
+	flex-basis: 30px;
+	flex-grow: 0;
+	flex-shrink: 0;
+}
+
+#itemised-list-header > p:nth-child(3),
+.total-price-col {
+	flex-basis: 100px;
+	flex-grow: 0;
+	flex-shrink: 0;
+
+	margin-left: auto;
+}
+
+#itemised-list {
+	min-height: 100px;
+
+	padding: 0;
+
+	list-style: numbers;
+}
+
+#itemised-list > li {
+	display: flex;
+	flex-direction: row;
+
+	margin-bottom: 30px;
+}
+
+#itemised-list > li > p:first-child {
+	flex-basis: 30px;
+	flex-grow: 0;
+	flex-shrink: 0;
+}
+
+.itemised-bill-qty-counter {
+	font-size: .85rem;
+	color: #606060;
+}
+
+#itemised-list-summary {
+	display: flex;
+	flex-direction: row;
+
+	padding-top: 10px;
+
+	font-weight: 700;
+
+	border-top-style: solid;
+	border-top-width: 1px;
+	border-top-color: black;
+}
+
+#payment-container {
+	padding-left: 15px;
+
+	border-left-style: solid;
+	border-left-width: 1px;
+	border-left-color: black;
+}
+
+@media (max-width: 720px) {
+	#lr-container {
+		flex-direction: column;
+	}
+
+	#itemised-bill-container {
+		margin-right: 0;
+	}
 }

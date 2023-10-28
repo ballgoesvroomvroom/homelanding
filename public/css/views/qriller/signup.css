@@ -1,0 +1,88 @@
+#container {
+	margin-top: var(--page-start-offset);
+
+	padding: 10px var(--horizontal-padding);
+}
+
+#login {
+	display: flex;
+	flex-direction: column;
+
+	width: 400px;
+	max-width: 100%;
+
+	margin-top: 100px;
+}
+
+label {
+	padding: 10px 0;
+	margin-top: 20px;
+}
+
+input {
+	padding: 10px 5px;
+
+	outline: none;
+
+	border-style: solid;
+	border-width: 1px;
+	border-color: black;
+	box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+
+	transition-property: border-color;
+	transition-duration: 150ms;
+	transition-timing-function: linear;
+}
+
+input:valid {
+	border-color: #0e600e;
+}
+
+#formErrorMsg {
+	padding: 6px 0;
+	margin-top: 25px;
+
+	font-size: .9rem;
+	color: #e20d00;
+}
+
+#formSubmitBtn {
+	padding: 10px;
+
+	font-weight: 700;
+
+	border-style: solid;
+	border-width: 1px;
+	border-color: black;
+	border-right-width: 2px;
+	border-bottom-width: 2px;
+	background-color: #efefef;
+}
+
+#formSubmitBtn:hover,
+#formSubmitBtn:focus {
+	outline-style: solid;
+	outline-width: 1px;
+	outline-color: black;
+}
+
+#links-container {
+	padding-left: 20px;
+	margin-top: 40px;
+
+	border-left-style: solid;
+	border-left-width: 1px;
+	border-left-color: black;
+}
+
+#links-container p {
+	padding: 5px 0;
+	padding-top: 15px;
+
+	font-weight: 700;
+}
+
+#links-container a {
+
+	color: #979797;
+}

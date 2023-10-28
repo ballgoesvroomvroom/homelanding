@@ -9,13 +9,13 @@
 		<link rel="stylesheet" href="/css/includes/qriller/default.css">
 		<link rel="stylesheet" href="/css/includes/qriller/topbar.css">
 		<link rel="stylesheet" href="/css/includes/qriller/modal.css">
-		<link rel="stylesheet" href="/css/views/qriller/login.css">
+		<link rel="stylesheet" href="/css/views/qriller/signup.css">
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 		<link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap" rel="stylesheet">
 
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-		<script src="/js/views/qriller/login.js"></script>
+		<script src="/js/views/qriller/signup.js"></script>
 
 		<title>Qriller | Login</title>
 	</head>
@@ -57,16 +57,19 @@
 		<div id="container">
 			<form id="login">
 				<label for="username">Username</label>
-				<input id="username-inp" name="username" type="text">
+				<input id="username-inp" name="username" type="text" minlength="3" maxlength="23" required>
+				<label for="emailaddr">Email address</label>
+				<input id="emailaddr-inp" name="emailaddr" type="email" required>
 				<label for="password">Password</label>
-				<input id="password-inp" name="password" type="password">
+				<input id="password-inp" name="password" type="password" minlength="3" maxlength="23">
+				<label for="cfm-password">Confirm password</label>
+				<input id="cfm-password-inp" name="cfm-password" type="password" minlength="3" maxlength="23">
 
 				<p id="formErrorMsg">&nbsp;</p>
 				<button id="formSubmitBtn" type="submit">SUBMIT</button>
 			</form>
 			<div id="links-container">
-				<p><a href="/qriller/signup">LOG IN WITH GOOGLE</a></p>
-				<p><a href="/qriller/signup">REGISTER</a></p>
+				<p><a href="/qriller/signup">SIGN UP WITH GOOGLE</a></p>
 			</div>
 		</div>
 	</body>
