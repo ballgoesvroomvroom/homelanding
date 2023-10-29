@@ -178,9 +178,8 @@ $(document).ready(e => {
 					// apply grid styling
 					$contentContainer.css("grid-template-rows", `repeat(${styleProp.qnColumn}, 1fr})`)
 
-					// calculate the relative space each questions will take up to calculate the total questions we can fit in this page
-					var relQnHt = qnHt /availHt
-					var qnPerPage = Math.min(Math.floor(1 /relQnHt) *styleProp.qnColumn, QUESTIONS.length -absQnIdx) // math.min() for the last page scenario
+					// calculate the total questions we can fit in one page (taking into account of how many columns are spanned)
+					var qnPerPage = Math.min(Math.floor(availHt /qnHt) *styleProp.qnColumn, QUESTIONS.length -absQnIdx) // math.min() for the last page scenario
 					for (let j = 0; j < qnPerPage; j++) {
 						// j = qnIdx
 						// qnData: [qnStr, latexEqnArr]

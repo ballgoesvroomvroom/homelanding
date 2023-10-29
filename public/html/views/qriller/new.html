@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=10.0, minimum-scale=.25, user-scalable=yes"/>
+		<meta name="description" content="Worksheets grandmaster"/>
+
+		<link rel="stylesheet" href="/css/includes/reset.css">
+		<link rel="stylesheet" href="/css/views/qriller/new.css">
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100;200;300;500;600;700;800;900&display=swap" rel="stylesheet">
+
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+		<!-- <script src="/js/views/qriller/signup.js"></script> -->
+
+		<title>Qriller | Home</title>
+	</head>
+	<body>
+		<div id="topbar-container">
+			<a href="/" id="logo-redirect"><img src="/qriller_assets/banner.svg"></a>
+			<a class="active" href="/about">About</a>
+			<a href="/about">Purchase</a>
+			<a href="/about">Pricing</a>
+			<a href="/about">Contact</a>
+		</div>
+		<div id="background-product-container">
+			<img id="background-tulip-img" src="/qriller_assets/tulip.svg">
+			<div id="product-container">
+				<img src="/qriller_assets/productdemo.svg">
+				<img src="/qriller_assets/productdemo.svg">
+			</div>
+		</div>
+		<div id="container">
+			<section id="section-intro" class="slide-sections">
+				<h1>WE SELL<br>WORKSHEETS<br>FOR $5<span class="header-disclaimer">(flat price, no charges)</span></h1>
+				<p>With more than 200 questions per worksheet.</p>
+			</section>
+
+			<section id="section-series" class="slide-sections">
+				<h1>CHOOSE FROM<br>TWO TYPES</h1>
+				<p>Generalised STANDARD and specialised MONO, priced at $5 each.</p>
+				<div id="series-comparison-container">
+					<div class="series-comparison-card">
+						<img class="series-comparison-card-thumbnail" src="/qriller_assets/mono.svg">
+						<div class="series-comparison-card-details">
+							<h3>MONO</h3>
+							<p>Worksheet purely contains 200 questions of the particular sub-topic.</p>
+							<div class="series-comparison-card-highlight"></div>
+						</div>
+					</div>
+					<div class="series-comparison-card">
+						<img class="series-comparison-card-thumbnail" src="/qriller_assets/standard.svg">
+						<div class="series-comparison-card-details">
+							<h3>STANDARD</h3>
+							<p>Generalised worksheet with 200 questions compromising of questions from all the sub-topics within the topic.</p>
+							<div class="series-comparison-card-highlight"></div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+	</body>
+	<script>
+		window.addEventListener("scroll", function() {
+			var topbar = document.getElementById("topbar-container");
+
+			if (window.scrollY > 50) { // Adjust the value as needed
+				topbar.classList.add("scrolled");
+			} else {
+				topbar.classList.remove("scrolled");
+			}
+		});
+	</script>
+</html>

@@ -138,6 +138,23 @@ router.get("/login", (req, res) => {
 	res.sendFile(views.qriller.loginPage)
 })
 
+// new page
+router.get("/new", (req, res) => {
+	/**
+	 * returns the login page with status 200
+	 */
+	res.type("html")
+	res.sendFile(views.qriller.newPage)
+})
+
+router.get("/login", (req, res) => {
+	/**
+	 * returns the login page with status 200
+	 */
+	res.type("html")
+	res.sendFile(views.qriller.loginPage)
+})
+
 // sign up page
 router.get("/signup", (req, res) => {
 	/**
@@ -423,6 +440,7 @@ router.get("/:documentId/ans", (req, res) => {
 
 		const q = new qriller.Qriller(data)
 		q.createQuestions(qriller.DifferentiatingPolynomialChainRule, 100)
+		console.log("FLAGGGG")
 
 		res.write(Utils.populateDocument(q))
 		res.status(200).end()

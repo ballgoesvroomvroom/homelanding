@@ -15,6 +15,7 @@ body {
 .page-container {
 	position: relative;
 	height: calc(100vh - 50px);
+	min-height: calc(100vh - 50px);
 	width: auto;
 	min-width: 0;
 
