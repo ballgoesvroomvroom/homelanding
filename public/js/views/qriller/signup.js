@@ -119,7 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
 			}
 		}).then(() => {
 			// store username in localStorage
-			localStorage.setItem("username", username)
+			localStorage.setItem("username", un)
 			localStorage.setItem("pendingLogin", true) // temporary state to be used by loginPage
 
 			// redirect to login page for user to login, with pre-filled username

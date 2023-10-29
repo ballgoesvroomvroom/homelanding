@@ -1,6 +1,12 @@
 const baseURL = "/auth"; // base url for this router
 
 const express = require("express");
+const crypto = require("crypto");
+const path = require("path")
+const dotenv = require("dotenv").config({path: path.join(__dirname, "../../.env")});
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey(process.env.SENDGRID_API_KEY)
+console.log("MAIL SERVER", process.env.SENDGRID_API_KEY)
 
 const views = require("../includes/views.js");
 const sessions = require("../includes/sessions.js");
@@ -69,7 +75,7 @@ const baseSession = (req, res, next) => { // session id
 	next();
 }
 
-const authenticated = (req, res, next) => { // actual authentication
+const authenticated = (req, res, next) => { // middleware that only accepts authenticated users
 	// validate if session object exists
 	let sessionobj = req.session;
 	if (sessionobj == null) {
@@ -92,35 +98,51 @@ const authenticated = (req, res, next) => { // actual authentication
 	}
 }
 
+const applyVerificationIdAction = (vid) => {
+	/**
+	 * verifies the users tagged to the specific verification id (vid)
+	 * vid: string, the 256-bit long string of random characters generated during creation of user
+	 * applies modifications to .pendingAccountCreationConfirmation in qrillerDB.data.users
+	 * returns a boolean, true if verification was successful, false otherwise
+	 */
+	if (qrillerDB.data.verificationLinks[vid]) {
+		// check for verification id's expiry
+		if (Date.now() > qrillerDB.data.verificationLinks[vid].expires) {
+			// expired, remove vid reference in .verificationLinks
+			delete qrillerDB.data.verificationLinks[vid]
+			return false
+		}
+
+		// check if user exists
+		if (qrillerDB.data.users[qrillerDB.data.verificationLinks[vid].username] == null) {
+			// no user found tagged to this verification link
+			// bugged out verification id?
+			delete qrillerDB.data.verificationLinks[vid] // remove this vid
+			return false
+		}
+
+		// check if user is already authenticated
+		if (!qrillerDB.data.users[qrillerDB.data.verificationLinks[vid].username].pendingAccountCreationConfirmation) {
+			// value of 0, false, null will return true
+			// if .pendingAccountCreationConfirmation takes any of these 3 values, it means user has already verified email address
+			// entry should have already been deleted during verification flow
+			delete qrillerDB.data.verificationLinks[vid]
+			return false
+		}
+
+		// proceed to authenticate user
+		delete qrillerDB.data.users[qrillerDB.data.verificationLinks[vid].username].pendingAccountCreationConfirmation // simply remove field (retrieval will result in a null value)
+		delete qrillerDB.data.verificationLinks[vid]
+
+		return true // success
+	}
+
+	return false // no vid found
+}
+
 router.get("/perms", (req, res) => {
 	// return permissions scope user has
 	res.json(req.session.perms);
-})
-
-router.get("/unexists", (req, res) => {
-	/**
-	 * username supplied in req.body.username
-	 * returns {exists: boolean} with content-type: application/json
-	 * returns status 400 on malformed input
-	 */
-	if (req.body.hasOwn("username")) {
-		return res.status(200).json({exists: qrillerDB.data.users[req.body.username] != null})
-	} else {
-		return res.status(400)
-	}
-})
-
-router.get("/emailexists", (req, res) => {
-	/**
-	 * email address supplied in req.body.email
-	 * returns {exists: boolean} with content-type: application/json
-	 * returns status 400 on malformed input
-	 */
-	if (req.body.hasOwn("email")) {
-		return res.status(200).json({exists: qrillerDB.data.emails[qrillerDB.mask.hash(req.body.email)] != null})
-	} else {
-		return res.status(400)
-	}
 })
 
 router.post("/create", (req, res) => {
@@ -141,7 +163,6 @@ router.post("/create", (req, res) => {
 	} else if (pw == null || typeof pw != "string") {
 		return res.status(400).json({error: "Password is not supplied or is of the wrong type."})
 	}
-	console.log("FLAG A")
 
 	if (un.length < 3 || un.length > 23) {
 		return res.status(400).json({error: "Username does not fit length requirements."})
@@ -174,20 +195,43 @@ router.post("/create", (req, res) => {
 		return res.status(400).json({error: "Email address already in use."})
 	}
 
-	// create a new user with hashed password and hashed email reference
-	qrillerDB.data.users[un] = {
-		"username": un,
-		"password": qrillerDB.mask.hash(pw),
-		"loginMethod": "password",
-		"email": email,
+	// generate a 256-bit long random string by the CryptoJS library, to be attached to the user for user verification by mail
+	// send mail with senggrid (sgMail)
+	var verificationId = crypto.randomBytes(32).toString("hex")
+	sgMail.send({
+		to: email,
+		from: "help@qriller.com",
+		subject: "Newly Created User",
+		text: "Hello! This email indicates your first sign up!\n\n",
+		html: `<h2>Steps you need to take next:</h2><br><ul><li>Follow this <a href="https://qriller.com/authenticate?vid=${verificationId}">link</a> to verify your email address</li><li>That's all!</li><ul><br><p>Your verification id: ${verificationId}</p>`
+	}).then(() => {
+		// email sent successfully
+		console.log("EMAIL SENT SUCCESSFULLY FOR VERID", verificationId)
 
-		"pendingAccountCreationConfirmation": true // to be set to false once user verifies email address
-	}
-	qrillerDB.data.emails[hashedEmail] = { // create map between used email and username
-		"username": un
-	}
+		// create a new user with hashed password and hashed email reference
+		// add in the verification reference too
+		qrillerDB.data.users[un] = {
+			"username": un,
+			"password": qrillerDB.mask.hash(pw),
+			"loginMethod": "password",
+			"email": email,
 
-	res.status(200).end()
+			"pendingAccountCreationConfirmation": true // to be set to false once user verifies email address
+		}
+		qrillerDB.data.emails[hashedEmail] = { // create map between used email and username
+			"username": un
+		}
+		qrillerDB.data.verificationLinks[verificationId] = {
+			"username": un,
+			"expires": Date.now() +(8.64e+8) // milliseconds when this verification link expires and will be purged from the database
+		}
+
+		// end request
+		res.status(200).end()
+	}).catch(err => {
+		console.warn("FAILED", err)
+		res.status(500).end() // server failure
+	})
 })
 
 router.post("/login", (req, res) => {
@@ -274,5 +318,5 @@ router.post("/login", (req, res) => {
 })
 
 module.exports = { // export router object and authenticated middleware
-	baseURL, router, parseCookie, baseSession, authenticated
+	baseURL, router, parseCookie, baseSession, authenticated, applyVerificationIdAction
 }

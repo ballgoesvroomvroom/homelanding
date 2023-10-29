@@ -6,11 +6,11 @@ const fs = require("fs");
 const path = require("path");
 const dotenv = require("dotenv").config({ path: path.join(__dirname, "./.env") });
 
-// const https = require("https");
-// const optionSSL = {
-// 	key: fs.readFileSync("C:\\Users\\Chong\\certificates\\server.key"),
-// 	cert: fs.readFileSync("C:\\Users\\Chong\\certificates\\server.crt")
-// };
+const https = require("https");
+const optionSSL = {
+	key: fs.readFileSync("C:\\Users\\Chong\\certificates\\server.key"),
+	cert: fs.readFileSync("C:\\Users\\Chong\\certificates\\server.crt")
+};
 
 // set root path
 global.root = path.resolve(path.join(__dirname, "../"));
@@ -25,12 +25,12 @@ const main_router = require(path.join(router_path, "main_router.js"));
 const views = require("./includes/views.js");
 const databaseInterface = require("./database/interface.js");
 const images_db = databaseInterface.images_db
-const qrillerDB = databaseInterface.qrillerDB
+const qrillerDB = databaseInterface.qriller_users
 // database.autosave = -1; // disable autosave
 
 const PORT = 443;
 const app = express();
-const httpServer = http.createServer(app);
+const httpsServer = https.createServer(optionSSL, app);
 
 app.use(express.static("public"));
 app.use(cors());
@@ -68,8 +68,7 @@ app.use((req, res, next) => {
 function exitHandler() {
 	console.log("EXITING");
 	const p = new Promise(res => {
-		qrillerDB.pushIntoFile();
-		images_db.pushIntoFile(res);
+		qrillerDB.pushIntoFile().then(() => images_db.pushIntoFile(res));
 	}).then(() => {
 		console.log("EXITING 2")
 		process.exit();
@@ -79,6 +78,6 @@ function exitHandler() {
 process.on("SIGHUP", exitHandler);
 process.on("SIGINT", exitHandler);
 
-httpServer.listen(PORT, () => {
+httpsServer.listen(PORT, () => {
 	console.log("listening at", PORT);
 })
