@@ -4,7 +4,6 @@
 }
 
 html {
-	width: 100svw;
 	height: 100svh;
 	height: auto;
 
@@ -15,7 +14,6 @@ html {
 body {
 	position: relative;
 
-	width: 100svw;
 	overflow-x: hidden;
 }
 
@@ -88,7 +86,7 @@ body {
 #product-container {
 	position: relative;
 	margin-left: 40%;
-	margin-top: 50px;
+	margin-top: 150px;
 
 	perspective: 900px;
 	perspective-origin: 50% 50%;
@@ -119,20 +117,15 @@ body {
 }
 
 #container {
-	padding-bottom: 400px;
 }
 
 .slide-sections {
 	margin-left: 300px;
 	margin-top: 250px;
-
-	min-width: 0;
-	width: auto;
 }
 
 .slide-sections > h1 {
 	padding-right: 10px;
-	width: auto;
 
 	font-weight: 700;
 	font-size: 4rem;
@@ -274,6 +267,62 @@ body {
 
 .audience-cards > p {
 	font-weight: 300;
+}
+
+#topics-demo-container {
+	margin-right: 20px;
+	margin-top: 20px;
+
+	border-collapse: collapse;
+
+	border-style: solid;
+	border-width: 1px;
+	border-color: #c2c2c2;
+}
+
+#topics-demo-container > thead > tr > th:first-child,
+#topics-demo-container > tbody > tr > td:first-child {
+	background-color: #f7f7f7;
+}
+
+#topics-demo-container th,
+#topics-demo-container td {
+	padding: 10px;
+
+	border-top-style: solid;
+	border-top-width: 1px;
+	border-top-color: #c2c2c2;
+}
+
+#topics-demo-container td {
+	font-weight: 300;
+}
+
+.slide-out-btn {
+	width: fit-content;
+}
+
+.slide-out-btn > a {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+
+	padding: 10px;
+	margin-top: 20px;
+
+	font-weight: 300;
+	letter-spacing: 2px;
+
+	color: white;
+	text-decoration: none;
+
+
+	border-radius: .2rem;
+	background-color: black;
+}
+
+#section-buynow {
+	padding-bottom: 400px;
 }
 
 @media (max-width: 920px) {
