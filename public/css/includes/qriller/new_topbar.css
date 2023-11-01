@@ -1,0 +1,47 @@
+#topbar-container {
+	position: fixed;
+	top: 0;
+
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: flex-end;
+
+	width: calc(100% - 140px);
+
+	padding: 20px 70px;
+	padding-bottom: 33px;
+
+	background-color: white;
+
+	z-index: 3;
+}
+
+#topbar-container.scrolled {
+	box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+}
+
+#logo-redirect > img {
+	width: auto;
+	height: 32px;
+
+	object-fit: cover;
+}
+
+#topbar-container > a {
+	color: black;
+	text-decoration: none;
+
+	transition-property: color;
+	transition-duration: 100ms;
+	transition-timing-function: linear;
+}
+
+#topbar-container > a:hover,
+#topbar-container > a:focus {
+	color: var(--accent-compl-color);
+}
+
+#topbar-container > a.active {
+	color: var(--accent-color);
+}
