@@ -22,43 +22,158 @@
 			<a href="/" id="logo-redirect"><img src="/qriller_assets/banner.svg"></a>
 			<a class="active" href="/about">About</a>
 			<a href="/about">Purchase</a>
-			<a href="/about">Pricing</a>
+			<a href="/about">Account</a>
 			<a href="/about">Contact</a>
+			<div id="topbar-mobile-component">
+				<a id="topbar-mobile-link">About</a>
+				<button id="topbar-mobile-hamburg">
+					<img src="/qriller_assets/hamburg.svg">
+				</button>
+				<div id="topbar-mobile-hamburg-menu">
+					<a>Purchase</a>
+					<a>Pricing</a>
+					<a>Contact</a>
+				</div>
+			</div>
 		</div>
 		<div id="background-product-container">
 			<img id="background-tulip-img" src="/qriller_assets/tulip.svg">
 		</div>
 		<div id="container">
-				<table id="topics-table-container">
-					<thead>
-						<tr>
-							<th>Topic Code</th>
-							<th>Topic Title</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr class="big-topic-row">
-							<td>TC001</td>
-							<td>Laws of Indices</td>
-						</tr>
-						<tr>
-							<td>TC001-0</td>
-							<td>Laws of Indices Part I</td>
-						</tr>
-						<tr>
-							<td>TC001-1</td>
-							<td>Laws of Indices Part II</td>
-						</tr>
-						<tr>
-							<td>TC001-2</td>
-							<td>Law of Indices Final Part</td>
-						</tr>
-						<tr>
-							<td>TC001-3</td>
-							<td>Expressing Numbers in Standard Form</td>
-						</tr>
-					</tbody>
-				</table>
+			<div id="searchbar-container">
+				<input id="searchbar-inp" name="searchquery-inp" placeholder="SEARCH TOPIC">
+				<button id="searchbar-search-btn"><img src="/qriller_assets/search.svg"></button>
+			</div>
+			<div id="scrolltable-container">
+				<div class="topic-entry">
+					<h2 class="topic-entry-header">1 | Laws of Indices</h2>
+					<table class="sub-topics-table">
+						<thead>
+							<tr>
+								<th>Topic Code</th>
+								<th>Topic Title</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>TC001-0</td>
+								<td>Laws of Indices Part I</td>
+							</tr>
+							<tr>
+								<td>TC001-1</td>
+								<td>Laws of Indices Part II</td>
+							</tr>
+							<tr>
+								<td>TC001-2</td>
+								<td>Law of Indices Final Part</td>
+							</tr>
+							<tr>
+								<td>TC001-3</td>
+								<td>Expressing Numbers in Standard Form</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="topic-entry">
+					<h2 class="topic-entry-header">2 | Laws of Indices</h2>
+					<table class="sub-topics-table">
+						<thead>
+							<tr>
+								<th>Topic Code</th>
+								<th>Topic Title</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="big-topic-row">
+								<td>TC001</td>
+								<td>Laws of Indices</td>
+							</tr>
+							<tr>
+								<td>TC001-0</td>
+								<td>Laws of Indices Part I</td>
+							</tr>
+							<tr>
+								<td>TC001-1</td>
+								<td>Laws of Indices Part II</td>
+							</tr>
+							<tr>
+								<td>TC001-2</td>
+								<td>Law of Indices Final Part</td>
+							</tr>
+							<tr>
+								<td>TC001-3</td>
+								<td>Expressing Numbers in Standard Form</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="topic-entry">
+					<h2 class="topic-entry-header">2 | Laws of Indices</h2>
+					<table class="sub-topics-table">
+						<thead>
+							<tr>
+								<th>Topic Code</th>
+								<th>Topic Title</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="big-topic-row">
+								<td>TC001</td>
+								<td>Laws of Indices</td>
+							</tr>
+							<tr>
+								<td>TC001-0</td>
+								<td>Laws of Indices Part I</td>
+							</tr>
+							<tr>
+								<td>TC001-1</td>
+								<td>Laws of Indices Part II</td>
+							</tr>
+							<tr>
+								<td>TC001-2</td>
+								<td>Law of Indices Final Part</td>
+							</tr>
+							<tr>
+								<td>TC001-3</td>
+								<td>Expressing Numbers in Standard Form</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="topic-entry">
+					<h2 class="topic-entry-header">2 | Laws of Indices</h2>
+					<table class="sub-topics-table">
+						<thead>
+							<tr>
+								<th>Topic Code</th>
+								<th>Topic Title</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="big-topic-row">
+								<td>TC001</td>
+								<td>Laws of Indices</td>
+							</tr>
+							<tr>
+								<td>TC001-0</td>
+								<td>Laws of Indices Part I</td>
+							</tr>
+							<tr>
+								<td>TC001-1</td>
+								<td>Laws of Indices Part II</td>
+							</tr>
+							<tr>
+								<td>TC001-2</td>
+								<td>Law of Indices Final Part</td>
+							</tr>
+							<tr>
+								<td>TC001-3</td>
+								<td>Expressing Numbers in Standard Form</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
 		</div>
 	</body>
 	<script>
@@ -71,5 +186,26 @@
 				topbar.classList.remove("scrolled");
 			}
 		});
+
+		var topicEntries = document.getElementsByClassName("topic-entry")
+		for (let i = 0; i < topicEntries.length; i++) {
+			let ele = topicEntries.item(i)
+			let table = ele.getElementsByClassName("sub-topics-table")
+			if (table.length >= 1) {
+				table = table[0]
+				ele.addEventListener("click", e => {
+					table.classList.toggle("active")
+				})
+			}
+		}
+
+		var topbarMobileComp = document.getElementById("topbar-mobile-component")
+		var hamburgMenu = document.getElementById("topbar-mobile-hamburg-menu")
+		document.getElementById("topbar-mobile-hamburg").addEventListener("click", e => {
+			topbarMobileComp.classList.toggle("expanded")
+		})
+		document.getElementById("topbar-mobile-hamburg-close-btn").addEventListener("click", e => {
+			topbarMobileComp.classList.toggle("expanded")
+		})
 	</script>
 </html>

@@ -19,7 +19,6 @@ body {
 	position: absolute;
 
 	width: 100svw;
-	min-height: 100svh;
 
 	z-index: -1;
 
@@ -69,15 +68,80 @@ body {
 }
 
 #container {
-	height: 100px;
+	display: flex;
+	flex-direction: column;
 
+	height: calc(100svh - 140px);
+
+	padding-bottom: 20px;
 	margin: 0 20px;
 	margin-top: 120px;
+}
+
+#searchbar-container {
+	display: flex;
+	flex-direction: row;
+
+	margin-bottom: 10px;
+
+	border-bottom-style: solid;
+	border-bottom-width: 1px;
+	border-bottom-color: var(--accent-color);
+}
+
+#searchbar-inp {
+	flex-grow: 1;
+	max-width: 35%;
+
+	padding: 10px;
+
+	outline: none;
+	border: none;
+
+	caret-color: var(--accent-color);
+}
+
+#searchbar-search-btn > img {
+	width: 28px;
+	height: 28px;
+
+	padding: 5px;
+
+	object-fit: cover;
+}
+
+#scrolltable-container {
+	padding-right: 10px;
 
 	overflow: auto;
 }
 
-#topics-table-container {
+.topic-entry {
+	padding-bottom: 10px;
+}
+
+.topic-entry-header {
+	padding: 10px;
+	margin-bottom: 10px;
+
+	font-weight: 300;
+
+	border-bottom-style: solid;
+	border-bottom-width: 1px;
+	border-bottom-color: #838383;
+
+	cursor: pointer;
+}
+
+.sub-topics-table {
+	display: none;
+}
+
+.sub-topics-table.active {
+	display: table;
+}
+
+.sub-topics-table {
 	width: 100%;
 	border-collapse: collapse;
 
@@ -86,27 +150,20 @@ body {
 	border-color: #c2c2c2;
 }
 
-#topics-table-container > thead {
-	position: sticky;
-	top: 0;
-
+.sub-topics-table > thead {
 	text-align: left;
-
-	border-style: solid;
-	border-width: 1px;
-	border-color: #c2c2c2;
 }
 
-#topics-table-container > thead {
+.sub-topics-table > thead {
 }
 
-#topics-table-container > thead > tr > th:first-child,
-#topics-table-container > tbody > tr > td:first-child {
+.sub-topics-table > thead > tr > th:first-child,
+.sub-topics-table > tbody > tr > td:first-child {
 	background-color: #f7f7f7;
 }
 
-#topics-table-container th,
-#topics-table-container td {
+.sub-topics-table th,
+.sub-topics-table td {
 	padding: 10px;
 
 	border-top-style: solid;
@@ -115,10 +172,12 @@ body {
 	background-color: white;
 }
 
-#topics-table-container td {
+.sub-topics-table td {
 	font-weight: 300;
 }
 
-#topics-table-container .big-topic-row td {
-	font-weight: 400;
+@media (max-width: 640px) {
+	#searchbar-inp {
+		max-width: unset;
+	}
 }
