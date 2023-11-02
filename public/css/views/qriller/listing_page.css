@@ -71,11 +71,15 @@ body {
 	display: flex;
 	flex-direction: column;
 
-	height: calc(100svh - 140px);
+	height: calc(100svh - 120px);
 
 	padding-bottom: 20px;
 	margin: 0 20px;
-	margin-top: 120px;
+	margin-top: 100px;
+}
+
+#page-header {
+	margin-bottom: 50px;
 }
 
 #searchbar-container {
@@ -117,11 +121,10 @@ body {
 }
 
 .topic-entry {
-	padding-bottom: 10px;
 }
 
 .topic-entry-header {
-	padding: 10px;
+	padding: 20px;
 	margin-bottom: 10px;
 
 	font-weight: 300;
@@ -177,6 +180,10 @@ body {
 }
 
 @media (max-width: 640px) {
+	#background-tulip-img {
+		width: 200px;
+	}
+
 	#searchbar-inp {
 		max-width: unset;
 	}
