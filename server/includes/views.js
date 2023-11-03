@@ -31,10 +31,12 @@ class Qriller {
 	static seriesPage = path.join(html, "views/qriller/series_page.html")
 	static listingPage = path.join(html, "views/qriller/listing_page.html")
 	static purchasePage = path.join(html, "views/qriller/purchase_page.html")
-	static purchasePageNew = path.join(html, "views/qriller/purchase_page_new.html")
+	static purchasePageNew = path.join(html, "views/qriller/purchase_page_legacy.html")
 	static checkoutPage = path.join(html, "views/qriller/checkout_page.html")
 
 	static newPage = path.join(html, "views/qriller/new.html")
+
+	static accountPage = path.join(html, "views/qriller/account_page.html")
 }
 
 class Views {

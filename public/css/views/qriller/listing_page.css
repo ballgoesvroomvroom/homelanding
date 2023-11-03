@@ -138,12 +138,18 @@ body {
 }
 
 .topic-entry-header > h2 {
+	flex-grow: 1;
+
 	padding-right: 10px;
 
 	font-weight: 300;
 }
 
 .topic-entry-expand-btn {
+	flex-basis: 80px;
+	flex-grow: 0;
+	flex-shrink: 0;
+
 	padding: 8px;
 
 	border-radius: .2rem;
@@ -183,7 +189,9 @@ body {
 .sub-topics-table th,
 .sub-topics-table td {
 	padding: 10px;
+}
 
+.sub-topics-table > tbody > tr {
 	border-top-style: solid;
 	border-top-width: 1px;
 	border-top-color: #c2c2c2;
@@ -192,6 +200,28 @@ body {
 
 .sub-topics-table td {
 	font-weight: 300;
+}
+
+.demo-out-btn {
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-end;
+}
+
+.demo-out-btn > a {
+	display: block;
+	width: calc(80px - 16px);
+
+	padding: 8px;
+	margin-right: 10px;
+
+	text-align: center;
+	text-decoration: none;
+
+	color: white;
+
+	border-radius: .2rem;
+	background-color: var(--accent-color);
 }
 
 @media (max-width: 640px) {

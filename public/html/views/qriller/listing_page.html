@@ -62,18 +62,22 @@
 							<tr>
 								<td>TC001-0</td>
 								<td>Laws of Indices Part I</td>
+								<td class="demo-out-btn"><a href="/demo?id=TC001-0">Demo</a></td>
 							</tr>
 							<tr>
 								<td>TC001-1</td>
 								<td>Laws of Indices Part II</td>
+								<td class="demo-out-btn"><a href="/demo?id=TC001-0">Demo</a></td>
 							</tr>
 							<tr>
 								<td>TC001-2</td>
 								<td>Law of Indices Final Part</td>
+								<td class="demo-out-btn"><a href="/demo?id=TC001-0">Demo</a></td>
 							</tr>
 							<tr>
 								<td>TC001-3</td>
 								<td>Expressing Numbers in Standard Form</td>
+								<td class="demo-out-btn"><a href="/demo?id=TC001-0">Demo</a></td>
 							</tr>
 						</tbody>
 					</table>
@@ -94,22 +98,27 @@
 							<tr class="big-topic-row">
 								<td>TC001</td>
 								<td>Laws of Indices</td>
+								<td class="demo-out-btn"><a href="/demo?id=TC001-0">DEMO</a></td>
 							</tr>
 							<tr>
 								<td>TC001-0</td>
 								<td>Laws of Indices Part I</td>
+								<td class="demo-out-btn"><a href="/demo?id=TC001-0">DEMO</a></td>
 							</tr>
 							<tr>
 								<td>TC001-1</td>
 								<td>Laws of Indices Part II</td>
+								<td class="demo-out-btn"><a href="/demo?id=TC001-0">DEMO</a></td>
 							</tr>
 							<tr>
 								<td>TC001-2</td>
 								<td>Law of Indices Final Part</td>
+								<td class="demo-out-btn"><a href="/demo?id=TC001-0">DEMO</a></td>
 							</tr>
 							<tr>
 								<td>TC001-3</td>
 								<td>Expressing Numbers in Standard Form</td>
+								<td class="demo-out-btn"><a href="/demo?id=TC001-0">DEMO</a></td>
 							</tr>
 						</tbody>
 					</table>
@@ -130,22 +139,27 @@
 							<tr class="big-topic-row">
 								<td>TC001</td>
 								<td>Laws of Indices</td>
+								<td class="demo-out-btn"><a href="/demo?id=TC001-0">DEMO</a></td>
 							</tr>
 							<tr>
 								<td>TC001-0</td>
 								<td>Laws of Indices Part I</td>
+								<td class="demo-out-btn"><a href="/demo?id=TC001-0">DEMO</a></td>
 							</tr>
 							<tr>
 								<td>TC001-1</td>
 								<td>Laws of Indices Part II</td>
+								<td class="demo-out-btn"><a href="/demo?id=TC001-0">DEMO</a></td>
 							</tr>
 							<tr>
 								<td>TC001-2</td>
 								<td>Law of Indices Final Part</td>
+								<td class="demo-out-btn"><a href="/demo?id=TC001-0">DEMO</a></td>
 							</tr>
 							<tr>
 								<td>TC001-3</td>
 								<td>Expressing Numbers in Standard Form</td>
+								<td class="demo-out-btn"><a href="/demo?id=TC001-0">DEMO</a></td>
 							</tr>
 						</tbody>
 					</table>
@@ -166,18 +180,22 @@
 							<tr class="big-topic-row">
 								<td>TC001</td>
 								<td>Laws of Indices</td>
+								<td class="demo-out-btn"><a href="/demo?id=TC001-0">DEMO</a></td>
 							</tr>
 							<tr>
 								<td>TC001-0</td>
 								<td>Laws of Indices Part I</td>
+								<td class="demo-out-btn"><a href="/demo?id=TC001-0">DEMO</a></td>
 							</tr>
 							<tr>
 								<td>TC001-1</td>
 								<td>Laws of Indices Part II</td>
+								<td class="demo-out-btn"><a href="/demo?id=TC001-0">DEMO</a></td>
 							</tr>
 							<tr>
 								<td>TC001-2</td>
 								<td>Law of Indices Final Part</td>
+								<td class="demo-out-btn"><a href="/demo?id=TC001-0">DEMO</a></td>
 							</tr>
 							<tr>
 								<td>TC001-3</td>
@@ -209,6 +227,11 @@
 				btn = btn[0], table = table[0]
 				btn.addEventListener("click", e => {
 					table.classList.toggle("active")
+					if (table.classList.contains("active")) {
+						btn.innerHTML = "Shrink"
+					} else {
+						btn.innerHTML = "Expand"
+					}
 				})
 			}
 		}

@@ -70,6 +70,34 @@ body {
 	z-index: -1;
 }
 
+#background-graph {
+	position: fixed;
+	bottom: 0;
+
+	width: 100%;
+	height: calc(100% - 81px);
+
+	z-index: -2;
+
+	opacity: .4;
+}
+
+#background-graph > path {
+	fill: none;
+	stroke: #5d5d5d;
+	stroke-width: 2px;
+}
+
+#background-graph > path.axis-head {
+	fill: #5d5d5d;
+	stroke-width: 0;
+	stroke: none;
+}
+
+#background-graph > path:last-child {
+	stroke: var(--accent-color);
+}
+
 #container {
 }
 
@@ -232,6 +260,11 @@ body {
 	border-style: solid;
 	border-width: 1px;
 	border-color: #c2c2c2;
+}
+
+#topics-demo-container > thead > tr > th,
+#topics-demo-container > tbody > tr > td {
+	background-color: white;
 }
 
 #topics-demo-container > thead > tr > th:first-child,

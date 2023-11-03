@@ -31,6 +31,10 @@
 				<img src="/qriller_assets/productdemo.svg">
 				<img src="/qriller_assets/productdemo.svg">
 			</div>
+			<svg id="background-graph">
+				<path id="background-svg-yaxishead" class="axis-head" d="m 13.374846,9.7237606 -16.2314793,0 8.11574,-14.0568738 z"></path>
+				<path id="background-svg-xaxishead" class="axis-head" d="m 13.374846,9.7237606 -16.2314793,0 8.11574,-14.0568738 z"></path>
+			</svg>
 		</div>
 		<div id="container">
 			<section id="section-intro" class="slide-sections">
@@ -135,5 +139,60 @@
 				topbar.classList.remove("scrolled");
 			}
 		});
+
+		// sine graph background
+		const graphSVG = document.getElementById("background-graph")
+
+		const xAxisHeadPath = document.getElementById("background-svg-xaxishead")
+		const yAxisHeadPath = document.getElementById("background-svg-yaxishead")
+		const xAxisPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+		const yAxisPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+		const sinePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+		xAxisPath.className = "axis-lines"
+		yAxisPath.className = "axis-lines"
+		graphSVG.appendChild(xAxisPath)
+		graphSVG.appendChild(yAxisPath)
+		graphSVG.appendChild(sinePath)
+
+		function drawSineGraph() {
+			/**
+			 * draws a path in graphSvg which mimics a sine graph plot
+			 * takes the computed width and height of the svg container as graph boundaries
+			 */
+			let containerWidth = graphSVG.clientWidth - 150; // 100 padding to the right
+			let containerHeight = graphSVG.clientHeight;
+
+			let scrollFactor = (window.scrollY /graphSVG.clientHeight)
+			let amplitude =  (scrollFactor + 1) *(0.03 *containerHeight) // pixels
+			let bottomPadding = 100 // pixels
+
+			let xOrigin = 20 // pixels, where origin will start
+			let yOrigin = containerHeight - amplitude - bottomPadding
+
+			let xPadding = 20
+
+			let period = (scrollFactor) *.015 + 0.02 // arbitrary units
+
+			// set axis heads
+			xAxisHeadPath.setAttribute("transform", `translate(${containerWidth +45 +xPadding}, ${yOrigin -8}), matrix(0,0.96460432,-0.66988476,0,9.8055563,2.927043)`)
+			yAxisHeadPath.setAttribute("transform", `translate(${xOrigin -5 +xPadding}, ${100 -5})`)
+
+			// plot axis graph
+			xAxisPath.setAttribute("d", `M${xPadding} ${yOrigin} L${containerWidth +50 +xPadding} ${yOrigin}`)
+			yAxisPath.setAttribute("d", `M${xOrigin +xPadding} 100 L${xOrigin +xPadding} ${yOrigin +bottomPadding *1.2}`)
+
+			// graph sine
+			let d = `M${xOrigin +xPadding} ${yOrigin}`
+			for (let x = xOrigin +xPadding; x < containerWidth; x++) {
+				let y = amplitude *Math.sin(period *(x -(xOrigin +xPadding))) +yOrigin
+				d += ` L${x} ${y}`
+			}
+
+			sinePath.setAttribute("d", d)
+		}
+
+		window.addEventListener('resize', drawSineGraph)
+		window.addEventListener('scroll', drawSineGraph)
+		drawSineGraph()
 	</script>
 </html>

@@ -6,99 +6,239 @@
 		<meta name="description" content="Worksheets grandmaster"/>
 
 		<link rel="stylesheet" href="/css/includes/reset.css">
-		<link rel="stylesheet" href="/css/includes/qriller/default.css">
-		<link rel="stylesheet" href="/css/includes/qriller/topbar.css">
-		<link rel="stylesheet" href="/css/includes/qriller/modal.css">
+		<link rel="stylesheet" href="/css/includes/qriller/new_topbar.css">
 		<link rel="stylesheet" href="/css/views/qriller/purchase_page.css">
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-		<link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100;200;300;500;600;700;800;900&display=swap" rel="stylesheet">
 
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-		<script src="/js/views/qriller/purchase.js"></script>
+		<!-- <script src="/js/views/qriller/purchase.js"></script> -->
 
-		<title>Qriller | Buy</title>
+		<title>Qriller | Topics</title>
 	</head>
 	<body>
-		<div id="modal-window">
-			<div id="modal-dialogue-container">
-				<h2 id="modal-dialogue-header">
-				</h2>
-				<p id="modal-dialogue-details">
-				</p>
-				<div id="modal-dialogue-action-container">
-					<button id="modal-dialogue-confirm-btn" title="reset cart">YES</button>
-					<button id="modal-dialogue-cancel-btn" title="keep cart">CANCEL</button>
+		<div id="topbar-container">
+			<a href="/" id="logo-redirect"><img src="/qriller_assets/banner.svg"></a>
+			<a class="active" href="/qriller/new">About</a>
+			<a href="/qriller/buy">Purchase</a>
+			<a href="/qriller/account">Account</a>
+			<a href="/qriller/contact">Contact</a>
+			<div id="topbar-mobile-component">
+				<a id="topbar-mobile-link">About</a>
+				<button id="topbar-mobile-hamburg">
+					<img src="/qriller_assets/hamburg.svg">
+				</button>
+				<div id="topbar-mobile-hamburg-menu">
+					<a href="/qriller/buy">Purchase</a>
+					<a href="/qriller/account">Account</a>
+					<a href="/qriller/contact">Contact</a>
 				</div>
 			</div>
 		</div>
-		<div id="topbar-container">
-			<a id="topbar-logo" href="/qriller">Qriller</a>
-			<div id="topbar-action-container">
-				<button id="contactus-btn" class="topbar-action-btn">
-					Support
-				</button>
-				<button id="contactus-btn" class="topbar-action-btn">
-					Contact Us
-				</button>
-				<a id="buy-btn" class="topbar-action-btn" href="/qriller/buy">
-					BUY
-				</a>
-			</div>
-		</div>
-		<div id="topbar-bottom-container">
-			<p>Conceptual learning | worksheets grandmaster</p>
-			<div id="topbar-bottom-action-container">
-				<div><a href="/qriller">Home</a></div>
-				<div><a href="/qriller/series">Series</a></div>
-				<div><a href="/qriller/topic-list">Topic List</a></div>
-			</div>
+		<div id="background-product-container">
+			<img id="background-tulip-img" src="/qriller_assets/tulip.svg">
 		</div>
 		<div id="container">
-			<h1>Purchase</h1>
+			<h1 id="page-header">PURCHASE</h1>
 			<div id="lr-container">
-				<div id="topics-selection-container">
-					<div id="topics-search-menu">
-						<input id="search-query-inp" name="searchquery" type="text" placeholder="SEARCH TITLE">
-						<button id="search-query-btn">SEARCH</button>
+				<div id="list-container">
+					<div id="searchbar-container">
+						<input id="searchbar-inp" name="searchquery-inp" placeholder="SEARCH TOPIC">
+						<button id="searchbar-search-btn"><img src="/qriller_assets/search.svg"></button>
 					</div>
-					<div id="topics-choice-menu">
-						<div id="topics-choice-selection">
+					<div id="scrolltable-container">
+						<div class="topic-entry">
+							<div class="topic-entry-header">
+								<h2>1 | FUMP</h2>
+								<button class="topic-entry-expand-btn">Expand</button>
+								<button class="add-to-cart-btn">Add</button>
+							</div>
+							<table class="sub-topics-table">
+								<thead>
+									<tr>
+										<th>Topic Code</th>
+										<th>Topic Title</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>TC001-0</td>
+										<td>Laws of Indices Part I</td>
+										<td><button class="add-to-cart-btn">Add</button></td>
+									</tr>
+									<tr>
+										<td>TC001-1</td>
+										<td>Laws of Indices Part II</td>
+										<td><button class="add-to-cart-btn">Add</button></td>
+									</tr>
+									<tr>
+										<td>TC001-2</td>
+										<td>Law of Indices Final Part</td>
+										<td><button class="add-to-cart-btn">Add</button></td>
+									</tr>
+									<tr>
+										<td>TC001-3</td>
+										<td>Expressing Numbers in Standard Form</td>
+										<td><button class="add-to-cart-btn">Add</button></td>
+									</tr>
+								</tbody>
+							</table>
 						</div>
-						<div id="topics-display-demo">
-							<h2>DEMO</h2>
-							<p>A few questions from the selected topics will appear here.</p>
+						<div class="topic-entry">
+							<div class="topic-entry-header">
+								<h2>1 | FUMP</h2>
+								<button class="topic-entry-expand-btn">Expand</button>
+								<button class="add-to-cart-btn">Add</button>
+							</div>
+							<table class="sub-topics-table">
+								<thead>
+									<tr>
+										<th>Topic Code</th>
+										<th>Topic Title</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>TC001-0</td>
+										<td>Laws of Indices Part I</td>
+										<td><button class="add-to-cart-btn">Add</button></td>
+									</tr>
+									<tr>
+										<td>TC001-1</td>
+										<td>Laws of Indices Part II</td>
+										<td><button class="add-to-cart-btn">Add</button></td>
+									</tr>
+									<tr>
+										<td>TC001-2</td>
+										<td>Law of Indices Final Part</td>
+										<td><button class="add-to-cart-btn">Add</button></td>
+									</tr>
+									<tr>
+										<td>TC001-3</td>
+										<td>Expressing Numbers in Standard Form</td>
+										<td><button class="add-to-cart-btn">Add</button></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div class="topic-entry">
+							<div class="topic-entry-header">
+								<h2>1 | FUMP</h2>
+								<button class="topic-entry-expand-btn">Expand</button>
+								<button class="add-to-cart-btn">Add</button>
+							</div>
+							<table class="sub-topics-table">
+								<thead>
+									<tr>
+										<th>Topic Code</th>
+										<th>Topic Title</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>TC001-0</td>
+										<td>Laws of Indices Part I</td>
+										<td><button class="add-to-cart-btn">Add</button></td>
+									</tr>
+									<tr>
+										<td>TC001-1</td>
+										<td>Laws of Indices Part II</td>
+										<td><button class="add-to-cart-btn">Add</button></td>
+									</tr>
+									<tr>
+										<td>TC001-2</td>
+										<td>Law of Indices Final Part</td>
+										<td><button class="add-to-cart-btn">Add</button></td>
+									</tr>
+									<tr>
+										<td>TC001-3</td>
+										<td>Expressing Numbers in Standard Form</td>
+										<td><button class="add-to-cart-btn">Add</button></td>
+									</tr>
+								</tbody>
+							</table>
 						</div>
 					</div>
 				</div>
-				<div id="shopping-cart-container">
-					<div id="shopping-cart-header-container">
-						<h3>CART</h3>
-						<button id="shopping-cart-reset-btn" title="reset cart">
-							<img src="/static/refresh_icon.svg">
-						</button>
+				<div id="cart-container">
+					<div id="cart-header">
+						<h2>Cart</h2>
+						<button id="cart-reset-btn"><img src="/qriller_assets/cart_reset.svg"></button>
 					</div>
-					<div id="shopping-list-summary">
-						<div id="shopping-list-summary-headers">
-							<p class="type-col">Type</p>
-							<p class="title-col">Title</p>
-							<p class="qty-col">Qty</p>
-							<p class="price-col">Price</p>
-						</div>
-					</div>
-					<div id="total-summary">
-						<p class="total-col">Total</p>
-						<p class="qty-col">0</p>
-						<p class="totalprice-col">SGD 0</p>
-					</div>
-					<div id="checkout-container">
-						<p id="checkout-msg">&nbsp;</p>
-						<button id="checkout-btn">
-							CHECKOUT
-						</button>
+					<div id="cart-scroll-container">
+						<table id="cart-content-container">
+							<thead>
+								<tr>
+									<th>Type</th>
+									<th>Title</th>
+									<th>Qty</th>
+									<th>Price</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>MO</td>
+									<td>Law of Indices Part I</td>
+									<td>3</td>
+									<td class="price-col">15<button class="cart-trash-btn"><img src="/qriller_assets/trash_icon.svg"></button></td>
+								</tr>
+								<tr>
+									<td>MO</td>
+									<td>Law of Indices Part I</td>
+									<td>3</td>
+									<td class="price-col">15<button class="cart-trash-btn"><img src="/qriller_assets/trash_icon.svg"></button></td>
+								</tr>
+							</tbody>
+							<tfoot>
+								<tr>
+									<td colspan="2">Total</td>
+									<td>3</td>
+									<td>SGD 15</td>
+								</tr>
+							</tfoot>
+						</table>
 					</div>
 				</div>
 			</div>
 		</div>
 	</body>
+	<script>
+		window.addEventListener("scroll", function() {
+			var topbar = document.getElementById("topbar-container");
+
+			if (window.scrollY > 50) { // Adjust the value as needed
+				topbar.classList.add("scrolled");
+			} else {
+				topbar.classList.remove("scrolled");
+			}
+		});
+
+		var topicEntries = document.getElementsByClassName("topic-entry")
+		for (let i = 0; i < topicEntries.length; i++) {
+			let ele = topicEntries.item(i)
+			let btn = ele.getElementsByClassName("topic-entry-expand-btn")
+			let table = ele.getElementsByClassName("sub-topics-table")
+			if (btn.length === 1 && table.length === 1) {
+				btn = btn[0], table = table[0]
+				btn.addEventListener("click", e => {
+					table.classList.toggle("active")
+					if (table.classList.contains("active")) {
+						btn.innerHTML = "Shrink"
+					} else {
+						btn.innerHTML = "Expand"
+					}
+				})
+			}
+		}
+
+		var topbarMobileComp = document.getElementById("topbar-mobile-component")
+		var hamburgMenu = document.getElementById("topbar-mobile-hamburg-menu")
+		document.getElementById("topbar-mobile-hamburg").addEventListener("click", e => {
+			topbarMobileComp.classList.toggle("expanded")
+		})
+		document.getElementById("topbar-mobile-hamburg-close-btn").addEventListener("click", e => {
+			topbarMobileComp.classList.toggle("expanded")
+		})
+	</script>
 </html>

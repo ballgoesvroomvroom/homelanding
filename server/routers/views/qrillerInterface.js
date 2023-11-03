@@ -196,6 +196,11 @@ router.get("/buy:new", (req, res) => {
 	res.sendFile(views.qriller.purchasePageNew)
 })
 
+router.get("/account", auth_router.authenticated, (req, res) => {
+	res.type("html")
+	res.sendFile(views.qriller.accountPage)
+})
+
 router.get("/checkout", auth_router.authenticated, (req, res) => {
 	res.type("html")
 	res.sendFile(views.qriller.checkoutPage)
