@@ -124,16 +124,31 @@ body {
 }
 
 .topic-entry-header {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+
 	padding: 20px;
 	margin-bottom: 10px;
-
-	font-weight: 300;
 
 	border-bottom-style: solid;
 	border-bottom-width: 1px;
 	border-bottom-color: #838383;
+}
 
-	cursor: pointer;
+.topic-entry-header > h2 {
+	padding-right: 10px;
+
+	font-weight: 300;
+}
+
+.topic-entry-expand-btn {
+	padding: 8px;
+
+	border-radius: .2rem;
+	color: white;
+	background-color: black;
 }
 
 .sub-topics-table {

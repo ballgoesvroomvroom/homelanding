@@ -603,6 +603,7 @@ document.addEventListener("DOMContentLoaded", e => {
 			var title = DATA[i][1]
 			if (title.toLowerCase().includes(modifiedQuery)) {
 				// skip entire branch of sub topics since main topic is relevant
+				containerMappings[i][0].classList.remove("uninterested") // toggled ininterested with previous filter
 				continue
 			} else {
 				var oneInterested = false // at least one is interested
