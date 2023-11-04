@@ -6,12 +6,6 @@ const fs = require("fs");
 const path = require("path");
 const dotenv = require("dotenv").config({ path: path.join(__dirname, "./.env") });
 
-const https = require("https");
-const optionSSL = {
-	key: fs.readFileSync("C:\\Users\\Chong\\certificates\\server.key"),
-	cert: fs.readFileSync("C:\\Users\\Chong\\certificates\\server.crt")
-};
-
 // set root path
 global.root = path.resolve(path.join(__dirname, "../"));
 console.log(global.root);
@@ -30,7 +24,7 @@ const qrillerDB = databaseInterface.qriller_users
 
 const PORT = 443;
 const app = express();
-const httpsServer = https.createServer(optionSSL, app);
+const httpServer = http.createServer(app);
 
 app.use(express.static("public"));
 app.use(cors());
@@ -78,6 +72,6 @@ function exitHandler() {
 process.on("SIGHUP", exitHandler);
 process.on("SIGINT", exitHandler);
 
-httpsServer.listen(PORT, () => {
+httpServer.listen(PORT, () => {
 	console.log("listening at", PORT);
 })

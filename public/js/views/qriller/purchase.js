@@ -47,18 +47,18 @@ class Session {
 		 * returns [container, input field, decrement btn, increment btn]
 		 */
 		const container = document.createElement("div")
-		container.className = "add-qty-inp-container"
+		container.className = "qty-counter-container"
 
 		const decrBtn = document.createElement("button")
-		decrBtn.className = "add-qty-decr-btn"
+		decrBtn.className = "qty-decr-btn"
 		decrBtn.innerHTML = "-"
 
 		const incrBtn = document.createElement("button")
-		incrBtn.className = "add-qty-incr-btn"
+		incrBtn.className = "qty-incr-btn"
 		incrBtn.innerHTML = "+"
 
 		const fieldInp = document.createElement("input")
-		fieldInp.className = "add-qty-field-inp"
+		fieldInp.className = "qty-inp"
 		fieldInp.setAttribute("type", "number")
 		fieldInp.setAttribute("min", 0)
 		fieldInp.value = 1
@@ -70,7 +70,7 @@ class Session {
 		return [container, fieldInp, decrBtn, incrBtn]
 	}
 
-	constructor(data=null) {
+	constructor(data = null) {
 		/*
 		 * data: [topicRoute, qty][], saved data from previous session, if exists preload it into this.cart map
 		 */
@@ -78,7 +78,7 @@ class Session {
 
 		if (data != null) {
 			console.log(data)
-			for (let i = data.length -1; i >= 0; i--) {
+			for (let i = data.length - 1; i >= 0; i--) {
 				this.cart.set(...data[i])
 				console.log(this.cart)
 			}
@@ -111,7 +111,7 @@ class Session {
 
 			// create cart visual entry
 			var containerInCart = this.addToCart(topicRoute)
-			var deleteBtn = containerInCart.getElementsByClassName("delete-btn")[0]
+			var deleteBtn = containerInCart.getElementsByClassName("cart-trash-btn")[0]
 
 			// change buy button to a quantity ticker (to be destroyed whenever item is removed out of cart i.e. qty === 0)
 			var [container, fieldInp, decrBtn, incrBtn] = Session.createQuantityCounter()
@@ -166,8 +166,8 @@ class Session {
 			})
 			incrBtn.addEventListener("click", e => {
 				var c = this.cart.get(topicRoute)
-				this.cart.set(topicRoute, c +1)
-				fieldInp.value = c +1
+				this.cart.set(topicRoute, c + 1)
+				fieldInp.value = c + 1
 
 				this.updateItemCartVisual(topicRoute, containerInCart) // update cart count
 
@@ -197,8 +197,8 @@ class Session {
 					return
 				}
 
-				this.cart.set(topicRoute, c -1)
-				fieldInp.value = c -1 // update input
+				this.cart.set(topicRoute, c - 1)
+				fieldInp.value = c - 1 // update input
 				this.updateItemCartVisual(topicRoute, containerInCart) // update cart count
 
 				// save data
@@ -246,13 +246,13 @@ class Session {
 		var title = `${topicRoute} | `
 		if (path.length === 1) {
 			// standard
-			title += DATA[parseInt(path[0]) -1][1]
+			title += DATA[parseInt(path[0]) - 1][1]
 		} else {
 			// mono, length 2
-			title += DATA[parseInt(path[0]) -1][3][parseInt(path[1])][1]
+			title += DATA[parseInt(path[0]) - 1][3][parseInt(path[1])][1]
 		}
 		var qty = this.cart.get(topicRoute)
-		var price = 5 *qty
+		var price = 5 * qty
 
 		return this.addItemToCartVisuals(type, title, qty, price)
 	}
@@ -260,7 +260,7 @@ class Session {
 	updateItemCartVisual(topicRoute, visualContainer) {
 		/*
 		 * topicRoute: string, e.g. "3.0" represents the individual indices ("." as delimiter) to obtain the data in DATA
-		 * visualContainer: dom element (div container, in the cart checkout)
+		 * visualContainer: dom element (div container, in the cart checkout, i.e. <tr> element)
 		 * takes in topicRoute and calculate the new quantity and total price
 		 */
 
@@ -270,25 +270,37 @@ class Session {
 		}
 
 		var qty = this.cart.get(topicRoute)
-		var price = `${Math.trunc(qty *5 *100) /100}`
+		var price = `${qty *5}`
 
-		visualContainer.getElementsByClassName("qty-col")[0].innerHTML = qty
-		visualContainer.getElementsByClassName("price-col")[0].innerHTML = price
+		visualContainer.getElementsByTagName("td")[2].innerHTML = qty
+		visualContainer.getElementsByTagName("td")[3].getElementsByTagName("span")[0].innerHTML = price
 
 		// update the total summary too
 		this.updateCartTotalVisuals()
 	}
 
 	updateCartTotalVisuals() {
-		var container = document.getElementById("total-summary")
+		/**
+		 * update visual elements in total cart summary
+		 * called whenever there is a change to the cart's content, hence will toggle '.empty' class for #cart-content-container when cart.length is === 0
+		 */
+		var container = document.getElementById("cart-content-foot")
 		var totalQty = 0
 		for (let qty of this.cart.values()) {
 			totalQty += qty
 		}
 
-		var totalPrice = Math.trunc(totalQty *5 *100) /100
-		container.getElementsByClassName("qty-col")[0].innerHTML = totalQty
-		container.getElementsByClassName("totalprice-col")[0].innerHTML = `SGD ${totalPrice}`
+		var totalPrice = Math.trunc(totalQty * 5 * 100) / 100
+		var cols = container.getElementsByTagName("td")
+		cols[1].innerHTML = totalQty
+		cols[2].innerHTML = `SGD ${totalPrice}`
+
+		if (totalQty === 0) {
+			// empty cart, apply .empty style
+			document.getElementById("cart-content-container").classList.add("empty")
+		} else {
+			document.getElementById("cart-content-container").classList.remove("empty")
+		}
 	}
 
 	addItemToCartVisuals(type, title, qty, price) {
@@ -296,41 +308,36 @@ class Session {
 		 * adds the visual entrys to cart checkout
 		 * returns the container (without any events binded)
 		 */
-		const cartContainer = document.getElementById("shopping-list-summary")
+		const cartContainer = document.getElementById("cart-content-body")
 
-		const container = document.createElement("div")
-		container.className = "shopping-list-entry"
+		const container = document.createElement("tr")
 
-		const typeCol = document.createElement("p")
-		typeCol.className = "type-col"
+		const typeCol = document.createElement("td")
 		typeCol.innerHTML = type
 
-		const titleCol = document.createElement("p")
-		titleCol.className = "title-col"
+		const titleCol = document.createElement("td")
 		titleCol.innerHTML = title
 
-		const qtyCol = document.createElement("p")
-		qtyCol.className = "qty-col"
+		const qtyCol = document.createElement("td")
 		qtyCol.innerHTML = qty
 
-		const priceCol = document.createElement("p")
+		const priceCol = document.createElement("td")
 		priceCol.className = "price-col"
-		priceCol.innerHTML = price
 
-		const actionContainer = document.createElement("div")
-		actionContainer.className = "action-col"
+		const priceSpan = document.createElement("span")
+		priceSpan.innerHTML = price
 
 		const deleteBtn = document.createElement("button")
-		deleteBtn.className = "delete-btn"
-		deleteBtn.innerHTML = `<img src="/static/trash_icon.svg">`
+		deleteBtn.className = "cart-trash-btn"
+		deleteBtn.innerHTML = `<img src="/qriller_assets/trash_icon.svg">`
 
-		actionContainer.appendChild(deleteBtn)
+		priceCol.appendChild(priceSpan)
+		priceCol.appendChild(deleteBtn)
 
 		container.appendChild(typeCol)
 		container.appendChild(titleCol)
 		container.appendChild(qtyCol)
 		container.appendChild(priceCol)
-		container.appendChild(actionContainer)
 		cartContainer.appendChild(container)
 
 		// update total summary
@@ -350,21 +357,21 @@ class Session {
 		this.saveToLocalStorage() // save to localStorage
 
 		// un-hide back all the add buttons
-		var addBtns = document.getElementsByClassName("add-btn")
+		var addBtns = document.getElementsByClassName("add-to-cart-btn")
 		var addBtnsLen = addBtns.length
 		for (let i = 0; i < addBtnsLen; i++) {
 			addBtns.item(i).style.removeProperty("display")
 		}
 
 		// remove all the qty input counters
-		var qtyInpCounters = document.getElementsByClassName("add-qty-inp-container")
+		var qtyInpCounters = document.getElementsByClassName("qty-counter-container")
 		var qtyInpCountersLen = qtyInpCounters.length
 		for (let i = 0; i < qtyInpCountersLen; i++) {
 			qtyInpCounters.item(0).remove()
 		}
 
 		// remove cart visuals
-		var shoppingListEntries = document.getElementsByClassName("shopping-list-entry")
+		var shoppingListEntries = document.getElementById("cart-content-body").getElementsByTagName("tr")
 		var shoppingListEntriesLen = shoppingListEntries.length
 		for (let i = 0; i < shoppingListEntriesLen; i++) {
 			shoppingListEntries.item(0).remove()
@@ -403,7 +410,7 @@ class Session {
 		var arr = []
 		for (let [topic, qty] of this.cart) {
 			var split = topic.split(".")
-			var topicData = DATA[parseInt(split[0]) -1]
+			var topicData = DATA[parseInt(split[0]) - 1]
 
 			var uniqueCode = `${topicData[2]}`
 			if (split.length === 2) {
@@ -418,7 +425,7 @@ class Session {
 			headers: {
 				"Content-Type": "application/json"
 			},
-			body: JSON.stringify({'suppliedArr': arr})
+			body: JSON.stringify({ 'suppliedArr': arr })
 		})
 	}
 }
@@ -476,7 +483,7 @@ class Modal {
 }
 
 document.addEventListener("DOMContentLoaded", e => {
-	const topicChoiceSelectionContainer = document.getElementById("topics-choice-selection")
+	const entriesContainer = document.getElementById("scrolltable-container")
 
 	var preloadData = localStorage.getItem("cartData")
 	if (preloadData != null) {
@@ -520,73 +527,94 @@ document.addEventListener("DOMContentLoaded", e => {
 		var containerMappings = []
 
 		for (let i = 0; i < DATA.length; i++) {
-			// build the container
 			const container = document.createElement("div")
-			container.className = "topic-element-container"
+			container.className = "topic-entry"
 
-			const detailsContainer = document.createElement("div")
-			detailsContainer.className = "topic-element-details-container"
+			// create the topic-entry-header
+			const topicEntryHeader = document.createElement("div");
+			topicEntryHeader.className = "topic-entry-header";
 
-			const dropdownBtn = document.createElement("button")
-			dropdownBtn.className = "topic-element-dropdown-btn"
+			const h2 = document.createElement("h2");
+			h2.innerHTML = `${DATA[i][0]} | ${DATA[i][1]}`;
 
-			const dropdownBtnImg = document.createElement("img")
-			dropdownBtnImg.src = "/static/dropdown_collapsed_arrow_icon.svg"
+			const expandBtn = document.createElement("button");
+			expandBtn.className = "topic-entry-expand-btn";
+			expandBtn.innerHTML = "Expand";
 
-			const topicPTag = document.createElement("p")
-			topicPTag.innerHTML = `${DATA[i][0]} | ${DATA[i][1]}`
+			const addBtn = document.createElement("button");
+			addBtn.className = "add-to-cart-btn";
+			addBtn.textContent = "Add";
 
-			const topicATCBtn = document.createElement("button")
-			topicATCBtn.className = "topic add-btn"
-			topicATCBtn.innerHTML = "ADD"
+			topicEntryHeader.appendChild(h2);
+			topicEntryHeader.appendChild(expandBtn);
+			topicEntryHeader.appendChild(addBtn);
 
-			const subtopicsContainer = document.createElement("div")
-			subtopicsContainer.className = "subtopic-element-list-container"
+			const subTopicsTable = document.createElement("table");
+			subTopicsTable.className = "sub-topics-table";
+			const thead = document.createElement("thead");
+			const tbody = document.createElement("tbody");
 
-			// add functionality
-			dropdownBtn.addEventListener("click", e => {
-				container.classList.toggle("expanded")
-			})
+			const tableHeaderRow = document.createElement("tr");
+			const topicCodeHeader = document.createElement("th");
+			topicCodeHeader.innerHTML = "Topic Code";
+			const topicTitleHeader = document.createElement("th");
+			topicTitleHeader.innerHTML = "Topic Title";
 
-			// maintain hierarchy
-			dropdownBtn.appendChild(dropdownBtnImg)
-			detailsContainer.appendChild(dropdownBtn)
-			detailsContainer.appendChild(topicPTag)
-			detailsContainer.appendChild(topicATCBtn)
-			container.appendChild(detailsContainer)
-			container.appendChild(subtopicsContainer)
+			tableHeaderRow.appendChild(topicCodeHeader);
+			tableHeaderRow.appendChild(topicTitleHeader);
 
-			topicChoiceSelectionContainer.appendChild(container)
-
-			// register buy event handler
-			session.registerTopic(`${DATA[i][0]}`, topicATCBtn)
+			thead.appendChild(tableHeaderRow);
 
 			// append to map
 			var subtopicsContainerMappings = [];
 			containerMappings.push([container, subtopicsContainerMappings])
 
-			var subtopics = DATA[i][3]
-			for (let j = 0; j < subtopics.length; j++) {
-				const subtopicEleContainer = document.createElement("div")
-				subtopicEleContainer.className = "subtopic-element-container"
+			// build table rows for sub topic lists
+			for (let j = 0; j < DATA[i][3].length; j++) {
+				const topicRow = document.createElement("tr");
+				const topicCodeCell = document.createElement("td");
+				topicCodeCell.innerHTML = `${DATA[i][2]}-${DATA[i][3][j][0]}`;
+				const topicTitleCell = document.createElement("td");
+				topicTitleCell.innerHTML = `${DATA[i][3][j][1]}`;
+				const addToCartCell = document.createElement("td");
+				const addToCartBtn = document.createElement("button");
+				addToCartBtn.className = "add-to-cart-btn";
+				addToCartBtn.textContent = "Add";
 
-				const subtopicPTag = document.createElement("p")
-				subtopicPTag.innerHTML = `${DATA[i][0]}.${subtopics[j][0]} | ${subtopics[j][1]}`
-
-				const subtopicATCBtn = document.createElement("button")
-				subtopicATCBtn.className = "subtopic add-btn"
-				subtopicATCBtn.innerHTML = "ADD"
-
-				subtopicEleContainer.appendChild(subtopicPTag)
-				subtopicEleContainer.appendChild(subtopicATCBtn)
-				subtopicsContainer.appendChild(subtopicEleContainer)
+				addToCartCell.appendChild(addToCartBtn);
+				topicRow.appendChild(topicCodeCell);
+				topicRow.appendChild(topicTitleCell);
+				topicRow.appendChild(addToCartCell);
+				tbody.appendChild(topicRow);
 
 				// register buy event handler
-				session.registerTopic(`${DATA[i][0]}.${subtopics[j][0]}`, subtopicATCBtn)
+				session.registerTopic(`${DATA[i][0]}.${DATA[i][3][j][0]}`, addToCartBtn)
 
 				// append to map
-				subtopicsContainerMappings.push(subtopicEleContainer)
+				subtopicsContainerMappings.push(topicRow)
 			}
+
+			subTopicsTable.appendChild(thead);
+			subTopicsTable.appendChild(tbody);
+
+			container.appendChild(topicEntryHeader);
+			container.appendChild(subTopicsTable);
+
+			// add dropdown functionality
+			expandBtn.addEventListener("click", e => {
+				subTopicsTable.classList.toggle("active");
+				if (subTopicsTable.classList.contains("active")) {
+					expandBtn.innerHTML = "Shrink"
+				} else {
+					expandBtn.innerHTML = "Expand"
+				}
+			})
+			
+			// register buy event handler
+			session.registerTopic(`${DATA[i][0]}`, addBtn)
+
+			// add entire row container to DOM
+			entriesContainer.appendChild(container)
 		}
 
 		return containerMappings
@@ -604,6 +632,10 @@ document.addEventListener("DOMContentLoaded", e => {
 			if (title.toLowerCase().includes(modifiedQuery)) {
 				// skip entire branch of sub topics since main topic is relevant
 				containerMappings[i][0].classList.remove("uninterested") // toggled ininterested with previous filter
+				for (let j = 0; j < DATA[i][3].length; j++) {
+					containerMappings[i][1][j].classList.remove("uninterested")
+				}
+
 				continue
 			} else {
 				var oneInterested = false // at least one is interested
@@ -639,8 +671,8 @@ document.addEventListener("DOMContentLoaded", e => {
 
 	var containerMappings = loadSelections()
 
-	var searchBarInp = document.getElementById("search-query-inp")
-	var searchBarBtn = document.getElementById("search-query-btn")
+	var searchBarInp = document.getElementById("searchbar-inp")
+	var searchBarBtn = document.getElementById("searchbar-search-btn")
 	searchBarInp.addEventListener("input", e => {
 		if (searchBarInp.value.length === 0) {
 			resetFilterOnSelection(containerMappings);
@@ -657,7 +689,7 @@ document.addEventListener("DOMContentLoaded", e => {
 	})
 
 	// reset cart button
-	document.getElementById("shopping-cart-reset-btn").addEventListener("click", e => {
+	document.getElementById("cart-reset-btn").addEventListener("click", e => {
 		console.log("FIRST")
 		resetCart()
 	})
@@ -668,6 +700,7 @@ document.addEventListener("DOMContentLoaded", e => {
 		if (session.cart.size === 0) {
 			// empty cart
 			messageBoxAboveCheckoutBtn.innerHTML = "Your cart is empty."
+			messageBoxAboveCheckoutBtn.classList.add("active")
 			return
 		}
 
@@ -685,6 +718,7 @@ document.addEventListener("DOMContentLoaded", e => {
 		}).catch(errMsg => {
 			// display error message
 			messageBoxAboveCheckoutBtn.innerHTML = `Error checking out cart with errror message:<br>${errMsg}<br><br>If the error persists, please reach out to us for near-immediate assistance at help@qriller.com`
+			messageBoxAboveCheckoutBtn.classList.add("active")
 		})
 	})
 })

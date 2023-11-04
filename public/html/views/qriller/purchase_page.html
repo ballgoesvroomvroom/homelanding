@@ -7,17 +7,30 @@
 
 		<link rel="stylesheet" href="/css/includes/reset.css">
 		<link rel="stylesheet" href="/css/includes/qriller/new_topbar.css">
+		<link rel="stylesheet" href="/css/includes/qriller/modal.css">
 		<link rel="stylesheet" href="/css/views/qriller/purchase_page.css">
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 		<link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100;200;300;500;600;700;800;900&display=swap" rel="stylesheet">
 
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-		<!-- <script src="/js/views/qriller/purchase.js"></script> -->
+		<script src="/js/views/qriller/purchase.js"></script>
 
 		<title>Qriller | Topics</title>
 	</head>
 	<body>
+		<div id="modal-window">
+			<div id="modal-dialogue-container">
+				<h2 id="modal-dialogue-header">
+				</h2>
+				<p id="modal-dialogue-details">
+				</p>
+				<div id="modal-dialogue-action-container">
+					<button id="modal-dialogue-confirm-btn" title="reset cart">YES</button>
+					<button id="modal-dialogue-cancel-btn" title="keep cart">CANCEL</button>
+				</div>
+			</div>
+		</div>
 		<div id="topbar-container">
 			<a href="/" id="logo-redirect"><img src="/qriller_assets/banner.svg"></a>
 			<a class="active" href="/qriller/new">About</a>
@@ -48,117 +61,6 @@
 						<button id="searchbar-search-btn"><img src="/qriller_assets/search.svg"></button>
 					</div>
 					<div id="scrolltable-container">
-						<div class="topic-entry">
-							<div class="topic-entry-header">
-								<h2>1 | FUMP</h2>
-								<button class="topic-entry-expand-btn">Expand</button>
-								<button class="add-to-cart-btn">Add</button>
-							</div>
-							<table class="sub-topics-table">
-								<thead>
-									<tr>
-										<th>Topic Code</th>
-										<th>Topic Title</th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr>
-										<td>TC001-0</td>
-										<td>Laws of Indices Part I</td>
-										<td><button class="add-to-cart-btn">Add</button></td>
-									</tr>
-									<tr>
-										<td>TC001-1</td>
-										<td>Laws of Indices Part II</td>
-										<td><button class="add-to-cart-btn">Add</button></td>
-									</tr>
-									<tr>
-										<td>TC001-2</td>
-										<td>Law of Indices Final Part</td>
-										<td><button class="add-to-cart-btn">Add</button></td>
-									</tr>
-									<tr>
-										<td>TC001-3</td>
-										<td>Expressing Numbers in Standard Form</td>
-										<td><button class="add-to-cart-btn">Add</button></td>
-									</tr>
-								</tbody>
-							</table>
-						</div>
-						<div class="topic-entry">
-							<div class="topic-entry-header">
-								<h2>1 | FUMP</h2>
-								<button class="topic-entry-expand-btn">Expand</button>
-								<button class="add-to-cart-btn">Add</button>
-							</div>
-							<table class="sub-topics-table">
-								<thead>
-									<tr>
-										<th>Topic Code</th>
-										<th>Topic Title</th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr>
-										<td>TC001-0</td>
-										<td>Laws of Indices Part I</td>
-										<td><button class="add-to-cart-btn">Add</button></td>
-									</tr>
-									<tr>
-										<td>TC001-1</td>
-										<td>Laws of Indices Part II</td>
-										<td><button class="add-to-cart-btn">Add</button></td>
-									</tr>
-									<tr>
-										<td>TC001-2</td>
-										<td>Law of Indices Final Part</td>
-										<td><button class="add-to-cart-btn">Add</button></td>
-									</tr>
-									<tr>
-										<td>TC001-3</td>
-										<td>Expressing Numbers in Standard Form</td>
-										<td><button class="add-to-cart-btn">Add</button></td>
-									</tr>
-								</tbody>
-							</table>
-						</div>
-						<div class="topic-entry">
-							<div class="topic-entry-header">
-								<h2>1 | FUMP</h2>
-								<button class="topic-entry-expand-btn">Expand</button>
-								<button class="add-to-cart-btn">Add</button>
-							</div>
-							<table class="sub-topics-table">
-								<thead>
-									<tr>
-										<th>Topic Code</th>
-										<th>Topic Title</th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr>
-										<td>TC001-0</td>
-										<td>Laws of Indices Part I</td>
-										<td><button class="add-to-cart-btn">Add</button></td>
-									</tr>
-									<tr>
-										<td>TC001-1</td>
-										<td>Laws of Indices Part II</td>
-										<td><button class="add-to-cart-btn">Add</button></td>
-									</tr>
-									<tr>
-										<td>TC001-2</td>
-										<td>Law of Indices Final Part</td>
-										<td><button class="add-to-cart-btn">Add</button></td>
-									</tr>
-									<tr>
-										<td>TC001-3</td>
-										<td>Expressing Numbers in Standard Form</td>
-										<td><button class="add-to-cart-btn">Add</button></td>
-									</tr>
-								</tbody>
-							</table>
-						</div>
 					</div>
 				</div>
 				<div id="cart-container">
@@ -167,7 +69,7 @@
 						<button id="cart-reset-btn"><img src="/qriller_assets/cart_reset.svg"></button>
 					</div>
 					<div id="cart-scroll-container">
-						<table id="cart-content-container">
+						<table id="cart-content-container" class="empty">
 							<thead>
 								<tr>
 									<th>Type</th>
@@ -176,21 +78,9 @@
 									<th>Price</th>
 								</tr>
 							</thead>
-							<tbody>
-								<tr>
-									<td>MO</td>
-									<td>Law of Indices Part I</td>
-									<td>3</td>
-									<td class="price-col">15<button class="cart-trash-btn"><img src="/qriller_assets/trash_icon.svg"></button></td>
-								</tr>
-								<tr>
-									<td>MO</td>
-									<td>Law of Indices Part I</td>
-									<td>3</td>
-									<td class="price-col">15<button class="cart-trash-btn"><img src="/qriller_assets/trash_icon.svg"></button></td>
-								</tr>
+							<tbody id="cart-content-body">
 							</tbody>
-							<tfoot>
+							<tfoot id="cart-content-foot">
 								<tr>
 									<td colspan="2">Total</td>
 									<td>3</td>
@@ -199,6 +89,10 @@
 							</tfoot>
 						</table>
 					</div>
+					<p id="checkout-msg">Hello! Your cart is empty.</p>
+					<button id="checkout-btn">
+						CHECKOUT
+					</button>
 				</div>
 			</div>
 		</div>
