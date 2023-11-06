@@ -7,12 +7,12 @@
 	justify-content: space-between;
 	align-items: flex-end;
 
-	width: calc(100% - 140px);
+	width: calc(100% - 90px);
 
-	padding: 20px 70px;
+	padding: 20px 45px;
 	padding-bottom: 33px;
 
-	background-color: white;
+	background-color: var(--primary-color);
 
 	z-index: 3;
 }

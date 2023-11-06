@@ -1,14 +1,12 @@
-:root {
-	--accent-color: #e34848;
-	--accent-compl-color: #a76262;
-}
-
 html {
 	height: 100svh;
 	height: auto;
 
 	font-family: "Roboto Slab", serif;
 	overflow-x: hidden;
+
+	color: var(--contrast-color);
+	background-color: var(--primary-color);
 }
 
 body {
@@ -103,6 +101,7 @@ body {
 	border: none;
 
 	caret-color: var(--accent-color);
+	background-color: unset;
 }
 
 #searchbar-search-btn > img {
@@ -183,7 +182,7 @@ body {
 
 .sub-topics-table > thead > tr > th:first-child,
 .sub-topics-table > tbody > tr > td:first-child {
-	background-color: #f7f7f7;
+	background-color: #ffdddd;
 }
 
 .sub-topics-table th,
@@ -191,6 +190,7 @@ body {
 	padding: 10px;
 }
 
+.sub-topics-table > thead > tr,
 .sub-topics-table > tbody > tr {
 	border-top-style: solid;
 	border-top-width: 1px;
@@ -221,7 +221,7 @@ body {
 	color: white;
 
 	border-radius: .2rem;
-	background-color: var(--accent-color);
+	background-color: var(--accent2-color);
 }
 
 @media (max-width: 640px) {

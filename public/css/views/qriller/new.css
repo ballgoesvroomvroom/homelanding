@@ -1,14 +1,12 @@
-:root {
-	--accent-color: #e34848;
-	--accent-compl-color: #a76262;
-}
-
 html {
 	height: 100svh;
 	height: auto;
 
 	font-family: "Roboto Slab", serif;
 	overflow-x: hidden;
+
+	color: var(--contrast-color);
+	background-color: var(--primary-color);
 }
 
 body {
@@ -269,7 +267,7 @@ body {
 
 #topics-demo-container > thead > tr > th:first-child,
 #topics-demo-container > tbody > tr > td:first-child {
-	background-color: #f7f7f7;
+	background-color: #ffdddd;
 }
 
 #topics-demo-container th,
@@ -349,5 +347,15 @@ body {
 
 	#section-series {
 		margin-top: 600px;
+	}
+
+	#series-comparison-container {
+		flex-direction: column;
+	}
+
+	.series-comparison-card {
+		max-width: 100%;
+
+		margin-bottom: 20px;
 	}
 }

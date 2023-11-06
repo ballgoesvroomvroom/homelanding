@@ -6,6 +6,7 @@
 		<meta name="description" content="Worksheets grandmaster"/>
 
 		<link rel="stylesheet" href="/css/includes/reset.css">
+		<link rel="stylesheet" href="/css/includes/qriller/default_new.css">
 		<link rel="stylesheet" href="/css/includes/qriller/new_topbar.css">
 		<link rel="stylesheet" href="/css/includes/qriller/modal.css">
 		<link rel="stylesheet" href="/css/views/qriller/purchase_page.css">
@@ -62,11 +63,16 @@
 					</div>
 					<div id="scrolltable-container">
 					</div>
+					<button id="mobile-cart-btn">
+						<img src="/qriller_assets/cart_icon.svg">
+						<span>CART</span>
+					</button>
 				</div>
 				<div id="cart-container">
 					<div id="cart-header">
 						<h2>Cart</h2>
 						<button id="cart-reset-btn"><img src="/qriller_assets/cart_reset.svg"></button>
+						<button id="cart-exit-btn"><img src="/qriller_assets/cart_exit.svg"></button>
 					</div>
 					<div id="cart-scroll-container">
 						<table id="cart-content-container" class="empty">
@@ -83,8 +89,8 @@
 							<tfoot id="cart-content-foot">
 								<tr>
 									<td colspan="2">Total</td>
-									<td>3</td>
-									<td>SGD 15</td>
+									<td>0</td>
+									<td>SGD 0</td>
 								</tr>
 							</tfoot>
 						</table>
@@ -108,31 +114,23 @@
 			}
 		});
 
-		var topicEntries = document.getElementsByClassName("topic-entry")
-		for (let i = 0; i < topicEntries.length; i++) {
-			let ele = topicEntries.item(i)
-			let btn = ele.getElementsByClassName("topic-entry-expand-btn")
-			let table = ele.getElementsByClassName("sub-topics-table")
-			if (btn.length === 1 && table.length === 1) {
-				btn = btn[0], table = table[0]
-				btn.addEventListener("click", e => {
-					table.classList.toggle("active")
-					if (table.classList.contains("active")) {
-						btn.innerHTML = "Shrink"
-					} else {
-						btn.innerHTML = "Expand"
-					}
-				})
-			}
-		}
-
 		var topbarMobileComp = document.getElementById("topbar-mobile-component")
 		var hamburgMenu = document.getElementById("topbar-mobile-hamburg-menu")
 		document.getElementById("topbar-mobile-hamburg").addEventListener("click", e => {
 			topbarMobileComp.classList.toggle("expanded")
 		})
-		document.getElementById("topbar-mobile-hamburg-close-btn").addEventListener("click", e => {
-			topbarMobileComp.classList.toggle("expanded")
+
+		/**
+		 * mobile cart button
+		 */
+		var lrContainer = document.getElementById("lr-container")
+		var cartContainer = document.getElementById("cart-container")
+		var cartExitBtn = document.getElementById("cart-exit-btn")
+		document.getElementById("mobile-cart-btn").addEventListener("click", e => {
+			lrContainer.classList.toggle("active")
+		})
+		cartExitBtn.addEventListener("click", e => {
+			lrContainer.classList.toggle("active")
 		})
 	</script>
 </html>
