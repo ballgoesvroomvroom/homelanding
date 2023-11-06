@@ -185,7 +185,7 @@
 			// graph sine
 			let d = `M${xOrigin +xPadding} ${yOrigin}`
 			for (let x = xOrigin +xPadding; x < containerWidth; x++) {
-				let y = amplitude *Math.sin(period *(x -(xOrigin +xPadding))) +yOrigin
+				let y = amplitude *-Math.sin(period *(x -(xOrigin +xPadding))) +yOrigin
 				d += ` L${x} ${y}`
 			}
 

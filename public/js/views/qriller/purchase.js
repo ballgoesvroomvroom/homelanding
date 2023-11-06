@@ -695,12 +695,13 @@ document.addEventListener("DOMContentLoaded", e => {
 	})
 
 	// checkout button
-	var messageBoxAboveCheckoutBtn = document.getElementById("checkout-msg")
+	var errorMsgContainer = document.getElementById("checkout-msg-container")
+	var errorMsgSpan = document.getElementById("checkout-msg")
 	document.getElementById("checkout-btn").addEventListener("click", e => {
 		if (session.cart.size === 0) {
 			// empty cart
-			messageBoxAboveCheckoutBtn.innerHTML = "Your cart is empty."
-			messageBoxAboveCheckoutBtn.classList.add("active")
+			errorMsgSpan.innerHTML = "Your cart is empty, kindly add something before checking out."
+			errorMsgContainer.classList.add("active")
 			return
 		}
 
@@ -717,8 +718,8 @@ document.addEventListener("DOMContentLoaded", e => {
 			window.location.href = "/qriller/checkout"
 		}).catch(errMsg => {
 			// display error message
-			messageBoxAboveCheckoutBtn.innerHTML = `Error checking out cart with errror message:<br>${errMsg}<br><br>If the error persists, please reach out to us for near-immediate assistance at help@qriller.com`
-			messageBoxAboveCheckoutBtn.classList.add("active")
+			errorMsgSpan.innerHTML = "Server failed to process checkout request, please try again; else reach out to help@qriller.com for near-immediate assistance."
+			errorMsgContainer.classList.remove("active")
 		})
 	})
 })

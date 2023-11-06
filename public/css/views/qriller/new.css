@@ -267,7 +267,7 @@ body {
 
 #topics-demo-container > thead > tr > th:first-child,
 #topics-demo-container > tbody > tr > td:first-child {
-	background-color: #ffdddd;
+	background-color: #fffaf1;
 }
 
 #topics-demo-container th,
@@ -317,7 +317,7 @@ body {
 	}
 
 	#product-container > img {
-		width: 500px;
+		width: 300px;
 	}
 
 	#section-intro {

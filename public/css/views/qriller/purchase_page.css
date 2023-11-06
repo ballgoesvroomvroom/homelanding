@@ -87,7 +87,7 @@ body {
 }
 
 #list-container {
-	flex-basis: 600px;
+	flex-basis: 450px;
 	flex-grow: 1;
 
 	display: flex;
@@ -131,7 +131,9 @@ body {
 
 #scrolltable-container {
 	flex-grow: 1;
+
 	padding-right: 10px;
+	padding-bottom: 10px;
 
 	overflow: auto;
 }
@@ -148,7 +150,7 @@ body {
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
-	align-items: center;
+	align-items: flex-start;
 
 	padding: 20px;
 	margin-bottom: 10px;
@@ -232,10 +234,6 @@ body {
 }
 
 .sub-topics-table > tbody > tr > td:last-child {
-	display: flex;
-	flex-direction: row;
-	justify-content: flex-end;
-
 	width: 70px;
 
 	padding-right: 20px;
@@ -247,6 +245,7 @@ body {
 	flex-shrink: 0;
 
 	min-width: 0;
+	width: 70px;
 
 	padding: 8px;
 
@@ -263,6 +262,7 @@ body {
 	flex-grow: 0;
 	flex-shrink: 0;
 
+	width: 70px;
 	height: 32px;
 
 	display: flex;
@@ -412,8 +412,7 @@ body {
 	top: 0;
 
 	text-align: left;
-
-	background-color: white;
+	background-color: var(--primary-color);
 }
 
 #cart-content-container > thead > tr > th {
@@ -428,7 +427,7 @@ body {
 
 #cart-content-container.empty > tbody {
 	display: block;
-	min-height: 200px;
+	height: 25svh;
 }
 
 #cart-content-container > tbody > tr > td {
@@ -473,24 +472,47 @@ body {
 	margin: auto;
 }
 
-#checkout-msg {
+#checkout-msg-container {
+	position: relative;
+
 	padding: 10px;
 	margin-bottom: 10px;
 
-	font-weight: 300;
+	font-weight: 500;
 
 	color: black;
-	background-color: var(--accent-color-translucent);
+}
+
+#checkout-msg {
+	position: relative;
+
+	color: #851919;
+
+	z-index: 1;
+}
+
+#checkout-msg-bg {
+	position: absolute;
+	top: 0;
+	left: 0;
+
+	width: 100%;
+	height: 100%;
+
+	opacity: .6;
+	z-index: 0;
+
+	background-color: var(--accent-color);
 
 	transform: scaleX(0);
-	transform-origin: center;
+	transform-origin: center left;
 	
 	transition-property: transform;
 	transition-duration: 150ms;
 	transition-timing-function: linear;
 }
 
-#checkout-msg.active {
+#checkout-msg-container.active > #checkout-msg-bg {
 	transform: scaleX(1)
 }
 
@@ -504,7 +526,7 @@ body {
 	background-color: var(--accent-color);
 }
 
-@media (max-width: 640px) {
+@media (max-width: 920px) {
 	#background-tulip-img {
 		width: 200px;
 	}
@@ -557,8 +579,14 @@ body {
 
 		display: none;
 
-		width: calc(100% - 40px);
-		height: calc(100% - 40px);
+		width: 100%;
+		height: 100%;
+
+		box-sizing: border-box;
+
+		padding-bottom: 20px;
+
+		background-color: var(--primary-color);
 	}
 
 	#lr-container.active > #list-container {
