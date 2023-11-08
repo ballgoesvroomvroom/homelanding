@@ -116,11 +116,24 @@ body {
 }
 
 .slide-sections > p {
-	width: auto;
+	width: min(calc(100% - 10px), 600px);
+
 	padding-right: 10px;
+
+	line-height: 24px;
 }
 
-#section-series {
+.slide-sections > ul {
+	padding-left: 20px;
+
+	line-height: 20px;
+}
+
+.slide-sections > ul > li {
+	margin-bottom: 10px;
+}
+
+#section-intro-2 {
 	margin-top: 500px;
 }
 
@@ -345,7 +358,7 @@ body {
 		line-height: 55px;
 	}
 
-	#section-series {
+	#section-intro-2 {
 		margin-top: 600px;
 	}
 

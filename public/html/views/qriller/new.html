@@ -43,9 +43,38 @@
 				<p>With more than 200 questions per worksheet.</p>
 			</section>
 
+			<section id="section-intro-2" class="slide-sections">
+				<h1>MATH CORE<br>CONCEPTS.</h1>
+				<p>With a wide variety of questions in your toolbox, drilling similar question types with subtle nuances has never been easier.</p>
+				<!-- TO DO: ADD A HORIZONTAL SCROLL TO DISPLAY CARDS OF VARIOUS QUESTION TOPICS -->
+			</section>
+
+			<section id="section-generation" class="slide-sections">
+				<h1>COMPUTATIONAL<br>GENERATION.</h1>
+				<p>Procedurally computed mathematical questions with no limits on the quantities.<br>With randomness introduced, absolute minimal reuse of questions.*</p>
+				<!-- TO DO: SHOW ALL THE GENERATED TERMS, FRACTIONS, COEFFICIENTS ETC -->
+			</section>
+
+			<section id="section-answersheet" class="slide-sections">
+				<h1>ANSWER SHEETS<br>PROVIDED.</h1>
+				<p>Answer sheet will also be generated along-side by our native, built-in Computer Algebra System (CAS).</p>
+				<!-- TO DO: ADD ANSWER SHEET VISUALS -->
+			</section>
+
+			<section id="section-answersheet" class="slide-sections">
+				<h1>AESTHETICS<br>MATTERS.</h1>
+				<p>At Qriller, we believe loving your worksheets is the first step to enjoying the study process.<br>We help you to achieve that by allowing you to customise the worksheets from a wide array of themes, color schemes, layout and fonts.<br>You are also able to add your own visual elements, remove the branding or even add your own branding.<br>Try out our worksheet visual editor demo.</p>
+				<!-- TO DO: ADD LINK OUT DEMO BTN -->
+				<!-- TO DO: gif showing all the cool features as mentioned in the above stanza -->
+			</section>
+
 			<section id="section-series" class="slide-sections">
 				<h1>CHOOSE FROM<br>TWO TYPES</h1>
-				<p>Generalised STANDARD and specialised MONO, priced at $5 each.</p>
+				<p>There are two different types of worksheets for sale.</p>
+				<ul>
+					<li>MONO contains 200 questions of the particular sub-topic.</li>
+					<li>STANDARD contains 200 questions of all the sub-topics under the parent topic, with options to lay them out in the order of the sub-topics.</li>
+				</ul>
 				<div id="series-comparison-container">
 					<div class="series-comparison-card" tabindex="0">
 						<img class="series-comparison-card-thumbnail" src="/qriller_assets/mono.svg">
@@ -67,8 +96,8 @@
 			</section>
 
 			<section id="section-audience" class="slide-sections">
-				<h1>FOR EVERYONE</h1>
-				<p>We mean it.</p>
+				<h1>MADE FOR<br>EVERYONE</h1>
+				<p>We mean it.<br>Teachers and students alike will benefit from an endless supply of worksheets.</p>
 				<div id="audience-container">
 					<div class="audience-cards">
 						<img src="/qriller_assets/teacher.svg">
@@ -168,7 +197,7 @@
 			let bottomPadding = 100 // pixels
 
 			let xOrigin = 20 // pixels, where origin will start
-			let yOrigin = containerHeight - amplitude - bottomPadding
+			let yOrigin = containerHeight - (0.06 *containerHeight) -bottomPadding // max
 
 			let xPadding = 20
 
