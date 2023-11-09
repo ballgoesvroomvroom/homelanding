@@ -78,14 +78,14 @@
      id="layer1">
     <path
        id="rect1"
-       style="fill:none;fill-opacity:0;stroke:#000000;stroke-width:1.6;stroke-opacity:1;stroke-dasharray:none"
+       style="fill:none;fill-opacity:0;stroke:#ffffff;stroke-width:1.6;stroke-opacity:1;stroke-dasharray:none"
        d="M 42.620106 23.828125 L 42.620106 42.33592 C 42.620106 42.493359 42.493359 42.620106 42.33592 42.620106 L 5.6640803 42.620106 C 5.5066414 42.620106 5.3798943 42.493359 5.3798943 42.33592 L 5.3798943 5.6640803 C 5.3798943 5.5066414 5.5066414 5.3798943 5.6640803 5.3798943 L 5.6640803 5.3798943 L 24.171875 5.3798943 " />
     <path
-       style="fill:#000000;fill-opacity:0;stroke:#000000;stroke-opacity:1;stroke-width:1.6;stroke-dasharray:none"
+       style="fill:#000000;fill-opacity:0;stroke:#ffffff;stroke-opacity:1;stroke-width:1.6;stroke-dasharray:none"
        d="M 27.778136,20.221864 45.5,2.5"
        id="path3" />
     <path
-       style="fill:#000000;fill-opacity:0;stroke:#000000;stroke-opacity:1;stroke-width:1.6;stroke-dasharray:none"
+       style="fill:#000000;fill-opacity:0;stroke:#ffffff;stroke-opacity:1;stroke-width:1.6;stroke-dasharray:none"
        d="M 32.506914,2.5 H 45.5 v 12.993087"
        id="path4" />
   </g>

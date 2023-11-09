@@ -4,6 +4,9 @@
 	--accent-color: #e85d75;
 	--accent-compl-color: #a76262;
 	--accent2-color: #38369a;
+
+	--border-light: #c8c8c8;
+	--border-medium: #a7a7a7;
 }
 
 html {
