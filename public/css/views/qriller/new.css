@@ -1,18 +1,12 @@
 html {
-	height: 100svh;
-	height: auto;
-
-	font-family: "Roboto Slab", serif;
 	overflow-x: hidden;
 
-	color: var(--contrast-color);
-	background-color: var(--primary-color);
+	background-image: url("/qriller_assets/checkered_bg.svg");
+	background-repeat: repeat;
 }
 
 body {
 	position: relative;
-
-	overflow-x: hidden;
 }
 
 #background-product-container {
@@ -100,23 +94,54 @@ body {
 }
 
 .slide-sections {
-	margin-left: 300px;
-	margin-top: 250px;
+	position: relative;
+
+	width: fit-content;
+	max-width: 600px;
+/*	max-width: calc(100% - 320px);*/
+
+	padding: 20px;
+	margin-left: 280px;
+	margin-top: 280px;
+
+	border-style: solid;
+	border-width: 1px;
+	border-color: #c8c8c8;
+	background-color: var(--primary-color);
+}
+
+.slide-sections::after {
+	position: absolute;
+
+	display: block;
+	content: "";
+
+	top: 8px;
+	left: 10px;
+
+	width: 100%;
+	height: 100%;
+
+	z-index: -1;
+
+	background-color: var(--accent2-color);
 }
 
 .slide-sections > h1 {
+	width: fit-content;
+
 	padding-right: 10px;
 
 	font-weight: 700;
 	font-size: 4rem;
 
-	line-height: 100px;
+	line-height: 1.2;
 
 	word-break: break-all;
 }
 
 .slide-sections > p {
-	width: min(calc(100% - 10px), 600px);
+	width: min(calc(100% - 10px), 400px);
 
 	padding-right: 10px;
 
@@ -134,7 +159,7 @@ body {
 }
 
 #section-intro-2 {
-	margin-top: 500px;
+	margin-top: 540px;
 }
 
 .header-disclaimer {

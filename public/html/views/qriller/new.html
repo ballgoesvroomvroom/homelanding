@@ -96,13 +96,19 @@
 				<!-- TO DO: SHOW ALL THE GENERATED TERMS, FRACTIONS, COEFFICIENTS ETC -->
 			</section>
 
+			<section id="section-generation" class="slide-sections">
+				<h1>COMPUTATIONAL<br>GENERATION.</h1>
+				<p>Procedurally computed mathematical questions with no limits on the quantities.<br>With randomness introduced, absolute minimal reuse of questions.*</p>
+				<!-- TO DO: SHOW ALL THE GENERATED TERMS, FRACTIONS, COEFFICIENTS ETC -->
+			</section>
+
 			<section id="section-answersheet" class="slide-sections">
 				<h1>ANSWER SHEETS<br>PROVIDED.</h1>
 				<p>Answer sheet will also be generated along-side by our native, built-in Computer Algebra System (CAS).</p>
 				<!-- TO DO: ADD ANSWER SHEET VISUALS -->
 			</section>
 
-			<section id="section-answersheet" class="slide-sections">
+			<section id="section-aesthetics" class="slide-sections">
 				<h1>AESTHETICS<br>MATTERS.</h1>
 				<p>At Qriller, we believe loving your worksheets is the first step to enjoying the study process.<br>We help you to achieve that by allowing you to customise the worksheets from a wide array of themes, color schemes, layout and fonts.<br>You are also able to add your own visual elements, remove the branding or even add your own branding.<br>Try out our worksheet visual editor demo.</p>
 				<!-- TO DO: ADD LINK OUT DEMO BTN -->
@@ -235,14 +241,14 @@
 
 			let scrollFactor = (window.scrollY /graphSVG.clientHeight)
 			let amplitude =  (scrollFactor + 1) *(0.03 *containerHeight) // pixels
-			let bottomPadding = 100 // pixels
+			let bottomPadding = 109 // pixels
 
 			let xOrigin = 20 // pixels, where origin will start
 			let yOrigin = containerHeight - (0.06 *containerHeight) -bottomPadding // max
 
-			let xPadding = 20
+			let xPadding = 37.6
 
-			let period = (scrollFactor) *.015 + 0.02 // arbitrary units
+			let period = (scrollFactor) *.0008 + 0.02 // arbitrary units
 
 			// set axis heads
 			xAxisHeadPath.setAttribute("transform", `translate(${containerWidth +45 +xPadding}, ${yOrigin -8}), matrix(0,0.96460432,-0.66988476,0,9.8055563,2.927043)`)
