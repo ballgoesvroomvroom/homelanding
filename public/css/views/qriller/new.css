@@ -322,7 +322,7 @@ body {
 #aesthetics-demo-video-container {
 	position: relative;
 
-	width: 400px;
+	width: 450px;
 
 	border-style: solid;
 	border-width: 1px;
@@ -352,6 +352,19 @@ body {
 	border-width: 1px;
 	border-color: var(--contrast-color);
 	background-color: black;
+
+	transition-property: color;
+	transition-duration: 150ms;
+	transition-timing-function: linear;
+}
+
+#aesthetics-demo-link-out-btn:focus,
+#aesthetics-demo-link-out-btn:hover {
+	color: var(--accent-color);
+
+	outline-style: solid;
+	outline-width: 1px;
+	outline-color: var(--accent-color);
 }
 
 #aesthetics-demo-link-out-btn > img {
