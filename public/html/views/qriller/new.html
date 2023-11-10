@@ -16,6 +16,13 @@
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 		<!-- <script src="/js/views/qriller/signup.js"></script> -->
 
+		<!-- page hydration -->
+		<script src="/js/views/qriller/home.js"></script>
+
+		<!-- Katex (https://katex.org/docs/browser) -->
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
+		<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8" crossorigin="anonymous" onload="katexOnload()"></script>
+
 		<title>Qriller | Home</title>
 	</head>
 	<body>
@@ -99,6 +106,13 @@
 					<h1>COMPUTATIONAL<br>GENERATION.</h1>
 					<p>Procedurally computed mathematical questions with no limits on the quantities.<br>With randomness introduced, absolute minimal reuse of questions.*</p>
 				</div>
+				<div class="slide-sections-side-list-container" id="demo-generation-math-expression">
+					<p>&nbsp;</p>
+					<p>&nbsp;</p>
+					<p>&nbsp;</p>
+					<p>&nbsp;</p>
+					<p>&nbsp;</p>
+				</div>
 				<!-- TO DO: SHOW ALL THE GENERATED TERMS, FRACTIONS, COEFFICIENTS ETC -->
 			</section>
 
@@ -106,6 +120,33 @@
 				<div class="slide-sections-header">
 					<h1>ANSWER SHEETS<br>PROVIDED.</h1>
 					<p>Answer sheet will also be generated along-side by our native, built-in Computer Algebra System (CAS).</p>
+				</div>
+				<div class="slide-sections-side-list-container" id="demo-cas-math-expression">
+					<div class="slide-section-side-list-child-div">
+						<div><p>Solve</p></div>
+						<div><p>&nbsp;</p></div>
+						<div><p>&nbsp;</p></div>
+					</div>
+					<div class="slide-section-side-list-child-div">
+						<div><p>Expand</p></div>
+						<div><p>&nbsp;</p></div>
+						<div><p>&nbsp;</p></div>
+					</div>
+					<div class="slide-section-side-list-child-div">
+						<div><p>Factor</p></div>
+						<div><p>&nbsp;</p></div>
+						<div><p>&nbsp;</p></div>
+					</div>
+					<div class="slide-section-side-list-child-div">
+						<div><p>Multiply</p></div>
+						<div><p>&nbsp;</p></div>
+						<div><p>&nbsp;</p></div>
+					</div>
+					<div class="slide-section-side-list-child-div">
+						<div><p>Modulo</p></div>
+						<div><p>&nbsp;</p></div>
+						<div><p>&nbsp;</p></div>
+					</div>
 				</div>
 				<!-- TO DO: ADD ANSWER SHEET VISUALS -->
 			</section>
@@ -124,7 +165,6 @@
 						<span>TRY EDITOR</span>
 						<img src="/qriller_assets/linkout.svg">
 				</div>
-				<!-- TO DO: ADD LINK OUT DEMO BTN -->
 				<!-- TO DO: gif showing all the cool features as mentioned in the above stanza -->
 			</section>
 
@@ -170,7 +210,7 @@
 				<div class="slide-sections-header">
 					<h1>still on<BR>the FENCE?</h1>
 					<p>Feel free to reach out to us at help@qriller.com if you have any queries or questions.</p>
-					<p>We could even shoot you a free trial! ˋ( ° ▽、° ) </p>
+					<p>We could even send you a free trial!<br>ˋ( ° ▽、° ) </p>
 			</section>
 
 			<section id="section-audience" class="slide-sections">
@@ -267,7 +307,7 @@
 			 * draws a path in graphSvg which mimics a sine graph plot
 			 * takes the computed width and height of the svg container as graph boundaries
 			 */
-			let containerWidth = graphSVG.clientWidth - 150; // 100 padding to the right
+			let containerWidth = Math.floor(graphSVG.clientWidth) - 150; // 100 padding to the right
 			let containerHeight = graphSVG.clientHeight;
 
 			let scrollFactor = (window.scrollY /graphSVG.clientHeight)
@@ -278,8 +318,10 @@
 			let yOrigin = containerHeight - (0.06 *containerHeight) -bottomPadding // max
 
 			let xPadding = 37.6
+			containerWidth += xPadding %1 // make them end off with the same decimals, therefore x iteration will be iterate inclusively
 
-			let period = (scrollFactor) *.0008 + 0.02 // arbitrary units
+			let noOfCycles = Math.floor(containerWidth /70)
+			let b = (2 *Math.PI *noOfCycles) /(containerWidth -(xOrigin +xPadding))
 
 			// set axis heads
 			xAxisHeadPath.setAttribute("transform", `translate(${containerWidth +45 +xPadding}, ${yOrigin -8}), matrix(0,0.96460432,-0.66988476,0,9.8055563,2.927043)`)
@@ -289,10 +331,15 @@
 			xAxisPath.setAttribute("d", `M${xPadding} ${yOrigin} L${containerWidth +50 +xPadding} ${yOrigin}`)
 			yAxisPath.setAttribute("d", `M${xOrigin +xPadding} 100 L${xOrigin +xPadding} ${yOrigin +bottomPadding *1.2}`)
 
+			// middle of the boundary
+			let mid = (containerWidth +(xOrigin +xPadding)) /2
+
 			// graph sine
 			let d = `M${xOrigin +xPadding} ${yOrigin}`
-			for (let x = xOrigin +xPadding; x < containerWidth; x++) {
-				let y = amplitude *-Math.sin(period *(x -(xOrigin +xPadding))) +yOrigin
+			for (let x = xOrigin +xPadding; x <= containerWidth; x++) {
+				let y = (amplitude *(Math.abs(x -mid) /mid -1)) *Math.sin(b *(x -(xOrigin +xPadding)))
+				// y *= (amplitude /-40) *Math.cos(2 *b *(x -(xOrigin +xPadding)))
+				y += yOrigin
 				d += ` L${x} ${y}`
 			}
 

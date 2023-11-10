@@ -89,7 +89,8 @@ body {
 }
 
 #background-graph > path:last-child {
-	stroke: var(--accent-color);
+	fill: var(--accent-color);
+	stroke: var(--accent2-color);
 }
 
 #container {
@@ -247,9 +248,75 @@ body {
 	background-color: var(--primary-color);
 }
 
+#section-generation,
+#section-answersheet {
+	display: flex;
+	flex-direction: row;
+}
+
+.slide-sections-side-list-container {
+	flex-grow: 1;
+	flex-shrink: 1;
+
+	min-width: 0;
+	flex-basis: 100px;
+
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+
+	padding-right: 80px;
+	margin-left: 40px;
+}
+
+.slide-sections-side-list-container > p {
+	padding: 10px;
+
+	margin-bottom: 14px;
+
+	border-style: solid;
+	border-width: 1px;
+	border-color: var(--border-light);
+	background-color: var(--primary-color);
+}
+
+.slide-section-side-list-child-div {
+	display: flex;
+	flex-direction: row;
+
+	margin-bottom: 14px;
+
+	border-style: solid;
+	border-width: 1px;
+	border-color: var(--border-light);
+	background-color: var(--primary-color);
+}
+
+.slide-section-side-list-child-div > div {
+	flex-grow: 1;
+
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+
+	padding: 10px;
+}
+
+.slide-section-side-list-child-div > div:first-child {
+	flex-basis: 70px;
+	flex-grow: 0;
+	flex-shrink: 0;
+
+	background-color: #e7e7e7;
+}
+
 #section-aesthetics {
 	display: flex;
 	flex-direction: row;
+}
+
+#section-aesthetics > .slide-sections-header {
+	border-right-width: 0;
 }
 
 #aesthetics-demo-video-container {
@@ -480,6 +547,10 @@ body {
 		flex-direction: column;
 	}
 
+	#section-aesthetics > .slide-sections-header {
+		border-right-width: 1px;
+	}
+
 	#aesthetics-demo-video-container {
 		width: unset;
 		max-width: min(calc(100% - 290px), 640px);
@@ -487,6 +558,15 @@ body {
 
 		border-top-width: 0;
 		border-left-width: 1px;
+	}
+
+	#section-answersheet {
+		flex-direction: column;
+	}
+
+	#demo-cas-math-expression {
+		margin-left: 0;
+		margin-top: 40px;
 	}
 }
 
@@ -510,6 +590,19 @@ body {
 
 	.slide-sections-header {
 		max-width: calc(100% - 80px);
+	}
+
+	#aesthetics-demo-video-container {
+		max-width: calc(100% - 40px);
+	}
+
+	#section-generation {
+		flex-direction: column;
+	}
+
+	#demo-generation-math-expression {
+		margin-left: 0;
+		margin-top: 40px;
 	}
 }
 
@@ -536,6 +629,10 @@ body {
 
 	#section-intro-2 {
 		margin-top: 600px;
+	}
+
+	#aesthetics-demo-video-container {
+		max-width: calc(100% - 40px);
 	}
 
 	#series-comparison-container {
