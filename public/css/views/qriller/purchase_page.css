@@ -1,9 +1,6 @@
 html {
 	height: 100svh;
 	height: auto;
-
-	font-family: "Roboto Slab", serif;
-	overflow-x: hidden;
 }
 
 body {
@@ -143,7 +140,7 @@ body {
 }
 
 .topic-entry.uninterested {
-	display: hidden;
+	display: none;
 }
 
 .topic-entry-header {

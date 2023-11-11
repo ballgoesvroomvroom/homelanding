@@ -270,7 +270,7 @@ class Session {
 		}
 
 		var qty = this.cart.get(topicRoute)
-		var price = `${qty *5}`
+		var price = `${qty * 5}`
 
 		visualContainer.getElementsByTagName("td")[2].innerHTML = qty
 		visualContainer.getElementsByTagName("td")[3].getElementsByTagName("span")[0].innerHTML = price
@@ -609,7 +609,7 @@ document.addEventListener("DOMContentLoaded", e => {
 					expandBtn.innerHTML = "Expand"
 				}
 			})
-			
+
 			// register buy event handler
 			session.registerTopic(`${DATA[i][0]}`, addBtn)
 
@@ -638,16 +638,19 @@ document.addEventListener("DOMContentLoaded", e => {
 
 				continue
 			} else {
+				// title is not interested, try applying the filters on the sub-topics
 				var oneInterested = false // at least one is interested
 				for (let j = 0; j < DATA[i][3].length; j++) {
 					var subtopicTitle = DATA[i][3][j][1]
 					if (subtopicTitle.toLowerCase().includes(modifiedQuery)) {
 						oneInterested = true
+						containerMappings[i][1][j].classList.remove("uninterested") // cannot assume it does not contain the class "uninterested" -- could be residue from previous filter
 					} else {
 						containerMappings[i][1][j].classList.add("uninterested")
 					}
 				}
 
+				console.log("LOOPEY FINISHED", DATA[i][1], oneInterested)
 				if (oneInterested === false) {
 					// none of its sub topics (let alone itself) are interested results
 					containerMappings[i][0].classList.add("uninterested")
