@@ -162,6 +162,21 @@ router.get("/shop/getTotal", auth_router.authenticated, (req, res) => {
 	})
 })
 
+// PROCESSING PAYMENT END (TO RETURN DEFINITE OKAY|ERROR STATES BEFORE PURCHASE IS CONFIRMED)
+// last line of authorisation before order is granted
+router.post("/shop/processPayment", auth_router.authenticated, (req, res) => {
+	/**
+	 * POST /shop/processPayment
+	 *
+	 * 1. validates order's total tallies with payment received
+	 * 2. processes the token supplied by payment method, to be supplied into Stripe's API (payment gateway) for processing
+	 *
+	 * POST body:
+	 * 	token: string, token returned by payment method
+	 */
+	
+})
+
 module.exports = { // export router object and authenticated middleware
 	baseURL, router
 }
