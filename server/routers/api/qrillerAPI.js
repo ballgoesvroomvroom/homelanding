@@ -1,7 +1,9 @@
 const baseURL = `/${encodeURIComponent("qriller")}`
 
-const express = require("express")
-const path = require("path")
+const express = require("express");
+const path = require("path");
+const dotenv = require("dotenv").config({path: path.join(__dirname, "../../../.env")});
+const stripe = require("stripe")(process.env.STRIPE_SECRET);
 
 const topicsData = require(path.join(__dirname, "../../../server-locked-resource/qrillerTopics.json"))
 
@@ -9,6 +11,8 @@ const mem = require(path.join(__dirname, "../../includes/qrillerMemory.js"))
 const auth_router = require(path.join(__dirname, "../auth_router.js"));
 
 const router = express.Router()
+
+const ALLOWED_CURRENCIES = ["sgd", "usd"]
 
 // fetches questions in a specific document
 router.get("/db/:documentId/qns", (req, res) => {
@@ -77,6 +81,11 @@ router.post("/cart/overwrite", (req, res) => {
 		suppliedArr = req.body.suppliedArr
 	} else {
 		return res.status(400).end()
+	}
+
+	if (req.session.currentOrder.isValid === true) {
+		// ongoing cart session, invalidate current card session
+		req.session.currentOrder.isValid = false
 	}
 
 	// validate suppliedArr's dimension
@@ -162,6 +171,37 @@ router.get("/shop/getTotal", auth_router.authenticated, (req, res) => {
 	})
 })
 
+// ORDER
+router.get("/shop/createOrder", auth_router.authenticated, (req, res) => {
+	/**
+	 * creates a new order under the tagged user
+	 * returns object containing the items, total, currency to be used
+	 * 
+	 * will not over-write a current existing order, if any; instead it will reject the request
+	 * if order fails to create, returns 403 forbidden
+	 */
+	if (req.session.cartItems.length === 0) {
+		// empty cart, nothing to create order with
+		return res.status(403).end()
+	}
+
+	// assumes modification to .cartItems is protected and validated, thus, .cartItems is of valid format
+	if (req.session.currentOrder.isValid === true) {
+		// there is already an existing order
+		return res.status(403).end()
+	}
+	req.session.currentOrder.isValid = true
+	req.session.currentOrder.items = req.session.cartItems.map(r => {[...r]}) // create a shallow copy
+	req.session.currentOrder.total = req.session.currentOrder.items.reduce((sum, currEle) => sum +(5 *currEle[1]), 0) // $5 for each quantity and topic
+
+	return res.status(200).json({
+		creation: "OKAY",
+		total: req.session.currentOrder.total,
+		cartItems: req.session.currentOrder.items,
+		currency: req.session.currentOrder.currency
+	})
+})
+
 // PROCESSING PAYMENT END (TO RETURN DEFINITE OKAY|ERROR STATES BEFORE PURCHASE IS CONFIRMED)
 // last line of authorisation before order is granted
 router.post("/shop/processPayment", auth_router.authenticated, (req, res) => {
@@ -169,12 +209,74 @@ router.post("/shop/processPayment", auth_router.authenticated, (req, res) => {
 	 * POST /shop/processPayment
 	 *
 	 * 1. validates order's total tallies with payment received
-	 * 2. processes the token supplied by payment method, to be supplied into Stripe's API (payment gateway) for processing
+	 * 2. processes the token supplied by payment method, to be supplied into Stripe's API (payment processor) for processing
 	 *
 	 * POST body:
 	 * 	token: string, token returned by payment method
+	 * 	amount: number, 64-bit floating point
+	 * 	currency: "sgd"|"usd", currency type
 	 */
+
+	// validate if order exists
+	if (req.session.currentOrder.isValid === false) {
+		// order not created yet, forbidden
+		return res.status(403).end()
+	}
+
+	// validate body has .token as a string
+	if (!req.body.hasOwnProperty("token") || typeof req.body["token"] !== "string") {
+		return res.status(400).end() // bad request
+	}
+	if (!req.body.hasOwnProperty("amount") || typeof req.body["amount"] !== "number") {
+		return res.status(400).end()
+	}
+	if (!req.body.hasOwnProperty("currency") || typeof req.body["currency"] !== "string") {
+		return res.status(400).end()
+	} else {
+		// executes .hasOwnProperty's function
+		var validCurrency = false
+		for (let i = 0; i < ALLOWED_CURRENCIES.length; i++) {
+			if (ALLOWED_CURRENCIES[i] === req.body["currency"]) {
+				validCurrency = true
+				break
+			}
+		}
+
+		if (validCurrency === false) {
+			return res.status(400).end() // invalid currency supplied
+		}
+	}
+
+	// validate if supplied amount to be paid matches order's total
+	if (Math.abs(req.body.amount -req.session.currentOrder.total) > 0.0001) {
+		// allow for marginal discrepenacies
+		// price discrepenacies too high, forbidden to process
+		return res.status(403).end()
+	}
 	
+	// create a stripe payment method based on the token supplied
+	const paymentMethod = stripe.paymentMethods.create({
+		type: "card",
+		card: {
+			token: req.body.token
+		}
+	}).catch(err => {
+		console.warn(`[ERROR]: UNABLE TO INVOKE stripe.paymentMethods.create WITH ERROR`, err)
+
+		// end connection
+		res.status(400).end()
+
+		return new Promise.reject(-1) // exit
+	})
+
+	// create a payment intent
+	paymentMethod.then(paymentMethodObj => {
+		// paymentMethodObj: paymentMethod object returned by stripe api
+		return stripe.paymentIntents.create({
+			amount: req.body.amount,
+
+		})
+	})
 })
 
 module.exports = { // export router object and authenticated middleware
