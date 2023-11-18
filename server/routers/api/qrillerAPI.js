@@ -247,12 +247,15 @@ router.post("/shop/processPayment", auth_router.authenticated, (req, res) => {
 		}
 	}
 
-	// validate if supplied amount to be paid matches order's total
+	// validate if supplied amount to be paid matches order's total (lowest unit should be cents, should not hit marginal error unless values mismatched)
 	if (Math.abs(req.body.amount -req.session.currentOrder.total) > 0.0001) {
 		// allow for marginal discrepenacies
 		// price discrepenacies too high, forbidden to process
 		return res.status(403).end()
 	}
+
+	// lock current order while order is processing
+	orderPayload._isLocked = true
 	
 	// create a stripe payment method based on the token supplied
 	const paymentMethod = stripe.paymentMethods.create({
@@ -273,9 +276,33 @@ router.post("/shop/processPayment", auth_router.authenticated, (req, res) => {
 	paymentMethod.then(paymentMethodObj => {
 		// paymentMethodObj: paymentMethod object returned by stripe api
 		return stripe.paymentIntents.create({
-			amount: req.body.amount,
-
+			amount: Math.floor(req.body.amount *100),
+	        currency: req.body.currency,
+			payment_method: paymentMethodObj.id,
+			confirm: true
 		})
+	}).then(paymentIntentObj => {
+		// store the paymentIntent status to be checked
+		req.session.currentOrder.paymentIntentId = paymentIntentObj.id;
+		switch (paymentIntentObj.status) {
+			case "succeeded":
+				// fulfil order
+				break
+			case "requires_payment_method":
+				// need to retry with different payment method
+				break
+			case "requires_action":
+				// further action required
+				// such as 3DS
+				console.warn("CONFIRMING PAYMENT INTENT REQUIRES FURTHER ACTION");
+				break
+
+			default:
+				console.warn("CONFIRMING PAYMENT INTENT RESOLVED WITH .status,", paymentIntentObj.status)
+		}
+		if (paymentIntentObj.status === "succeeded") {
+			// succees
+		}
 	})
 })
 

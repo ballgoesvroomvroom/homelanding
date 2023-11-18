@@ -114,7 +114,7 @@ const applyVerificationIdAction = (vid) => {
 		}
 
 		// check if user exists
-		if (qrillerDB.data.users[qrillerDB.data.verificationLinks[vid].username] == null) {
+		if (qrillerDB.data.users[qrillerDB.data.verificationLinks[vid].key] == null) {
 			// no user found tagged to this verification link
 			// bugged out verification id?
 			delete qrillerDB.data.verificationLinks[vid] // remove this vid
@@ -122,7 +122,7 @@ const applyVerificationIdAction = (vid) => {
 		}
 
 		// check if user is already authenticated
-		if (!qrillerDB.data.users[qrillerDB.data.verificationLinks[vid].username].pendingAccountCreationConfirmation) {
+		if (!qrillerDB.data.users[qrillerDB.data.verificationLinks[vid].key].pendingAccountCreationConfirmation) {
 			// value of 0, false, null will return true
 			// if .pendingAccountCreationConfirmation takes any of these 3 values, it means user has already verified email address
 			// entry should have already been deleted during verification flow
@@ -131,7 +131,7 @@ const applyVerificationIdAction = (vid) => {
 		}
 
 		// proceed to authenticate user
-		delete qrillerDB.data.users[qrillerDB.data.verificationLinks[vid].username].pendingAccountCreationConfirmation // simply remove field (retrieval will result in a null value)
+		delete qrillerDB.data.users[qrillerDB.data.verificationLinks[vid].key].pendingAccountCreationConfirmation // simply remove field (retrieval will result in a null value)
 		delete qrillerDB.data.verificationLinks[vid]
 
 		return true // success
@@ -148,6 +148,7 @@ router.get("/perms", (req, res) => {
 router.post("/create", (req, res) => {
 	/**
 	 * creates the user with credentials supplied in body as fields, 'username', 'email', 'pw'
+	 * created user's uid would be the hashed email address
 	 * responds with status 200 if successful
 	 * otherwise status 400 if invalid request (username already exists, password and email failed formatting)
 	 */
@@ -172,7 +173,7 @@ router.post("/create", (req, res) => {
 		return res.status(400).json({error: "Email address does not fit length requirements."})
 	}
 
-	var emailSplit = email.split("@")
+	var emailSplit = email.toLowerCase().split("@") // make email details case-insensitive
 	if (emailSplit.length !== 2) {
 		return res.status(400).json({error: "Email address is not formatted correctly."})
 	} else if (emailSplit[0].length === 0) {
@@ -187,11 +188,11 @@ router.post("/create", (req, res) => {
 		return res.status(400).json({error: "Domain portion of email address is not a valid domain, check for excess period characters."})
 	}
 
-	// determine if username and email address already exists
-	var hashedEmail = qrillerDB.mask.hash(email)
-	if (qrillerDB.data.users[un] != null) {
-		return res.status(400).json({error: "Username already exists."})
-	} else if (qrillerDB.data.emails[hashedEmail] != null) {
+	// generate key for this user from solely email
+	var key = qrillerDB.mask.hash(email)
+
+	// determine if email address already exists
+	if (qrillerDB.data.users[key] != null) {
 		return res.status(400).json({error: "Email address already in use."})
 	}
 
@@ -210,7 +211,7 @@ router.post("/create", (req, res) => {
 
 		// create a new user with hashed password and hashed email reference
 		// add in the verification reference too
-		qrillerDB.data.users[un] = {
+		qrillerDB.data.users[key] = {
 			"username": un,
 			"password": qrillerDB.mask.hash(pw),
 			"loginMethod": "password",
@@ -218,11 +219,8 @@ router.post("/create", (req, res) => {
 
 			"pendingAccountCreationConfirmation": true // to be set to false once user verifies email address
 		}
-		qrillerDB.data.emails[hashedEmail] = { // create map between used email and username
-			"username": un
-		}
 		qrillerDB.data.verificationLinks[verificationId] = {
-			"username": un,
+			"key": key,
 			"expires": Date.now() +(8.64e+8) // milliseconds when this verification link expires and will be purged from the database
 		}
 
