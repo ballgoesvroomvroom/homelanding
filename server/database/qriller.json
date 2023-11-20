@@ -11,15 +11,16 @@
 					"serialisedWorksheet": "ABC",
 					"serialisedAnswersheet": "CBA",
 					"dateCreatedUnixEpochMS": 82131201,
-
 					"orderId": "3e9fb29aded5a6c0"
 				}
-			}
+			},
 			"orders": {
 				"fulfilled": {
 					"3e9fb29aded5a6c0": {
 						"orderId": "3e9fb29aded5a6c0",
-						"worksheetIds": ["fc8e44c1a72e08ca"],
+						"worksheetIds": [
+							"fc8e44c1a72e08ca"
+						],
 						"amount": 500,
 						"stripePaymentIntentId": "6f6cef046f546f9a",
 						"dateCreatedUnixEpochMS": 418293120
@@ -27,11 +28,19 @@
 				},
 				"current": {
 					"orderId": "06c6af7b01459a6d",
-					"orderCart": [["GX001", 2], ["GX004-1", 1]],
+					"orderCart": [
+						[
+							"GX001",
+							2
+						],
+						[
+							"GX004-1",
+							1
+						]
+					],
 					"amount": 1500,
 					"stripePaymentIntentId": "c77e2fb17c579ea4",
 					"dateCreatedUnixEpohcMS": 4123211123,
-
 					"_isLocked": false
 				}
 			}

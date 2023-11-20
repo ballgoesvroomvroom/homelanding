@@ -5,6 +5,9 @@ const path = require("path");
 const dotenv = require("dotenv").config({path: path.join(__dirname, "../../../.env")});
 const stripe = require("stripe")(process.env.STRIPE_SECRET);
 
+const databaseInterface = require("../../database/interface.js");
+const qrillerDB = databaseInterface.qriller_users
+
 const topicsData = require(path.join(__dirname, "../../../server-locked-resource/qrillerTopics.json"))
 
 const mem = require(path.join(__dirname, "../../includes/qrillerMemory.js"))
@@ -174,10 +177,10 @@ router.get("/shop/getTotal", auth_router.authenticated, (req, res) => {
 // ORDER
 router.get("/shop/createOrder", auth_router.authenticated, (req, res) => {
 	/**
-	 * creates a new order under the tagged user
+	 * creates a new order under the tagged user, into qrillerDB
 	 * returns object containing the items, total, currency to be used
 	 * 
-	 * will not over-write a current existing order, if any; instead it will reject the request
+	 * will over-write the current existing order, if any; unless currentorder._isLocked is true
 	 * if order fails to create, returns 403 forbidden
 	 */
 	if (req.session.cartItems.length === 0) {
@@ -185,20 +188,23 @@ router.get("/shop/createOrder", auth_router.authenticated, (req, res) => {
 		return res.status(403).end()
 	}
 
-	// assumes modification to .cartItems is protected and validated, thus, .cartItems is of valid format
-	if (req.session.currentOrder.isValid === true) {
-		// there is already an existing order
+	var userData = qrillerDB.data.users[req.session.userId]
+	if (userData.orders.current != null && userData.orders.current._isLocked === true) {
+		// current order exists and is locked from further modification
 		return res.status(403).end()
 	}
-	req.session.currentOrder.isValid = true
-	req.session.currentOrder.items = req.session.cartItems.map(r => {[...r]}) // create a shallow copy
-	req.session.currentOrder.total = req.session.currentOrder.items.reduce((sum, currEle) => sum +(5 *currEle[1]), 0) // $5 for each quantity and topic
+
+	// populate cart data in data.orders.current
+	userData.orders.current.orderId = crypto.randomBytes(32).toString("hex") // generate order id
+	userData.orders.current.orderCart = req.session.cartItems.map(r => [...r]) // create a shallow copy
+	userData.orders.current.amount = req.session.cartItems.reduce((sum, currEle) => sum +(5 *currEle[1]), 0) // $5 for each quantity and topic
 
 	return res.status(200).json({
 		creation: "OKAY",
-		total: req.session.currentOrder.total,
-		cartItems: req.session.currentOrder.items,
-		currency: req.session.currentOrder.currency
+		username, userData.username, // for user to ensure name is his
+		total: userData.orders.current.amount, // return as cents
+		totalRepr: (userData.orders.current.amount /100).toFixed(2), // return as a representative string
+		itemNames: req.session.cartItemsRepresentative, // return the built representative
 	})
 })
 

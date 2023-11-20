@@ -274,7 +274,8 @@ router.post("/login", (req, res) => {
 				throw new Error(errmsg.invalid);
 			}
 
-			var userdata = qrillerDB.data.users[username.toLowerCase()]
+			var key = qrillerDB.mask.hash(username.toLowerCase())
+			var userdata = qrillerDB.data.users[key]
 			if (userdata == null) {
 				// no user found
 				throw new Error(errmsg.missing)
@@ -282,9 +283,9 @@ router.post("/login", (req, res) => {
 
 			var hashed_password = qrillerDB.mask.hash(password)
 			if (hashed_password === userdata.password) {
+				req.session.userId = key
 				req.session.username = userdata.username;
 				console.log("[DEBUG]: user logged in as", req.session.username)
-				req.session.uid = userdata.username
 
 				authSuccess = true;
 			}

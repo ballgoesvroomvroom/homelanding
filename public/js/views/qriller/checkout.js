@@ -51,7 +51,7 @@ let isAbleToProcessPayment = false // will be set to true when able to retrieve 
 let clickedGPayBtn = false // debounce value
 
 // get outstanding invoice
-let outstandingInvoice = fetch(`/api/qriller/shop/getTotal`, {
+let outstandingInvoice = fetch(`/api/qriller/shop/createOrder`, {
 	method: "GET",
 	credentials: "same-origin"
 }).then(r => {
@@ -63,8 +63,11 @@ let outstandingInvoice = fetch(`/api/qriller/shop/getTotal`, {
 }).then(data => {
 	/**
 	 * data payload schema: {
- 	 *	totalPrice: '25',
- 	 *	itemNames: [["1.0 | Topic 1", 3], ["1.2 | Topic 1.2", 2]]
+	 * 	creation: "OKAY"|"FAIL",
+ 	 * 	username: str,
+ 	 * 	total: number, price in cents
+ 	 *	totalRepr: str, price in dollars up to 2 decimal places
+ 	 *	itemNames: [["1.0 | Topic 1", 3], ["1.2 | Topic 1.2", 2]],
 	 * }
 	 */
 	console.log("FETCHED DATA", data)
@@ -183,7 +186,7 @@ function completeGPay() {
 	outstandingInvoice.then(data => {
 		console.log("PASSED")
 		paymentDataRequest.transactionInfo = {
-			totalPrice: data.totalPrice,
+			totalPrice: data.totalRepr,
 			currencyCode: "SGD",
 			totalPriceStatus: "FINAL",
 			totalPriceLabel: "Total"
