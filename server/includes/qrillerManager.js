@@ -70,7 +70,11 @@ class Manager {
 
 		// create new order payload in data.orders.fulfilled
 		userData.orders.fulfilled[orderId] = {
-
+			orderId: orderId,
+			worksheetIds: [],
+			amount: currentOrderData.amount,
+			stripePaymentIntentId: currentOrderData.stripePaymentIntentId,
+			dateCreatedUnixEpochMS: currentOrderData.dateCreatedUnixEpochMS
 		}
 
 		// set current cart to be empty
