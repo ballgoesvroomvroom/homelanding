@@ -3,6 +3,7 @@ const baseURL = `/${encodeURIComponent("qriller")}`
 const express = require("express");
 const path = require("path");
 const dotenv = require("dotenv").config({path: path.join(__dirname, "../../../.env")});
+const crypto = require("crypto");
 const stripe = require("stripe")(process.env.STRIPE_SECRET);
 
 const databaseInterface = require("../../database/interface.js");
@@ -146,34 +147,6 @@ router.post("/cart/overwrite", (req, res) => {
 	return res.status(200).end()
 })
 
-// SHOP
-router.get("/shop/getTotal", auth_router.authenticated, (req, res) => {
-	/**
-	 * returns a JSON object with the following keys:
-	 *	username: string, username of the user to verify the total he/she is paying is for her account
-	 *	totalPrice: string
-	 *	itemNames: [[topicName: string, qtyOrdered: number], ...]
-	 * returns 403 forbidden if shopping cart is empty
-	 */
-
-	if (req.session.cartItems == null || req.session.cartItems.length === 0) {
-		// missing or empty cart (yet to be set?)
-		return res.status(403).end()
-	}
-
-	// calculate total
-	var total = 0
-	for (let i = 0; i < req.session.cartItems.length; i++) {
-		total += 5 *req.session.cartItems[i][1]
-	}
-	
-	return res.status(200).json({
-		username: req.session.username,
-		totalPrice: total.toFixed(2), // returns string representation
-		itemNames: req.session.cartItemsRepresentative
-	})
-})
-
 // ORDER
 router.get("/shop/createOrder", auth_router.authenticated, (req, res) => {
 	/**
@@ -194,14 +167,29 @@ router.get("/shop/createOrder", auth_router.authenticated, (req, res) => {
 		return res.status(403).end()
 	}
 
+	// generate new order id for this current id (with no collision with data.orders.fulfilled)
+	var newOrderId;
+	for (let i = 0; i < 10; i++) {
+		newOrderId = crypto.randomBytes(32).toString("hex")
+		if (userData.orders.fulfilled[newOrderId] == null &&
+			(userData.orders.current == null || userData.orders.current.orderId == null || userData.orders.current.orderId !== newOrderId)) {
+			// no fulfilled data, or has current order whose orderId DOES NOT match the newly generated id
+			break
+		} else if (i === 9) {
+			// last attempt still not valid
+			return res.status(403).end() // forbidden
+		}
+	}
+
 	// populate cart data in data.orders.current
-	userData.orders.current.orderId = crypto.randomBytes(32).toString("hex") // generate order id
+	userData.orders.current.orderId = newOrderId
 	userData.orders.current.orderCart = req.session.cartItems.map(r => [...r]) // create a shallow copy
-	userData.orders.current.amount = req.session.cartItems.reduce((sum, currEle) => sum +(5 *currEle[1]), 0) // $5 for each quantity and topic
+	userData.orders.current.amount = req.session.cartItems.reduce((sum, currEle) => sum +(5 *currEle[1]), 0) *100 // $5 for each quantity and topic; store as cents too
+	userData.orders.current.dateCreatedUnixEpochMS = +new Date()
 
 	return res.status(200).json({
 		creation: "OKAY",
-		username, userData.username, // for user to ensure name is his
+		username: userData.username, // for user to ensure name is his
 		total: userData.orders.current.amount, // return as cents
 		totalRepr: (userData.orders.current.amount /100).toFixed(2), // return as a representative string
 		itemNames: req.session.cartItemsRepresentative, // return the built representative

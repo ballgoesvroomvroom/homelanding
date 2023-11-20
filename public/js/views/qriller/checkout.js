@@ -267,6 +267,6 @@ document.addEventListener("DOMContentLoaded", e => {
 		}
 
 		// update total price display in DOM too
-		document.getElementById("total-price-summary").innerHTML = `${dataArr.totalPrice} SGD`
+		document.getElementById("total-price-summary").innerHTML = `${dataArr.totalRepr} SGD`
 	})
 })

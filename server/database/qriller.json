@@ -27,21 +27,18 @@
 					}
 				},
 				"current": {
-					"orderId": "06c6af7b01459a6d",
+					"orderId": "a5013d007e4cb2e14d7ecd72124a6d7415f12181a13bb1cbe813c9f34e122ca3",
 					"orderCart": [
 						[
-							"GX001",
+							"TC002",
 							2
-						],
-						[
-							"GX004-1",
-							1
 						]
 					],
-					"amount": 1500,
+					"amount": 1000,
+					"stripePaymentAttachedForOrderId": "cc9a8f95ee8bd17374ca046a7e252bbe18da185f7d975f63438a2d593c8f0c85",
 					"stripePaymentIntentId": "c77e2fb17c579ea4",
-					"dateCreatedUnixEpohcMS": 4123211123,
-					"_isLocked": false
+					"_isLocked": false,
+					"dateCreatedUnixEpochMS": 1700447116895
 				}
 			}
 		}
