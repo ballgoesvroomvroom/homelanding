@@ -66,6 +66,20 @@ class Manager {
 		if (userData.orders.fulfilled[orderId] != null) {
 			// id generation should have checked for id collisisons within order.fulfilled
 			// fail-safe, re-generate a whole orderId of 32 bytes long
+			var newOrderId;
+			for (let i = 0; i < 10; i++) {
+				newOrderId = crypto.randomBytes(32).toString("hex")
+				if (userData.orders.fulfilled[newOrderId] == null &&
+					(userData.orders.current == null || userData.orders.current.orderId == null || userData.orders.current.orderId !== newOrderId)) {
+					// no fulfilled data, or has current order whose orderId DOES NOT match the newly generated id
+					currentOrderData.orderId = newOrderId
+					orderId = newOrderId
+					break
+				} else if (i === 9) {
+					// last attempt still not valid
+					return 0 // unable to fail-safe
+				}
+			}
 		}
 
 		// create new order payload in data.orders.fulfilled
@@ -77,7 +91,10 @@ class Manager {
 			dateCreatedUnixEpochMS: currentOrderData.dateCreatedUnixEpochMS
 		}
 
-		// set current cart to be empty
+		// actual fulfillment of orders (generate worksheets and attach their resource locator (represented in base 16) into data.orders.fulfilled[orderId])
+		// TO-DO
+
+		// set current cart to be empty (removes ._isLocked property, simultaneously unlocking current order to allow for modifications)
 		delete orderData.current;
 	}
 }
