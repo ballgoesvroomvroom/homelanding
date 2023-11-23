@@ -94,17 +94,26 @@ function processPayment(token) {
 	 * returns a promise that eithers resolves upon confirmation from server (i.e. user got his goods), or rejects when user fails to get his goods (unable to grant, etc)
 	 * promise rejects with the error object with keys, 'reason', 'message', 'intent'
 	 */
+	console.log("TOKEN", token)
 	return fetch("/api/qriller/shop/processPayment", {
 		method: "POST",
+		headers: {
+			"Content-Type": "application/json"
+		},
 		body: JSON.stringify({
-			"token": token
+			token: token
 		}),
 		credentials: "same-origin"
 	}).then(r => {
 		if (r.status === 200) {
 			return r.json()
 		} else {
-			return new Promise.reject(r.status)
+			console.log("SERVER THREW", r.status)
+			return new Promise.reject({
+				reason: "OTHER_ERROR",
+				message: "Server is unable to process payment. Please try again later or contact us at help@qriller.com for immediate assistance.",
+				intent: "PAYMENT_AUTHORIZATION"
+			})
 		}
 	})
 }
@@ -133,7 +142,6 @@ function getGPaymentsClient() {
 	return paymentsClient
 }
 
-console.log("VER 1")
 function paymentAuthorisedGPay(paymentData) {
 	/**
 	 * handles authorise payments callbacks (response)

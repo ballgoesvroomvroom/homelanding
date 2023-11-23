@@ -35,4 +35,4 @@ const DIRECTORY = {
 	}
 }
 
-modue.exports = DIRECTORY;
+module.exports = DIRECTORY;

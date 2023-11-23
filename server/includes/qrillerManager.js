@@ -2,7 +2,9 @@
  * manages service related to Qriller site's framework
  * i.e. handling payment charges, fulfilling orders
  */
+const path = require("path")
 const dotenv = require("dotenv").config({path: path.join(__dirname, "../../.env")});
+console.log(process.env.STRIPE_SECRET)
 const stripe = require("stripe")(process.env.STRIPE_SECRET);
 
 const qriller = require("./qriller.js")
@@ -11,17 +13,61 @@ const qrillerDirectory = require("./qrillerDirectory.js")
 const databaseInterface = require("../database/interface.js");
 const qrillerDB = databaseInterface.qriller_users
 
-function assert(condition, ...msg) {
-	if (!condition) {
-		throw new Error()
-	}
-}
-
 class Manager {
 	/**
 	 * manages the user data within the supplied userid
 	 */
-	async generateWorksheet(userId, topicCode) {
+	static getCurrentOrder(userId) {
+		/**
+		 * returns payload of current order if any, else returns null if current order does not exists
+		 * payload: {
+	 	 * 	amount: number, cents
+		 * }
+		 */
+
+		var userData = qrillerDB.data.users[userId]
+		if (userData == null || userData.orders == null || userData.orders.current == null || userData.orders.current.amount == null) {
+			// missing fields
+			console.log("[DEBUG]: attempting to retrieve current order for", userId, userData.orders.current)
+			return;
+		}
+
+		return {
+			amount: userData.orders.current.amount
+		}
+	}
+
+	static getCurrentOrderLockState(userId) {
+		/**
+		 * returns true if data.orders.current._isLocked === true, else false (even if errors occur)
+		 */
+
+		var userData = qrillerDB.data.users[userId]
+		if (userData == null || userData.orders == null || userData.orders.current == null || userData.orders.current._isLocked == null) {
+			// missing fields
+			return false;
+		}
+
+		return userData.orders.current._isLocked;
+	}
+
+	static lockCurrentOrder(userId, toLock = true) {
+		/**
+		 * locks current order and prevents further modification
+		 * returns 1 on successful lock, else 0
+		 */
+
+		var userData = qrillerDB.data.users[userId]
+		if (userData == null || userData.orders == null || userData.orders.current == null) {
+			// missing fields
+			return 0
+		}
+
+		userData.orders.current._isLocked = toLock;
+		return 1; // success state
+	}
+
+	static async generateWorksheet(userId, topicCode) {
 		/**
 		 * generates the worksheet based on the topic code
 		 * stores generated worksheet in data.worksheets
@@ -84,9 +130,7 @@ class Manager {
 		}
 
 		// serialise data to be stored in database
-		let serialisedQnData = q.serialiseQuestions()
-		let serialisedAnsData = q.serialiseAnswers()
-		// TO DO LOOK INTO SEEDING INSTEAD OF RELYING ON SERIALISING QUESTIONS DUE TO A LOT OF REDUNDANT QUESTION HEADERS
+		let seed = q.rngseed;
 
 
 		// add it to data.worksheets
@@ -116,15 +160,14 @@ class Manager {
 		userData.worksheets[worksheetId] = {
 			title: `${data.code} | ${data.title}`,
 			topicCode,
-			serialisedQnData,
-			serialisedAnsData,
+			seed, // store seed to deterministically generate worksheet on each call
 			dateCreatedUnixEpochMS: +new Date()
 		}
 
 		return worksheetId
 	}
 
-	async fulfilOrder(userId, paymentIntentCS) {
+	static async fulfilOrder(userId, paymentIntentCS) {
 		/**
 		 * userId: key for the qriller database
 		 * paymentIntentCS: string, client secret of the server-side generated paymentIntent
@@ -170,6 +213,7 @@ class Manager {
 
 		// current order exists, paymentIntent status and amount matches
 		// attach stripePaymentIntent, fulfil current order, build data to data.orders.fulfilled
+		// current order is locked (._isLocked === true), no modificatons can occur, following two appended data should stick with respective orders
 		currentOrderData.stripePaymentIntentId = paymentIntent.id;
 		currentOrderData.stripePaymentAttachedForOrderId = currentOrderData.orderId;
 
@@ -222,5 +266,10 @@ class Manager {
 
 		// set current cart to be empty (removes ._isLocked property, simultaneously unlocking current order to allow for modifications)
 		delete orderData.current;
+
+		// return 1 for success
+		return 1
 	}
 }
+
+module.exports = Manager

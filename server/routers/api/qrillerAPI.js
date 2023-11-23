@@ -9,6 +9,8 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET);
 const databaseInterface = require("../../database/interface.js");
 const qrillerDB = databaseInterface.qriller_users
 
+const manager = require("../../includes/qrillerManager.js");
+
 const topicsData = require(path.join(__dirname, "../../../server-locked-resource/qrillerTopics.json"))
 
 const mem = require(path.join(__dirname, "../../includes/qrillerMemory.js"))
@@ -156,14 +158,17 @@ router.get("/shop/createOrder", auth_router.authenticated, (req, res) => {
 	 * will over-write the current existing order, if any; unless currentorder._isLocked is true
 	 * if order fails to create, returns 403 forbidden
 	 */
+	console.log(`[DEBUG]: order created for user ${req.session.username}`)
 	if (req.session.cartItems.length === 0) {
 		// empty cart, nothing to create order with
+		console.log(`[DEBUG]: unable to create order for user ${req.session.username} as cartItems.length === 0`)
 		return res.status(403).end()
 	}
 
 	var userData = qrillerDB.data.users[req.session.userId]
 	if (userData.orders.current != null && userData.orders.current._isLocked === true) {
 		// current order exists and is locked from further modification
+		console.log(`[DEBUG]: current order for ${req.session.userId} failed to create due to locked current order`)
 		return res.status(403).end()
 	}
 
@@ -182,10 +187,13 @@ router.get("/shop/createOrder", auth_router.authenticated, (req, res) => {
 	}
 
 	// populate cart data in data.orders.current
+	userData.orders.current = {} // create dictionary
 	userData.orders.current.orderId = newOrderId
 	userData.orders.current.orderCart = req.session.cartItems.map(r => [...r]) // create a shallow copy
-	userData.orders.current.amount = req.session.cartItems.reduce((sum, currEle) => sum +(5 *currEle[1]), 0) *100 // $5 for each quantity and topic; store as cents too
+	userData.orders.current.amount = req.session.cartItems.reduce((sum, currEle) => sum +(5 *currEle[1]), 0) *100 // $5 for each quantity and topic; store as cents
 	userData.orders.current.dateCreatedUnixEpochMS = +new Date()
+
+	console.log(`[DEBUG]: finished order creation,`, userData.orders.current)
 
 	return res.status(200).json({
 		creation: "OKAY",
@@ -202,56 +210,65 @@ router.post("/shop/processPayment", auth_router.authenticated, (req, res) => {
 	/**
 	 * POST /shop/processPayment
 	 *
-	 * 1. validates order's total tallies with payment received
-	 * 2. processes the token supplied by payment method, to be supplied into Stripe's API (payment processor) for processing
+	 * 1. processes the token supplied by payment method, to be supplied into Stripe's API (payment processor) for processing
 	 *
 	 * POST body:
 	 * 	token: string, token returned by payment method
-	 * 	amount: number, 64-bit floating point
-	 * 	currency: "sgd"|"usd", currency type
 	 */
 
-	// validate if order exists
-	if (req.session.currentOrder.isValid === false) {
-		// order not created yet, forbidden
-		return res.status(403).end()
-	}
+	console.log(`[DEBUG]: processing payment for user ${req.session.username} and with token ${JSON.stringify(req.body)}`)
 
 	// validate body has .token as a string
 	if (!req.body.hasOwnProperty("token") || typeof req.body["token"] !== "string") {
+		console.log("[DEBUG]: no body or token supplied for process payment request", req.session.userId)
 		return res.status(400).end() // bad request
 	}
-	if (!req.body.hasOwnProperty("amount") || typeof req.body["amount"] !== "number") {
-		return res.status(400).end()
-	}
-	if (!req.body.hasOwnProperty("currency") || typeof req.body["currency"] !== "string") {
-		return res.status(400).end()
-	} else {
-		// executes .hasOwnProperty's function
-		var validCurrency = false
-		for (let i = 0; i < ALLOWED_CURRENCIES.length; i++) {
-			if (ALLOWED_CURRENCIES[i] === req.body["currency"]) {
-				validCurrency = true
-				break
-			}
-		}
+	// if (!req.body.hasOwnProperty("currency") || typeof req.body["currency"] !== "string") {
+	// 	return res.status(400).end()
+	// } else {
+	// 	// executes .hasOwnProperty's function
+	// 	var validCurrency = false
+	// 	for (let i = 0; i < ALLOWED_CURRENCIES.length; i++) {
+	// 		if (ALLOWED_CURRENCIES[i] === req.body["currency"]) {
+	// 			validCurrency = true
+	// 			break
+	// 		}
+	// 	}
 
-		if (validCurrency === false) {
-			return res.status(400).end() // invalid currency supplied
-		}
-	}
+	// 	if (validCurrency === false) {
+	// 		return res.status(400).end() // invalid currency supplied
+	// 	}
+	// }
 
-	// validate if supplied amount to be paid matches order's total (lowest unit should be cents, should not hit marginal error unless values mismatched)
-	if (Math.abs(req.body.amount -req.session.currentOrder.total) > 0.0001) {
-		// allow for marginal discrepenacies
-		// price discrepenacies too high, forbidden to process
+	// determine lock status
+	var isLocked = manager.getCurrentOrderLockState(req.session.userId)
+	if (isLocked) {
+		// current order is locked, forbidden
 		return res.status(403).end()
 	}
 
 	// lock current order while order is processing
-	orderPayload._isLocked = true
+	var success = manager.lockCurrentOrder(req.session.userId, true)
+	if (success === 0) {
+		// failed to lock
+		console.warn("[WARN]: failed to lock order for", req.session.username)
+		return res.status(403).end()
+	}
+
+	// get order data
+	var orderData = manager.getCurrentOrder(req.session.userId)
+	if (orderData == null) {
+		// failed to retrieve data, could be missing fields
+		console.warn(`[WARN]: failed to retrieve data for user's current order, ${req.session.userId}`)
+
+		// unlock order (does not have to work particularly, data.orders.current might be missing)
+		manager.lockCurrentOrder(req.session.userId, false)
+
+		return res.status(403).end()
+	}
 	
 	// create a stripe payment method based on the token supplied
+	console.log("[DEBUG]: creating stripe paymentmethod")
 	const paymentMethod = stripe.paymentMethods.create({
 		type: "card",
 		card: {
@@ -259,6 +276,9 @@ router.post("/shop/processPayment", auth_router.authenticated, (req, res) => {
 		}
 	}).catch(err => {
 		console.warn(`[ERROR]: UNABLE TO INVOKE stripe.paymentMethods.create WITH ERROR`, err)
+
+		// unlock order (does not have to work particularly, data.orders.current might be missing)
+		manager.lockCurrentOrder(req.session.userId, false)
 
 		// end connection
 		res.status(400).end()
@@ -269,9 +289,10 @@ router.post("/shop/processPayment", auth_router.authenticated, (req, res) => {
 	// create a payment intent
 	paymentMethod.then(paymentMethodObj => {
 		// paymentMethodObj: paymentMethod object returned by stripe api
+		console.log(`[DEBUG]: creating stripe paymentIntent`)
 		return stripe.paymentIntents.create({
-			amount: Math.floor(req.body.amount *100),
-	        currency: req.body.currency,
+			amount: orderData.amount,
+	        currency: "sgd",
 			payment_method: paymentMethodObj.id,
 			confirm: true
 		})
@@ -281,7 +302,16 @@ router.post("/shop/processPayment", auth_router.authenticated, (req, res) => {
 		switch (paymentIntentObj.status) {
 			case "succeeded":
 				// fulfil order
-				break
+				console.log("[DEBUG]: paymentIntent resolved with 'succeeded', proceeding to fulfill order")
+				manager.fulfillOrder(req.session.userId, paymentIntentObj.id).then(status => {
+					if (status === 1) {
+						// success
+						console.log(`[DEBUG]: fulfilled order successful`)
+					} else {
+						// failed
+						console.log(`[DEBUG]: fulfilled order failed ${status}`)
+					}
+				})
 			case "requires_payment_method":
 				// need to retry with different payment method
 				break
@@ -294,9 +324,15 @@ router.post("/shop/processPayment", auth_router.authenticated, (req, res) => {
 			default:
 				console.warn("CONFIRMING PAYMENT INTENT RESOLVED WITH .status,", paymentIntentObj.status)
 		}
-		if (paymentIntentObj.status === "succeeded") {
-			// succees
-		}
+
+		res.status(200).end()
+	}).catch(() => {
+		console.warn("[ERROR]: unable to process charge")
+
+		// unlock order (does not have to work particularly, data.orders.current might be missing)
+		manager.lockCurrentOrder(req.session.userId, false)
+
+		return res.status(500).end()
 	})
 })
 
