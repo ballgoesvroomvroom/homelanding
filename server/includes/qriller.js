@@ -35,6 +35,18 @@ class Qriller {
 		}
 	}
 
+	serialiseQuestions() {
+		/**
+		 * reads this.questions and serialises it into a single string
+		 * returns the string representation of this.questions
+		 */
+		
+	}
+
+	serialiseAnswers() {
+
+	}
+
 	updateRefsToMem() {
 		// expose qriller instance to shared memory so API side can reference it
 		mem[this.id] = this
