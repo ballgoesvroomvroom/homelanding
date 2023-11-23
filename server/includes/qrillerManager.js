@@ -3,6 +3,7 @@
  * i.e. handling payment charges, fulfilling orders
  */
 const path = require("path")
+const crypto = require("crypto")
 const dotenv = require("dotenv").config({path: path.join(__dirname, "../../.env")});
 console.log(process.env.STRIPE_SECRET)
 const stripe = require("stripe")(process.env.STRIPE_SECRET);
@@ -74,27 +75,31 @@ class Manager {
 		 * returns the worksheet code (base16 representation)
 		 * returns 0 if unsuccessful
 		 */
+		console.log(`[DEBUG]: fulfilling for ${userId}, topicCode: ${topicCode}`)
 		const split =  topicCode.split("-") // e.g. TC001-2
 
 		let rootTopicCode = split[0]
 		let data = qrillerDirectory[rootTopicCode]
+		console.log("[DEBUG]: ", qrillerDirectory, data, split)
 
+		if (data == null) {
+			// topic code invalid, no root found
+			console.warn(`[WARN]: supplied topicCode: ${topicCode} is invalid and does not correspond to any data in qrillerDirectory.js`)
+			return 0
+		}		
 		if (split.length === 2) {
 			// mono series
 			let subTopic = split[1]
 
+			data = data.subTopics[subTopic]
 			if (data == null) {
+				console.warn(`[WARN]: supplied topicCode: ${topicCode}, sub topic is invalid and does not correspond to any subdata in qrillerDirectory.js`)
 				return 0
-			} else {
-				data = data[subTopic]
-				if (data == null) {
-					return 0
-				}
 			}
 		}
 
 		// data contains the subtopic data
-		if (data.code == null || data.title == null || data.note == null || data.path == null) {
+		if (data == null || data.code == null || data.title == null || data.note == null || data.path == null) {
 			// empty fields
 			console.warn("[WARN]: empty fields in qrillerDirectory.js for topic code", topicCode)
 			return 0
@@ -110,7 +115,13 @@ class Manager {
 		// build questions
 		if (split.length === 2) {
 			// mono series
-			q.createQuestions(data.path, 200)
+			try {
+				q.createQuestions(data.path, 200)
+			} catch (err) {
+				// caught exception
+				console.warn(`[WARN]: unable to create worksheets for topicCode: ${topicCode} with error:`, err)
+				return 0;
+			}
 		} else {
 			// standard series
 			if (data.subTopics == null) {
@@ -125,7 +136,13 @@ class Manager {
 					return 0;
 				}
 
-				q.createQuestions(subData.path, 40)
+				try {
+					q.createQuestions(subData.path, 40)
+				} catch (err) {
+					// caught exception
+					console.warn(`[WARN]: unable to create worksheets for topicCode: ${topicCode} with error:`, err)
+					return 0;
+				}
 			}
 		}
 
@@ -137,6 +154,7 @@ class Manager {
 		const userData = qrillerDB.data.users[userId]
 		if (userData == null) {
 			// missing user
+			console.log("[DEBUG]: userData missing for userId:", userId)
 			return 0
 		}
 		if (userData.worksheets == null) {
@@ -153,6 +171,7 @@ class Manager {
 				break
 			} else if (i === 9) {
 				// last attempt still not valid
+				console.log("[DEBUG]: unable to generate worksheet's id - failed collision prevention, last attempt:", worksheetId)
 				return 0 // unable to fail-safe
 			}
 		}
@@ -238,17 +257,9 @@ class Manager {
 			}
 		}
 
-		// create new order payload in data.orders.fulfilled
-		userData.orders.fulfilled[orderId] = {
-			orderId: orderId,
-			worksheetIds: [],
-			amount: currentOrderData.amount,
-			stripePaymentIntentId: currentOrderData.stripePaymentIntentId,
-			dateCreatedUnixEpochMS: currentOrderData.dateCreatedUnixEpochMS
-		}
-
 		// actual fulfillment of orders (generate worksheets and attach their resource locator (represented in base 16) into data.orders.fulfilled[orderId])
-		// TO-DO
+		var createdWorksheetIds = [] // store worksheet ids of those generated, so that when it fails, we can void them all
+		var errorThrown = false // to be set to true when error encountered on any point in time where worksheet generation fails
 		for (let orderItem of currentOrderData.orderCart) {
 			for (let i = 0; i < orderItem[1]; i++) {
 				// iterate over the quantity
@@ -256,12 +267,34 @@ class Manager {
 
 				if (generatedWsId === 0) {
 					// error thrown
-					return 3;
+					errorThrown = true
+					break
 				} else {
 					userData.worksheets[generatedWsId].orderId = orderId // append new field, orderId to attach worksheet data to corresponding orderId
-					userData.orders.fulfilled[orderId].worksheetIds.push(generatedWsId)
 				}
 			}
+		}
+
+		// worksheet generation error handling
+		if (errorThrown) {
+			// void all worksheets
+			for (let i = 0; i < createdWorksheetIds.length; i++) {
+				var id = createdWorksheetIds[i]
+
+				// remove from data.worksheets
+				delete userData.worksheets[id];
+			}
+
+			return 3; // error thrown on worksheet generation
+		}
+
+		// create new order payload in data.orders.fulfilled
+		userData.orders.fulfilled[orderId] = {
+			orderId: orderId,
+			worksheetIds: createdWorksheetIds,
+			amount: currentOrderData.amount,
+			stripePaymentIntentId: currentOrderData.stripePaymentIntentId,
+			dateCreatedUnixEpochMS: currentOrderData.dateCreatedUnixEpochMS
 		}
 
 		// set current cart to be empty (removes ._isLocked property, simultaneously unlocking current order to allow for modifications)

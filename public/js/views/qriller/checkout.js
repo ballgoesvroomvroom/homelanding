@@ -107,7 +107,8 @@ function processPayment(token) {
 		credentials: "same-origin"
 	}).then(r => {
 		if (r.status === 200) {
-			return r.json()
+			console.log("PROCESS PAYMENT RETURNED TRUE")
+			return r
 		} else {
 			console.log("SERVER THREW", r.status)
 			return new Promise.reject({
@@ -121,7 +122,8 @@ function processPayment(token) {
 
 function completePayment() {
 	/**
-	 * called when entire transaction is finished and items have been granted
+	 * master function that handles what happens after
+	 * order has been granted and payment has been processed server-side
 	 */
 	return true
 }
@@ -154,6 +156,7 @@ function paymentAuthorisedGPay(paymentData) {
 	return new Promise((res, rej) => {
 		console.log("CALLBACK FINAL SUCCESS", paymentData)
 		processPayment(paymentData.paymentMethodData.tokenizationData.token).then(() => {
+			console.log("GRAND FINAL SUCCESS");
 			res({"transactionState": "SUCCESS"})
 		}).catch(errObj => {
 			/**
@@ -163,7 +166,7 @@ function paymentAuthorisedGPay(paymentData) {
 		 	 *	intent: "OFFER"|"PAYMENT_AUTHORIZATION"|"SHIPPING_ADDRESS"|"SHIPPING_OPTION", (must be present in paymentDataRequest.callbackIntents)
 			 * }
 			 */
-			console.log("CATCHING")
+			console.log("CATCHING", errObj)
 			res({
 				transactionState: "ERROR",
 				error: errObj
@@ -204,6 +207,7 @@ function completeGPay() {
 		// call loadPaymentData method of payments client
 		return getGPaymentsClient().loadPaymentData(paymentDataRequest)
 	}).then(paymentData => {
+		console.log("PAYMENT DATA WENT THROUGH")
 		var paymentToken = paymentData.paymentMethodData.tokenizationData.token // token already dealt with in paymentAuthorisedGPay
 
 		completePayment();
@@ -212,7 +216,7 @@ function completeGPay() {
 		// payment prompt did not go through (user most likely exitted)
 		clickedGPayBtn = false // reset debounce
 
-		console.log("FAILED NOT CAUGHT")
+		console.log("FAILED NOT CAUGHT", err)
 		console.error(err)
 	})
 }

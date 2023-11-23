@@ -660,7 +660,7 @@ class LawOfIndices extends BaseQuestion {
 				if (isDualConstant) {
 					// generate another constant
 					constants[0] = c
-					constants[1] = BaseQuestion.randomInt(2, 9)
+					constants[1] = BaseQuestion.randomInt(rng, 2, 9)
 				}
 			} else {
 				c = Unknowns.constants[Math.floor(rng() * Unknowns.constants.length)]

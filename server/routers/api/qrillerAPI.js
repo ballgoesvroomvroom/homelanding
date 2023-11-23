@@ -295,7 +295,7 @@ router.post("/shop/processPayment", auth_router.authenticated, (req, res) => {
 	        currency: "sgd",
 			payment_method: paymentMethodObj.id,
 
-			return_url: "strunkcats.com/qriller/new",
+			return_url: "https://strunkcats.com/qriller/new",
 			confirm: true
 		})
 	}).then(paymentIntentObj => {
@@ -304,13 +304,16 @@ router.post("/shop/processPayment", auth_router.authenticated, (req, res) => {
 			case "succeeded":
 				// fulfil order
 				console.log("[DEBUG]: paymentIntent resolved with 'succeeded', proceeding to fulfill order")
-				manager.fulfillOrder(req.session.userId, paymentIntentObj.id).then(status => {
+				manager.fulfilOrder(req.session.userId, paymentIntentObj.id).then(status => {
 					if (status === 1) {
 						// success
 						console.log(`[DEBUG]: fulfilled order successful`)
 					} else {
 						// failed
 						console.log(`[DEBUG]: fulfilled order failed ${status}`)
+
+						// unlock order (does not have to work particularly, data.orders.current might be missing)
+						manager.lockCurrentOrder(req.session.userId, false)
 					}
 				})
 			case "requires_payment_method":

@@ -22,7 +22,7 @@ const images_db = databaseInterface.images_db
 const qrillerDB = databaseInterface.qriller_users
 // database.autosave = -1; // disable autosave
 
-const PORT = 443;
+const PORT = 5000;
 const app = express();
 const httpServer = http.createServer(app);
 

@@ -6,42 +6,9 @@
 			"loginMethod": "password",
 			"email": "chongjayden07@gmail.com",
 			"worksheets": {
-				"fc8e44c1a72e08ca": {
-					"title": "1 | Indices",
-					"topicCode": "TC002",
-					"serialisedWorksheet": "ABC",
-					"serialisedAnswersheet": "CBA",
-					"dateCreatedUnixEpochMS": 82131201,
-					"orderId": "3e9fb29aded5a6c0"
-				}
 			},
 			"orders": {
 				"fulfilled": {
-					"3e9fb29aded5a6c0": {
-						"orderId": "3e9fb29aded5a6c0",
-						"worksheetIds": [
-							"fc8e44c1a72e08ca"
-						],
-						"amount": 500,
-						"stripePaymentIntentId": "6f6cef046f546f9a",
-						"dateCreatedUnixEpochMS": 418293120
-					}
-				},
-				"current": {
-					"orderId": "d73c1ad6d5c7cd16ebfe12651624f995cae0b51e5e9f913209561c91421ef05f",
-					"orderCart": [
-						[
-							"TC001-1",
-							1
-						],
-						[
-							"TC001-0",
-							1
-						]
-					],
-					"amount": 1000,
-					"dateCreatedUnixEpochMS": 1700732155412,
-					"_isLocked": false
 				}
 			}
 		}
