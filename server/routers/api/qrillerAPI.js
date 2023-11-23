@@ -125,7 +125,7 @@ router.post("/cart/overwrite", (req, res) => {
 				var title
 				if (split.length === 2) {
 					// has a sub topic
-					title = topicsData.data[idx][3][parseInt(split[1])] // to throw error when split[1] is not an integer, i.e. TC001-X, x is not an integer
+					title = topicsData.data[idx][3][parseInt(split[1])][1] // to throw error when split[1] is not an integer, i.e. TC001-X, x is not an integer
 					title = `${idx +1}.${split[1]} | ${title}` // prepend topic number
 				} else if (split.length === 1) {
 					title = `${idx +1} | ${topicsData.data[idx][1]}`
@@ -283,7 +283,7 @@ router.post("/shop/processPayment", auth_router.authenticated, (req, res) => {
 		// end connection
 		res.status(400).end()
 
-		return new Promise.reject(-1) // exit
+		return Promise.reject(-1) // exit
 	})
 
 	// create a payment intent
@@ -294,11 +294,12 @@ router.post("/shop/processPayment", auth_router.authenticated, (req, res) => {
 			amount: orderData.amount,
 	        currency: "sgd",
 			payment_method: paymentMethodObj.id,
+
+			return_url: "strunkcats.com/qriller/new",
 			confirm: true
 		})
 	}).then(paymentIntentObj => {
 		// store the paymentIntent status to be checked
-		req.session.currentOrder.paymentIntentId = paymentIntentObj.id;
 		switch (paymentIntentObj.status) {
 			case "succeeded":
 				// fulfil order
@@ -326,8 +327,8 @@ router.post("/shop/processPayment", auth_router.authenticated, (req, res) => {
 		}
 
 		res.status(200).end()
-	}).catch(() => {
-		console.warn("[ERROR]: unable to process charge")
+	}).catch(err => {
+		console.warn("[ERROR]: unable to process charge", err)
 
 		// unlock order (does not have to work particularly, data.orders.current might be missing)
 		manager.lockCurrentOrder(req.session.userId, false)
