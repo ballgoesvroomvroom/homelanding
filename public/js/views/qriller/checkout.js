@@ -22,8 +22,9 @@ const baseRequest = {
 const tokenizationSpecification = {
 	type: 'PAYMENT_GATEWAY',
 	parameters: {
-		'gateway': 'example',
-		'gatewayMerchantId': 'exampleGatewayMerchantId'
+		"gateway": "stripe",
+		"stripe:version": "2018-10-31",
+		"stripe:publishableKey": "pk_test_51JuzxOCsXpNYHVTc7DLn7DZKVzDYoqVCoHiOanZP6tTJUaBkz5wp0xyC3j428MovqyUKPkDFivyq1iWdAyzRDH5B00KRw3cN3Q"
 	}
 };
 
@@ -94,14 +95,14 @@ function processPayment(token) {
 	 * returns a promise that eithers resolves upon confirmation from server (i.e. user got his goods), or rejects when user fails to get his goods (unable to grant, etc)
 	 * promise rejects with the error object with keys, 'reason', 'message', 'intent'
 	 */
-	console.log("TOKEN", token)
+	console.log("TOKEN", JSON.parse(token))
 	return fetch("/api/qriller/shop/processPayment", {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json"
 		},
 		body: JSON.stringify({
-			token: token
+			token: JSON.parse(token).id
 		}),
 		credentials: "same-origin"
 	}).then(r => {
@@ -186,8 +187,8 @@ function completeGPay() {
 	const paymentDataRequest = Object.assign({}, baseRequest);
 	paymentDataRequest.allowedPaymentMethods = [cardPaymentMethod]
 	paymentDataRequest.merchantInfo = {
-		merchantName: 'Example Merchant',
-		merchantId: '12345678901234567890'
+		merchantName: "Qriller",
+		merchantId: "BCR2DN4TU3L6X7D5"
 	};
 	paymentDataRequest.callbackIntents = ["PAYMENT_AUTHORIZATION"]
 
