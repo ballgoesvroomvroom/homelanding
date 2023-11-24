@@ -340,6 +340,33 @@ router.post("/shop/processPayment", auth_router.authenticated, (req, res) => {
 	})
 })
 
+// GET PROFILE DETAILS
+router.get("/account/details", auth_router.authenticated, (req, res) => {
+	/**
+	 * route valid only for authenticated users
+	 * returns personal data such as associated email address
+	 */
+	var userData = qrillerDB.data.users[req.session.userId]
+	if (userData == null) {
+		return res.status(400).end() // bad request
+	}
+
+	var payload = { // default values
+		username: userData.username,
+		email: userData.email,
+		signupTimeUTCEpochMS: userData.signupTimeUTCEpochMS,
+		noOfOrders: userData.noOfOrders
+	}
+
+	// default values
+	payload.username ??= ""
+	payload.email ??= ""
+	payload.signupTimeUTCEpochMS ??= 0
+	payload.noOfOrders ??= 0
+
+	return res.json(payload)
+})
+
 module.exports = { // export router object and authenticated middleware
 	baseURL, router
 }

@@ -217,6 +217,9 @@ router.post("/create", (req, res) => {
 			"loginMethod": "password",
 			"email": email,
 
+			"noOfOrders": 0,
+			"signupTimeUTCEpochMS": +new Date(),
+
 			"pendingAccountCreationConfirmation": true // to be set to false once user verifies email address
 		}
 		qrillerDB.data.verificationLinks[verificationId] = {

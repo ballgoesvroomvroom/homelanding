@@ -297,6 +297,9 @@ class Manager {
 			dateCreatedUnixEpochMS: currentOrderData.dateCreatedUnixEpochMS
 		}
 
+		// increment data.noOfOrders
+		userData.noOfOrders = (userData.noOfOrders ?? 0)++
+
 		// set current cart to be empty (removes ._isLocked property, simultaneously unlocking current order to allow for modifications)
 		delete orderData.current;
 
