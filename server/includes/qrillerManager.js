@@ -298,7 +298,8 @@ class Manager {
 		}
 
 		// increment data.noOfOrders
-		userData.noOfOrders = (userData.noOfOrders ?? 0)++
+		userData.noOfOrders ??= 0
+		userData.noOfOrders++
 
 		// set current cart to be empty (removes ._isLocked property, simultaneously unlocking current order to allow for modifications)
 		delete orderData.current;

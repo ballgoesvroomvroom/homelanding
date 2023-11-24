@@ -14,6 +14,7 @@
 		<link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100;200;300;500;600;700;800;900&display=swap" rel="stylesheet">
 
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+		<script src="/js/includes/qriller/topbar.js"></script>
 		<!-- <script src="/js/views/qriller/signup.js"></script> -->
 
 		<!-- page hydration -->
@@ -26,12 +27,32 @@
 		<title>Qriller | Home</title>
 	</head>
 	<body>
-		<div id="topbar-container">
+		<div id="topbar-container" class="scrolled">
 			<a href="/" id="logo-redirect"><img src="/qriller_assets/banner.svg"></a>
-			<a class="active" href="new">About</a>
-			<a href="buy">Purchase</a>
-			<a href="account">Account</a>
-			<a href="contact">Contact</a>
+			<div id="topbar-desktop-navig-container">
+				<a class="active" href="/qriller/new">About</a>
+				<a href="/qriller/buy">Purchase</a>
+				<a href="/qriller/account">Account</a>
+				<a href="/qriller/contact">Contact</a>
+			</div>
+			<div id="topbar-mobile-component">
+				<button id="topbar-mobile-hamburg-btn">
+					<img src="/qriller_assets/hamburg.svg">
+				</button>
+				<div id="topbar-mobile-sidepanel-container">
+					<div id="topbar-mobile-sidepanel-content">
+						<button id="topbar-mobile-close-btn">
+							<img src="/qriller_assets/exit_cross.svg">
+						</button>
+						<div id="topbar-mobile-navig-container" class="active">
+							<a class="active" href="/qriller/new"><img src="/qriller_assets/home_icon.svg">About</a>
+							<a href="/qriller/buy"><img src="/qriller_assets/shop_icon.svg">Purchase</a>
+							<a href="/qriller/account"><img src="/qriller_assets/profile_icon.svg">Account</a>
+							<a href="/qriller/contact"><img src="/qriller_assets/contact_icon.svg">Contact</a>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 		<div id="background-product-container">
 			<!-- <img id="background-tulip-img" src="/qriller_assets/tulip.svg"> -->
@@ -278,16 +299,6 @@
 		</div>
 	</body>
 	<script>
-		window.addEventListener("scroll", function() {
-			var topbar = document.getElementById("topbar-container");
-
-			if (window.scrollY > 50) { // Adjust the value as needed
-				topbar.classList.add("scrolled");
-			} else {
-				topbar.classList.remove("scrolled");
-			}
-		});
-
 		// sine graph background
 		const graphSVG = document.getElementById("background-graph")
 

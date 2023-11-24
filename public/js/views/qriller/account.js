@@ -1,4 +1,4 @@
-fetch("/api/qriller/account/details", {
+var fetchData = fetch("/api/qriller/account/details", {
 	method: "GET",
 	credentials: "same-origin"
 }).then(r => {
@@ -52,4 +52,26 @@ document.addEventListener("DOMContentLoaded", e => {
 			menuContainer[i].classList.add("hidden");
 		}
 	}
+
+	// load data
+	fetchData.then(data => {
+		/**
+		 * data: {
+	 	 * 	username: string,
+	 	 * 	email: string,
+	 	 * 	signupTimeUTCEpochMS: number,
+	 	 * 	noOfOrders: number
+		 * }
+		 */
+		var usernamePTag = document.getElementById("username-disp")
+		var profileEditNameInp = document.getElementById("profile-edit-name-inp")
+		usernamePTag.innerHTML = data.username
+		profileEditNameInp.value = data.username
+
+		var profileEditEmailInp = document.getElementById("profile-edit-email-inp")
+		profileEditEmailInp.value = data.email
+
+		var orderCountPTag = document.getElementById("order-count")
+		orderCountPTag.innerHTML = `Orders: ${data.noOfOrders}`
+	})
 })

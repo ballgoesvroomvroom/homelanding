@@ -14,26 +14,36 @@
 		<link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100;200;300;500;600;700;800;900&display=swap" rel="stylesheet">
 
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+		<script src="/js/includes/qriller/topbar.js"></script>
 		<script src="/js/views/qriller/account.js"></script>
 
 		<title>Qriller | Account</title>
 	</head>
 	<body>
-		<div id="topbar-container">
+		<div id="topbar-container" class="scrolled">
 			<a href="/" id="logo-redirect"><img src="/qriller_assets/banner.svg"></a>
-			<a class="active" href="/qriller/new">About</a>
-			<a href="/qriller/buy">Purchase</a>
-			<a href="/qriller/account">Account</a>
-			<a href="/qriller/contact">Contact</a>
+			<div id="topbar-desktop-navig-container">
+				<a class="active" href="/qriller/new">About</a>
+				<a href="/qriller/buy">Purchase</a>
+				<a href="/qriller/account">Account</a>
+				<a href="/qriller/contact">Contact</a>
+			</div>
 			<div id="topbar-mobile-component">
-				<a id="topbar-mobile-link">About</a>
-				<button id="topbar-mobile-hamburg">
+				<button id="topbar-mobile-hamburg-btn">
 					<img src="/qriller_assets/hamburg.svg">
 				</button>
-				<div id="topbar-mobile-hamburg-menu">
-					<a href="/qriller/buy">Purchase</a>
-					<a href="/qriller/account">Account</a>
-					<a href="/qriller/contact">Contact</a>
+				<div id="topbar-mobile-sidepanel-container">
+					<div id="topbar-mobile-sidepanel-content">
+						<button id="topbar-mobile-close-btn">
+							<img src="/qriller_assets/exit_cross.svg">
+						</button>
+						<div id="topbar-mobile-navig-container" class="active">
+							<a class="active" href="/qriller/new"><img src="/qriller_assets/home_icon.svg">About</a>
+							<a href="/qriller/buy"><img src="/qriller_assets/shop_icon.svg">Purchase</a>
+							<a href="/qriller/account"><img src="/qriller_assets/profile_icon.svg">Account</a>
+							<a href="/qriller/contact"><img src="/qriller_assets/contact_icon.svg">Contact</a>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -42,15 +52,16 @@
 			</div>
 			<div id="profile-container">
 				<div id="profile-headshot-container">
-					<img src="/qriller_assets/headshot.svg">
+					<img src="https://www.anime-planet.com/images/users/avatars/2499573.jpg?t=1635435181">
+					<!-- <img src="/qriller_assets/headshot.svg"> -->
 				</div>
 				<div id="profile-details-container">
-					<h2>Username goes here</h2>
-					<p>Id: #64109</p>
+					<h2 id="username-disp">Username goes here</h2>
+					<p id="order-count">Orders: 0</p>
 				</div>
 			</div>
 			<div id="menu-horizontal-navig-container">
-				<button>About</button>
+				<button class="active">About</button>
 				<button>Worksheets</button>
 				<button>Themes</button>
 				<button>Orders</button>
@@ -63,10 +74,10 @@
 					<section id="profile-details">
 						<h2>Details</h2>
 						<label for="profile-edit-name">Name</label>
-						<input name="profile-edit-name" value="fadedj" type="text">
+						<input id="profile-edit-name-inp" name="profile-edit-name" value="fadedj" type="text">
 
 						<label for="profile-edit-email">Email</label>
-						<input name="profile-edit-email" value="help@qriller.com" type="text" disabled>
+						<input id="profile-edit-email-inp" name="profile-edit-email" value="help@qriller.com" type="text" disabled>
 						<p>Email address cannot be changed, reach out to us via help@qriller.com and we'll see what we can do.</p>
 
 						<label for="profile-edit-headshot">Profile icon</label>
