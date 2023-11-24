@@ -472,7 +472,7 @@ body {
 	transition-timing-function: linear;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 940px) {
 	#profile-container {
 		flex-direction: column;
 
@@ -498,7 +498,9 @@ body {
 		padding-left: 30px;
 		padding-right: 30px;
 	}
+}
 
+@media (max-width: 640px) {
 	#worksheet-grid-container {
 		grid-template-columns: 1fr;
 	}
