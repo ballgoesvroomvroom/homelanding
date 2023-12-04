@@ -4,7 +4,6 @@ html {
 }
 
 body {
-	position: relative;
 }
 
 #background-product-container {
@@ -13,7 +12,6 @@ body {
 	width: 100svw;
 
 	z-index: -1;
-
 }
 
 #background-tulip-img {
@@ -63,7 +61,7 @@ body {
 	display: flex;
 	flex-direction: column;
 
-	height: calc(100svh - 120px);
+	height: calc(100svh - 201px);
 
 	padding-bottom: 20px;
 	margin: 0 20px;
@@ -526,6 +524,10 @@ body {
 @media (max-width: 920px) {
 	#background-tulip-img {
 		width: 200px;
+	}
+
+	#container {
+		height: calc(100svh - 172px);
 	}
 
 	#searchbar-inp {
