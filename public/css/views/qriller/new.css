@@ -34,10 +34,14 @@ body {
 
 	perspective: 900px;
 	perspective-origin: 50% 50%;
+
+	overflow-x: clip;
 }
 
 #product-container > img {
 	position: absolute;
+	left: 27px;
+
 	width: 600px;
 	height: auto;
 	object-fit: cover;
@@ -55,7 +59,7 @@ body {
 
 #product-container > img:nth-child(2) {
 	top: 8px;
-	left: 8px;
+	left: 35px;
 
 	z-index: -1;
 }
@@ -176,7 +180,6 @@ body {
 #questions-horizontal-scroll-container {
 	display: flex;
 	flex-direction: row;
-	flex-wrap: nowrap;
 
 	min-width: 0;
 
@@ -184,10 +187,6 @@ body {
 	margin-right: 40px;
 
 	overflow-x: auto;
-}
-
-#questions-horizontal-scroll-container::-webkit-scrollbar {
-	display: none;
 }
 
 .question-example-card {
@@ -337,7 +336,7 @@ body {
 	border-width: 1px;
 	border-left-width: 0px;
 	border-color: var(--border-light);
-	background-color: #e7e7e7;
+	background-color: #f3f3f3;
 }
 
 #aesthetics-demo-link-out-btn {

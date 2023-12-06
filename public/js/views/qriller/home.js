@@ -59,7 +59,7 @@ function katexOnload() {
 			detailsContainer.className = "question-details-example-card"
 
 			for (let j = 1; j < d.length; j++) {
-				var katexPTag = document.createElement("p")
+				var katexPTag = document.createElement("div")
 				sampleContContainer.appendChild(katexPTag)
 
 				katex.render(d[j], katexPTag, {

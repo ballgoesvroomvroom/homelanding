@@ -146,6 +146,13 @@ router.get("/new", (req, res) => {
 	res.type("html")
 	res.sendFile(views.qriller.newPage)
 })
+router.get("/debug", (req, res) => {
+	/**
+	 * returns the login page with status 200
+	 */
+	res.type("html")
+	res.sendFile(views.qriller.debugPage)
+})
 
 router.get("/login", (req, res) => {
 	/**

@@ -13,15 +13,21 @@ body {
 }
 
 .page-container {
+	display: flex;
+	flex-direction: column;
+
+	flex-grow: 0;
+	flex-shrink: 0;
+
 	position: relative;
-	height: calc(100vh - 50px);
-	min-height: calc(100vh - 50px);
-	width: auto;
 	min-width: 0;
+	max-width: 100%;
+	min-height: 0;
+	max-height: calc(100svh - 100px);
 
 	padding: 25px 20px;
 
-	aspect-ratio: 0.709;
+	aspect-ratio: 9 / 16;
 
 	border-top-style: solid;
 	border-top-width: 1px;
@@ -58,7 +64,7 @@ body {
 }
 
 .page-content-container {
-/*	height: 100%;*/
+	flex-grow: 1;
 }
 
 body.workbook .page-content-container {
@@ -77,11 +83,6 @@ body.workbook .page-content-container {
 }
 
 .page-footer {
-	position: absolute;
-	bottom: 0;
-
-	width: calc(100% - 40px);
-	height: 70px;
 }
 
 .page-footer-count {

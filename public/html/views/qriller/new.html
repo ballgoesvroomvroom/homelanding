@@ -145,10 +145,10 @@
 					<p>Try out our worksheet visual editor demo.</p>
 				</div>
 				<div id="aesthetics-demo-video-container">
-					<img src="/">
 					<button id="aesthetics-demo-link-out-btn">
 						<span>TRY EDITOR</span>
 						<img src="/qriller_assets/linkout.svg">
+					</button>
 				</div>
 				<!-- TO DO: gif showing all the cool features as mentioned in the above stanza -->
 			</section>
@@ -219,6 +219,10 @@
 			 * draws a path in graphSvg which mimics a sine graph plot
 			 * takes the computed width and height of the svg container as graph boundaries
 			 */
+
+			// restrict graphSVG width first
+			graphSVG.style.width = document.body.clientWidth;
+
 			let containerWidth = Math.floor(graphSVG.clientWidth) - 150; // 100 padding to the right
 			let containerHeight = graphSVG.clientHeight;
 

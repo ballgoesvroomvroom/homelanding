@@ -162,6 +162,7 @@ $(document).ready(e => {
 				var absQnIdx = 0; // absolute question index
 				var pageCount = 0; // page count
 				var qnHt = QUESTION_HEIGHT *styleProp.qnHtFactor // in pixels
+				console.log(QUESTIONS.length)
 				while (absQnIdx < QUESTIONS.length) {
 					const $header = getPageHeader()
 					const $footer = getPageFooter(++pageCount)
@@ -170,16 +171,14 @@ $(document).ready(e => {
 
 					// append to DOM to get height
 					$pageContainer.appendTo($selectors.body)
-					var availHt = $pageContainer.height() -$header.height() -$footer.height()
-
-					// set content container to height (relative)
-					$contentContainer.css("height", `${availHt /$pageContainer.height() *100}%`)
+					var availHt = window.innerHeight //$pageContainer.height() -$header.height() -$footer.height()
 
 					// apply grid styling
 					$contentContainer.css("grid-template-rows", `repeat(${styleProp.qnColumn}, 1fr})`)
 
 					// calculate the total questions we can fit in one page (taking into account of how many columns are spanned)
 					var qnPerPage = Math.min(Math.floor(availHt /qnHt) *styleProp.qnColumn, QUESTIONS.length -absQnIdx) // math.min() for the last page scenario
+					console.log(availHt, qnHt, $pageContainer.height(), qnPerPage)
 					for (let j = 0; j < qnPerPage; j++) {
 						// j = qnIdx
 						// qnData: [qnStr, latexEqnArr]

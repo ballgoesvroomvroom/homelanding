@@ -35,6 +35,7 @@ class Qriller {
 	static checkoutPage = path.join(html, "views/qriller/checkout_page.html")
 
 	static newPage = path.join(html, "views/qriller/new.html")
+	static debugPage = path.join(html, "views/qriller/new_2.html")
 
 	static accountPage = path.join(html, "views/qriller/account_page.html")
 }
