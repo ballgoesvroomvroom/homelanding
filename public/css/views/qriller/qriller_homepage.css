@@ -1,0 +1,132 @@
+.sgd-reference {
+	font-weight: 700;
+	color: white;
+}
+
+#homepage-banner {
+	margin-top: var(--page-start-offset);
+
+	width: 100%;
+	height: 500px;
+
+	background-image: url("/qriller_assets/big_showcase.png");
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-position: top;
+}
+
+#homepage-content-container {
+	padding: 10px var(--horizontal-padding);
+	padding-top: 20px;
+
+	border-top-style: solid;
+	border-top-width: 1px;
+	border-top-color: black;
+}
+
+#homepage-content-container > h4 {
+	padding: 5px 0;
+	margin-bottom: 20px;
+
+	font-weight: 400;
+	font-size: 14px;
+}
+
+#homepage-content-container > p {
+	padding: 20px 0;
+	line-height: 1.2;
+}
+
+#homepage-series-comparision-container {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-evenly;
+
+	width: 80%;
+	min-height: 0;
+
+	margin: 50px auto;
+}
+
+.series-comparison-unit {
+	position: relative;
+	width: calc(45% - 8px);
+	min-height: 250px;
+
+	padding: 15px;
+
+	background-color: #c3c2e7;
+	border-style: solid;
+	border-width: 1px;
+	border-color: black;
+}
+
+.series-comparison-unit:last-child {
+	background-color: #a6c5ff;
+}
+
+.series-comparison-unit > ul {
+	padding-inline-start: 25px;
+}
+
+.series-comparison-unit > ul > li {
+	padding: 5px 0;
+}
+
+.series-comparison-unit > h4 {
+	font-size: 12px;
+}
+
+.series-comparision-expand-redirect {
+	display: block;
+
+	position: absolute;
+	bottom: 15px;
+
+	width: calc(100% - 70px);
+
+	padding: 20px;
+
+	text-align: center;
+	text-decoration: none;
+
+	font-weight: 700;
+
+	background-color: #efefef;
+	border-style: solid;
+	border-width: 1px;
+	border-color: black;
+}
+
+.series-comparision-expand-redirect:link,
+.series-comparision-expand-redirect:visited,
+.series-comparision-expand-redirect:hover,
+.series-comparision-expand-redirect:active {
+	color: initial; /* remove link styling */
+}
+
+
+@media (max-width: 920px) {
+	#homepage-series-comparision-container {
+		width: 100%;
+	}
+}
+
+@media (max-width: 640px) {
+
+	#homepage-banner {
+		height: 250px;
+	}
+
+	#homepage-series-comparision-container {
+		flex-direction: column;
+	}
+
+	.series-comparison-unit {
+		width: calc(100% - 30px);
+	}
+
+	.series-comparison-unit:last-child {
+		margin-top: 10px;
+	}
+}

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=10.0, minimum-scale=.25, user-scalable=yes"/>
+		<meta name="description" content="Worksheets grandmaster"/>
+
+		<link rel="stylesheet" href="/css/includes/reset.css">
+		<link rel="stylesheet" href="/css/includes/qriller/default_new.css">
+		<link rel="stylesheet" href="/css/includes/qriller/new_topbar.css">
+		<link rel="stylesheet" href="/css/views/qriller/new.css">
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100;200;300;500;600;700;800;900&display=swap" rel="stylesheet">
+
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+		<script src="/js/includes/qriller/topbar.js"></script>
+		<!-- <script src="/js/views/qriller/signup.js"></script> -->
+
+		<!-- page hydration -->
+		<script src="/js/views/qriller/home.js"></script>
+
+		<!-- Katex (https://katex.org/docs/browser) -->
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
+		<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8" crossorigin="anonymous" onload="katexOnload()"></script>
+
+		<title>Qriller | Home</title>
+	</head>
+	<body>
+		<div id="topbar-container" class="scrolled">
+			<a href="/" id="logo-redirect"><img src="/qriller_assets/banner.svg"></a>
+			<div id="topbar-desktop-navig-container">
+				<a class="active" href="/qriller/new">About</a>
+				<a href="/qriller/buy">Purchase</a>
+				<a href="/qriller/account">Account</a>
+				<a href="/qriller/contact">Contact</a>
+			</div>
+			<div id="topbar-mobile-component">
+				<button id="topbar-mobile-hamburg-btn">
+					<img src="/qriller_assets/hamburg.svg">
+				</button>
+				<div id="topbar-mobile-sidepanel-container">
+					<div id="topbar-mobile-sidepanel-content">
+						<button id="topbar-mobile-close-btn">
+							<img src="/qriller_assets/exit_cross.svg">
+						</button>
+						<div id="topbar-mobile-navig-container" class="active">
+							<a class="active" href="/qriller/new"><img src="/qriller_assets/home_icon.svg">About</a>
+							<a href="/qriller/buy"><img src="/qriller_assets/shop_icon.svg">Purchase</a>
+							<a href="/qriller/account"><img src="/qriller_assets/profile_icon.svg">Account</a>
+							<a href="/qriller/contact"><img src="/qriller_assets/contact_icon.svg">Contact</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="background-product-container">
+			<!-- <img id="background-tulip-img" src="/qriller_assets/tulip.svg"> -->
+			<div id="product-container">
+				<img src="/qriller_assets/productdemo.svg">
+				<img src="/qriller_assets/productdemo.svg">
+			</div>
+			<svg id="background-graph">
+				<path id="background-svg-yaxishead" class="axis-head" d="m 13.374846,9.7237606 -16.2314793,0 8.11574,-14.0568738 z"></path>
+				<path id="background-svg-xaxishead" class="axis-head" d="m 13.374846,9.7237606 -16.2314793,0 8.11574,-14.0568738 z"></path>
+			</svg>
+		</div>
+		<div id="container">
+			<section id="section-intro" class="slide-sections">
+				<div class="slide-sections-header">
+					<h1>WE SELL<br>WORKSHEETS<br>FOR $5<span class="header-disclaimer">(flat price, no charges)</span></h1>
+					<p>With more than 200 questions per worksheet.</p>
+				</div>
+			</section>
+
+			<section id="section-intro-2" class="slide-sections">
+				<div class="slide-sections-header">
+					<h1>MATH CORE<br>CONCEPTS.</h1>
+					<p>With a wide variety of questions in your toolbox, drilling similar question types with subtle nuances has never been easier.</p>
+				</div>
+				<!-- TO DO: ADD A HORIZONTAL SCROLL TO DISPLAY CARDS OF VARIOUS QUESTION TOPICS -->
+				<div id="questions-horizontal-scroll-container">
+				</div>
+				<div id="questions-horizontal-scroll-container-disclaimer">
+					<p>Scroll horizontally to view more.</p>
+				</div>
+			</section>
+
+			<section id="section-generation" class="slide-sections">
+				<div class="slide-sections-header">
+					<h1>COMPUTATIONAL<br>GENERATION.</h1>
+					<p>Procedurally computed mathematical questions with no limits on the quantities.<br>With randomness introduced, absolute minimal reuse of questions.*</p>
+				</div>
+				<div class="slide-sections-side-list-container" id="demo-generation-math-expression">
+					<p>&nbsp;</p>
+					<p>&nbsp;</p>
+					<p>&nbsp;</p>
+					<p>&nbsp;</p>
+					<p>&nbsp;</p>
+				</div>
+				<!-- TO DO: SHOW ALL THE GENERATED TERMS, FRACTIONS, COEFFICIENTS ETC -->
+			</section>
+
+			<section id="section-answersheet" class="slide-sections">
+				<div class="slide-sections-header">
+					<h1>ANSWER SHEETS<br>PROVIDED.</h1>
+					<p>Answer sheet will also be generated along-side by our native, built-in Computer Algebra System (CAS).</p>
+				</div>
+				<div class="slide-sections-side-list-container" id="demo-cas-math-expression">
+					<div class="slide-section-side-list-child-div">
+						<div><p>Solve</p></div>
+						<div><p>&nbsp;</p></div>
+						<div><p>&nbsp;</p></div>
+					</div>
+					<div class="slide-section-side-list-child-div">
+						<div><p>Expand</p></div>
+						<div><p>&nbsp;</p></div>
+						<div><p>&nbsp;</p></div>
+					</div>
+					<div class="slide-section-side-list-child-div">
+						<div><p>Factor</p></div>
+						<div><p>&nbsp;</p></div>
+						<div><p>&nbsp;</p></div>
+					</div>
+					<div class="slide-section-side-list-child-div">
+						<div><p>Multiply</p></div>
+						<div><p>&nbsp;</p></div>
+						<div><p>&nbsp;</p></div>
+					</div>
+					<div class="slide-section-side-list-child-div">
+						<div><p>Modulo</p></div>
+						<div><p>&nbsp;</p></div>
+						<div><p>&nbsp;</p></div>
+					</div>
+				</div>
+				<!-- TO DO: ADD ANSWER SHEET VISUALS -->
+			</section>
+
+			<section id="section-aesthetics" class="slide-sections">
+				<div class="slide-sections-header">
+					<h1>AESTHETICS<br>MATTERS.</h1>
+					<p>At Qriller, we believe loving your worksheets is the first step to enjoying the study process.</p>
+					<p>We help you to achieve that by allowing you to customise the worksheets from a wide array of themes, color schemes, layout and fonts.</p>
+					<p>You are also able to add your own visual elements, remove the branding or even add your own branding.</p>
+					<p>Try out our worksheet visual editor demo.</p>
+				</div>
+				<div id="aesthetics-demo-video-container">
+					<button id="aesthetics-demo-link-out-btn">
+						<span>TRY EDITOR</span>
+						<img src="/qriller_assets/linkout.svg">
+					</button>
+				</div>
+				<!-- TO DO: gif showing all the cool features as mentioned in the above stanza -->
+			</section>
+
+			<section id="section-series" class="slide-sections">
+				<div class="slide-sections-header">
+					<h1>CHOOSE FROM<br>TWO TYPES.</h1>
+					<p>There are two different types of worksheets for sale.</p>
+					<ul>
+						<li>MONO contains 200 questions of the particular sub-topic.</li>
+						<li>STANDARD contains 200 questions of all the sub-topics under the parent topic, with options to lay them out in the order of the sub-topics.</li>
+					</ul>
+				</div>
+				<div id="series-comparison-container">
+					<div class="series-comparison-card" tabindex="0">
+						<img class="series-comparison-card-thumbnail" src="/qriller_assets/mono.svg">
+						<div class="series-comparison-card-details">
+							<h3>MONO</h3>
+							<p>Worksheet purely contains 200 questions of the particular sub-topic.</p>
+							<div class="series-comparison-card-highlight"></div>
+						</div>
+					</div>
+					<div class="series-comparison-card" tabindex="0">
+						<img class="series-comparison-card-thumbnail" src="/qriller_assets/standard.svg">
+						<div class="series-comparison-card-details">
+							<h3>STANDARD</h3>
+							<p>Generalised worksheet with 200 questions compromising of questions from all the sub-topics within the topic.</p>
+							<div class="series-comparison-card-highlight"></div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section id="section-more" class="slide-sections">
+				<div class="slide-sections-header">
+					<h1>WE ARE<br>MORE THAN<br>WORKSHEETS.</h1>
+					<p>We are a team of dedicated engineers and tutors, who used to be students, just like you.<br>We dedicate ourselves to providing tutors and students alike an endless supply of worksheets that are engineered to be truly beneficial.</p>
+					<p>We had also made the procurement process as easy as possible, such as supporting as many payment methods (either online, or in-person) as we can with transactions fees waived by us, while making this a profitable business.</p>
+					<p>Our help team is just one email away at help@qriller.com, with near-immediate replies.</p>
+				</div>
+			</section>
+
+			<section id="section-fence" class="slide-sections">
+				<div class="slide-sections-header">
+					<h1>still on<BR>the FENCE?</h1>
+					<p>Feel free to reach out to us at help@qriller.com if you have any queries or questions.</p>
+					<p>We could even send you a free trial!<br>ˋ( ° ▽、° ) </p>
+			</section>
+		</div>
+	</body>
+	<script>
+		// sine graph background
+		const graphSVG = document.getElementById("background-graph")
+
+		const xAxisHeadPath = document.getElementById("background-svg-xaxishead")
+		const yAxisHeadPath = document.getElementById("background-svg-yaxishead")
+		const xAxisPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+		const yAxisPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+		const sinePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+		xAxisPath.className = "axis-lines"
+		yAxisPath.className = "axis-lines"
+		graphSVG.appendChild(xAxisPath)
+		graphSVG.appendChild(yAxisPath)
+		graphSVG.appendChild(sinePath)
+
+		function drawSineGraph() {
+			/**
+			 * draws a path in graphSvg which mimics a sine graph plot
+			 * takes the computed width and height of the svg container as graph boundaries
+			 */
+
+			// restrict graphSVG width first
+			graphSVG.style.width = document.body.clientWidth;
+
+			let containerWidth = Math.floor(graphSVG.clientWidth) - 150; // 100 padding to the right
+			let containerHeight = graphSVG.clientHeight;
+
+			let scrollFactor = (window.scrollY /graphSVG.clientHeight)
+			let amplitude =  (scrollFactor *.5 + 1) *(0.03 *containerHeight) // pixels
+			let bottomPadding = 109 // pixels
+
+			let xOrigin = 20 // pixels, where origin will start
+			let yOrigin = containerHeight - (0.06 *containerHeight) -bottomPadding // max
+
+			let xPadding = 37.6
+			containerWidth += xPadding %1 // make them end off with the same decimals, therefore x iteration will be iterate inclusively
+
+			let noOfCycles = Math.floor(containerWidth /70)
+			let b = (2 *Math.PI *noOfCycles) /(containerWidth -(xOrigin +xPadding))
+
+			// set axis heads
+			xAxisHeadPath.setAttribute("transform", `translate(${containerWidth +45 +xPadding}, ${yOrigin -8}), matrix(0,0.96460432,-0.66988476,0,9.8055563,2.927043)`)
+			yAxisHeadPath.setAttribute("transform", `translate(${xOrigin -5 +xPadding}, ${100 -5})`)
+
+			// plot axis graph
+			xAxisPath.setAttribute("d", `M${xPadding} ${yOrigin} L${containerWidth +50 +xPadding} ${yOrigin}`)
+			yAxisPath.setAttribute("d", `M${xOrigin +xPadding} 100 L${xOrigin +xPadding} ${yOrigin +bottomPadding *1.2}`)
+
+			// middle of the boundary
+			let mid = (containerWidth +(xOrigin +xPadding)) /2
+
+			// graph sine
+			let d = `M${xOrigin +xPadding} ${yOrigin}`
+			for (let x = xOrigin +xPadding; x <= containerWidth; x++) {
+				let y = (amplitude *(Math.abs(x -mid) /mid -1)) *Math.sin(b *(x -(xOrigin +xPadding)))
+				// y *= (amplitude /-40) *Math.cos(2 *b *(x -(xOrigin +xPadding)))
+				y += yOrigin
+				d += ` L${x} ${y}`
+			}
+
+			sinePath.setAttribute("d", d)
+		}
+
+		window.addEventListener('resize', drawSineGraph)
+		window.addEventListener('scroll', drawSineGraph)
+		drawSineGraph()
+	</script>
+</html>

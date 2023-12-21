@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=10.0, minimum-scale=.25, user-scalable=yes"/>
+		<meta name="description" content="Worksheets grandmaster"/>
+
+		<link rel="stylesheet" href="/css/includes/reset.css">
+		<link rel="stylesheet" href="/css/includes/qriller/default_new.css">
+		<link rel="stylesheet" href="/css/includes/qriller/new_topbar.css">
+		<link rel="stylesheet" href="/css/views/qriller/listing_page.css">
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100;200;300;500;600;700;800;900&display=swap" rel="stylesheet">
+
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+		<!-- <script src="/js/views/qriller/signup.js"></script> -->
+
+		<title>Qriller | Topics</title>
+	</head>
+	<body>
+		<div id="topbar-container">
+			<a href="/" id="logo-redirect"><img src="/qriller_assets/banner.svg"></a>
+			<a class="active" href="/qriller/new">About</a>
+			<a href="/qriller/buy">Purchase</a>
+			<a href="/qriller/account">Account</a>
+			<a href="/qriller/contact">Contact</a>
+			<div id="topbar-mobile-component">
+				<a id="topbar-mobile-link">About</a>
+				<button id="topbar-mobile-hamburg">
+					<img src="/qriller_assets/hamburg.svg">
+				</button>
+				<div id="topbar-mobile-hamburg-menu">
+					<a href="/qriller/buy">Purchase</a>
+					<a href="/qriller/account">Account</a>
+					<a href="/qriller/contact">Contact</a>
+				</div>
+			</div>
+		</div>
+		<div id="background-product-container">
+			<img id="background-tulip-img" src="/qriller_assets/tulip.svg">
+		</div>
+		<div id="container">
+			<h1 id="page-header">TOPIC LIST</h1>
+			<div id="searchbar-container">
+				<input id="searchbar-inp" name="searchquery-inp" placeholder="SEARCH TOPIC">
+				<button id="searchbar-search-btn"><img src="/qriller_assets/search.svg"></button>
+			</div>
+			<div id="scrolltable-container">
+				<div class="topic-entry">
+					<div class="topic-entry-header">
+						<h2>1 | FUMP</h2>
+						<button class="topic-entry-expand-btn">Expand</button>
+					</div>
+					<table class="sub-topics-table">
+						<thead>
+							<tr>
+								<th>Topic Code</th>
+								<th colspan="2">Topic Title</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>TC001-0</td>
+								<td>Laws of Indices Part I</td>
+								<td class="demo-out-btn"><a href="/demo?id=TC001-0">Demo</a></td>
+							</tr>
+							<tr>
+								<td>TC001-1</td>
+								<td>Laws of Indices Part II</td>
+								<td class="demo-out-btn"><a href="/demo?id=TC001-0">Demo</a></td>
+							</tr>
+							<tr>
+								<td>TC001-2</td>
+								<td>Law of Indices Final Part</td>
+								<td class="demo-out-btn"><a href="/demo?id=TC001-0">Demo</a></td>
+							</tr>
+							<tr>
+								<td>TC001-3</td>
+								<td>Expressing Numbers in Standard Form</td>
+								<td class="demo-out-btn"><a href="/demo?id=TC001-0">Demo</a></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		window.addEventListener("scroll", function() {
+			var topbar = document.getElementById("topbar-container");
+
+			if (window.scrollY > 50) { // Adjust the value as needed
+				topbar.classList.add("scrolled");
+			} else {
+				topbar.classList.remove("scrolled");
+			}
+		});
+
+		var topicEntries = document.getElementsByClassName("topic-entry")
+		for (let i = 0; i < topicEntries.length; i++) {
+			let ele = topicEntries.item(i)
+			let btn = ele.getElementsByClassName("topic-entry-expand-btn")
+			let table = ele.getElementsByClassName("sub-topics-table")
+			if (btn.length === 1 && table.length === 1) {
+				btn = btn[0], table = table[0]
+				btn.addEventListener("click", e => {
+					table.classList.toggle("active")
+					if (table.classList.contains("active")) {
+						btn.innerHTML = "Shrink"
+					} else {
+						btn.innerHTML = "Expand"
+					}
+				})
+			}
+		}
+
+		var topbarMobileComp = document.getElementById("topbar-mobile-component")
+		var hamburgMenu = document.getElementById("topbar-mobile-hamburg-menu")
+		document.getElementById("topbar-mobile-hamburg").addEventListener("click", e => {
+			topbarMobileComp.classList.toggle("expanded")
+		})
+		document.getElementById("topbar-mobile-hamburg-close-btn").addEventListener("click", e => {
+			topbarMobileComp.classList.toggle("expanded")
+		})
+	</script>
+</html>

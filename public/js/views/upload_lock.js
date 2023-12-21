@@ -11,7 +11,7 @@ $(document).ready(() => {
 		fetch("/auth/login", {
 			method: "POST",
 			headers: {
-				"authorization": `Basic ${btoa(`username:${inp}`)}`
+				"authorization": `Basic ${btoa(`${username}:${inp}`)}` // `Basic b64.encode(username:password)` basic authorization scheme
 			}
 		}).then(r => {
 			if (r.status == 200) {

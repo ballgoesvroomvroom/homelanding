@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=10.0, minimum-scale=.25, user-scalable=yes"/>
+		<meta name="description" content="Worksheets grandmaster"/>
+
+		<link rel="stylesheet" href="/css/includes/reset.css">
+		<link rel="stylesheet" href="/css/includes/qriller/default_new.css">
+		<link rel="stylesheet" href="/css/includes/qriller/new_topbar.css">
+		<link rel="stylesheet" href="/css/views/qriller/account_page.css">
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100;200;300;500;600;700;800;900&display=swap" rel="stylesheet">
+
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+		<script src="/js/includes/qriller/topbar.js"></script>
+		<script src="/js/views/qriller/account.js"></script>
+
+		<title>Qriller | Account</title>
+	</head>
+	<body>
+		<div id="topbar-container" class="scrolled">
+			<a href="/" id="logo-redirect"><img src="/qriller_assets/banner.svg"></a>
+			<div id="topbar-desktop-navig-container">
+				<a href="/qriller/new">About</a>
+				<a href="/qriller/buy">Purchase</a>
+				<a class="active" href="/qriller/account">Account</a>
+				<a href="/qriller/contact">Contact</a>
+			</div>
+			<div id="topbar-mobile-component">
+				<button id="topbar-mobile-hamburg-btn">
+					<img src="/qriller_assets/hamburg.svg">
+				</button>
+				<div id="topbar-mobile-sidepanel-container">
+					<div id="topbar-mobile-sidepanel-content">
+						<button id="topbar-mobile-close-btn">
+							<img src="/qriller_assets/exit_cross.svg">
+						</button>
+						<div id="topbar-mobile-navig-container" class="active">
+							<a href="/qriller/new"><img src="/qriller_assets/home_icon.svg">About</a>
+							<a href="/qriller/buy"><img src="/qriller_assets/shop_icon.svg">Purchase</a>
+							<a class="active" href="/qriller/account"><img src="/qriller_assets/profile_icon.svg">Account</a>
+							<a href="/qriller/contact"><img src="/qriller_assets/contact_icon.svg">Contact</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="container">
+			<div id="banner-container">
+			</div>
+			<div id="profile-container">
+				<div id="profile-headshot-container">
+					<img src="https://www.anime-planet.com/images/users/avatars/2499573.jpg?t=1635435181">
+					<!-- <img src="/qriller_assets/headshot.svg"> -->
+				</div>
+				<div id="profile-details-container">
+					<h2 id="username-disp">Username goes here</h2>
+					<p id="order-count">Orders: 0</p>
+				</div>
+			</div>
+			<div id="menu-horizontal-navig-container">
+				<button class="active">About</button>
+				<button>Worksheets</button>
+				<button>Themes</button>
+				<button>Orders</button>
+				<button>Feedback</button>
+			</div>
+			<div id="menu-window">
+				<div class="menu-container" id="about-menu-container">
+					<h1>About</h1>
+
+					<section id="profile-details">
+						<h2>Details</h2>
+						<label for="profile-edit-name">Name</label>
+						<input id="profile-edit-name-inp" name="profile-edit-name" value="fadedj" type="text">
+
+						<label for="profile-edit-email">Email</label>
+						<input id="profile-edit-email-inp" name="profile-edit-email" value="help@qriller.com" type="text" disabled>
+						<p>Email address cannot be changed, reach out to us via help@qriller.com and we'll see what we can do.</p>
+
+						<label for="profile-edit-headshot">Profile icon</label>
+						<div class="image-edit-container">
+							<div class="image-display-container">
+								<p>64 x 64px</p>
+								<img src="/qriller_assets/headshot.svg">
+							</div>
+							<input name="profile-edit-headshot" type="file" accept="image/png, image/jpeg">
+						</div>
+
+						<label for="profile-edit-banner">Banner</label>
+						<div class="image-edit-container" id="banner-image-edit-container">
+							<div class="image-display-container">
+								<p>256 x 124px</p>
+								<img src="/qriller_assets/headshot.svg">
+							</div>
+							<input name="profile-edit-banner" type="file" accept="image/png, image/jpeg">
+						</div>
+
+						<button>Save</button>
+					</section>
+
+					<section id="profile-security">
+						<h2>Security</h2>
+
+						<div class="edit-field">
+							<div class="edit-field-header">
+								<h4>Set up PIN</h4>
+								<p>Set up a 6-digit code to prevent unauthorised actions on this account.</p>
+							</div>
+							<button>Set up</button>
+						</div>
+						<div class="edit-field">
+							<div class="edit-field-header">
+								<h4>Change password</h4>
+								<p>Click here to set a new password.</p>
+							</div>
+							<button>Change</button>
+						</div>
+						<div class="edit-field">
+							<div class="edit-field-header">
+								<h4>Forget password</h4>
+								<p>Click here to reset your forgotten password.</p>
+							</div>
+							<button>Reset</button>
+						</div>
+					</section>
+
+					<section id="profile-admin">
+						<h2>Danger</h2>
+
+						<div class="edit-field">
+							<div class="edit-field-header">
+								<h4>Delete account</h4>
+								<p>You can recover your account within 30 days of deletion, after that, it is permanently gone.</p>
+							</div>
+							<button>Delete</button>
+						</div>
+					</section>
+				</div>
+				<div class="menu-container hidden" id="worksheet-menu-container">
+					<h2>Worksheets</h2>
+					<p>Worksheets are only visible to you.</p>
+
+					<div id="worksheet-grid-container">
+						<div class="worksheet-card">
+							<div class="worksheet-card-header">
+								<h3>[GX1032] 1.0 | Law of Indices</h3>
+								<button class="worksheet-card-more-btn"><img src="/qriller_assets/bubble_more.svg"></button>
+							</div>
+							<p>Created: 16 Oct 2023</p>
+							<div class="worksheet-card-tags-container">
+								<div class="worksheet-card-tags">
+									<p>Week01</p>
+									<button class="worksheet-card-tags-remove-btn"><img src="/qriller_assets/cart_exit.svg"></button>
+								</div>
+							</div>
+							<div class="worksheet-lr-container">
+								<div class="sheettype-choice-selection">
+									<div class="sheettype-choice-selection-absolute-overlay">
+										Worksheet
+									</div>
+								</div>
+								<div class="sheettype-choice-selection">
+									<div class="sheettype-choice-selection-absolute-overlay">
+										Answersheet
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="worksheet-card">
+							<div class="worksheet-card-header">
+								<h3>[GX1032] 1.0 | Law of Indices</h3>
+								<button class="worksheet-card-more-btn"><img src="/qriller_assets/bubble_more.svg"></button>
+							</div>
+							<p>Created: 16 Oct 2023</p>
+							<div class="worksheet-card-tags-container">
+								<div class="worksheet-card-tags">
+									<p>Week01</p>
+									<button class="worksheet-card-tags-remove-btn"><img src="/qriller_assets/cart_exit.svg"></button>
+								</div>
+							</div>
+							<div class="worksheet-lr-container">
+								<div class="sheettype-choice-selection">
+									<div class="sheettype-choice-selection-absolute-overlay">
+										Worksheet
+									</div>
+								</div>
+								<div class="sheettype-choice-selection">
+									<div class="sheettype-choice-selection-absolute-overlay">
+										Answersheet
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="worksheet-card">
+							<div class="worksheet-card-header">
+								<h3>[GX1032] 1.0 | Law of Indices</h3>
+								<button class="worksheet-card-more-btn"><img src="/qriller_assets/bubble_more.svg"></button>
+							</div>
+							<p>Created: 16 Oct 2023</p>
+							<div class="worksheet-card-tags-container">
+								<div class="worksheet-card-tags">
+									<p>Week01</p>
+									<button class="worksheet-card-tags-remove-btn"><img src="/qriller_assets/cart_exit.svg"></button>
+								</div>
+								<div class="worksheet-card-tags" style="background-color: #ff000082;">
+									<p>impt</p>
+									<button class="worksheet-card-tags-remove-btn"><img src="/qriller_assets/cart_exit.svg"></button>
+								</div>
+							</div>
+							<div class="worksheet-lr-container">
+								<div class="sheettype-choice-selection">
+									<div class="sheettype-choice-selection-absolute-overlay">
+										Worksheet
+									</div>
+								</div>
+								<div class="sheettype-choice-selection">
+									<div class="sheettype-choice-selection-absolute-overlay">
+										Answersheet
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="menu-container hidden" id="themes-menu-container">
+					<h2>Themes</h2>
+					<p>Created themes are stored here.<br>They can be further modified.</p>
+				</div>
+				<div class="menu-container hidden" id="orders-menu-container">
+					<h2>Orders</h2>
+					<p>Control your payment methods, shipping address and invoices here.</p>
+				</div>
+				<div class="menu-container hidden" id="feedback-menu-container">
+					<h2>Orders</h2>
+					<p>As a developing company, any feedback is more valuable than no feedback.</p>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

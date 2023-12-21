@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=10.0, minimum-scale=.25, user-scalable=yes"/>
+		<meta name="description" content="Worksheets grandmaster"/>
+
+		<link rel="stylesheet" href="/css/includes/reset.css">
+		<link rel="stylesheet" href="/css/includes/qriller/default_new.css">
+		<link rel="stylesheet" href="/css/includes/qriller/new_topbar.css">
+		<link rel="stylesheet" href="/css/includes/qriller/modal.css">
+		<link rel="stylesheet" href="/css/views/qriller/purchase_page.css">
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100;200;300;500;600;700;800;900&display=swap" rel="stylesheet">
+
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+		<script src="/js/includes/qriller/topbar.js"></script>
+		<script src="/js/views/qriller/purchase.js"></script>
+
+		<title>Qriller | Topics</title>
+	</head>
+	<body>
+		<div id="modal-window">
+			<div id="modal-dialogue-container">
+				<h2 id="modal-dialogue-header">
+				</h2>
+				<p id="modal-dialogue-details">
+				</p>
+				<div id="modal-dialogue-action-container">
+					<button id="modal-dialogue-confirm-btn" title="reset cart">YES</button>
+					<button id="modal-dialogue-cancel-btn" title="keep cart">CANCEL</button>
+				</div>
+			</div>
+		</div>
+		<div id="topbar-container" class="scrolled">
+			<a href="/" id="logo-redirect"><img src="/qriller_assets/banner.svg"></a>
+			<div id="topbar-desktop-navig-container">
+				<a href="/qriller/new">About</a>
+				<a class="active" href="/qriller/buy">Purchase</a>
+				<a href="/qriller/account">Account</a>
+				<a href="/qriller/contact">Contact</a>
+			</div>
+			<div id="topbar-mobile-component">
+				<button id="topbar-mobile-hamburg-btn">
+					<img src="/qriller_assets/hamburg.svg">
+				</button>
+				<div id="topbar-mobile-sidepanel-container">
+					<div id="topbar-mobile-sidepanel-content">
+						<button id="topbar-mobile-close-btn">
+							<img src="/qriller_assets/exit_cross.svg">
+						</button>
+						<div id="topbar-mobile-navig-container" class="active">
+							<a href="/qriller/new"><img src="/qriller_assets/home_icon.svg">About</a>
+							<a class="active" href="/qriller/buy"><img src="/qriller_assets/shop_icon.svg">Purchase</a>
+							<a href="/qriller/account"><img src="/qriller_assets/profile_icon.svg">Account</a>
+							<a href="/qriller/contact"><img src="/qriller_assets/contact_icon.svg">Contact</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="background-product-container">
+			<img id="background-tulip-img" src="/qriller_assets/tulip.svg">
+		</div>
+		<div id="container">
+			<h1 id="page-header">PURCHASE</h1>
+			<div id="lr-container">
+				<div id="list-container">
+					<div id="searchbar-container">
+						<input id="searchbar-inp" name="searchquery-inp" placeholder="SEARCH TOPIC">
+						<button id="searchbar-search-btn"><img src="/qriller_assets/search.svg"></button>
+					</div>
+					<div id="scrolltable-container">
+					</div>
+					<button id="mobile-cart-btn">
+						<img src="/qriller_assets/cart_icon.svg">
+						<span>CART</span>
+					</button>
+				</div>
+				<div id="cart-container">
+					<div id="cart-header">
+						<h2>Cart</h2>
+						<button id="cart-reset-btn"><img src="/qriller_assets/cart_reset.svg"></button>
+						<button id="cart-exit-btn"><img src="/qriller_assets/cart_exit.svg"></button>
+					</div>
+					<div id="cart-scroll-container">
+						<table id="cart-content-container" class="empty">
+							<thead>
+								<tr>
+									<th>Type</th>
+									<th>Title</th>
+									<th>Qty</th>
+									<th>Price</th>
+								</tr>
+							</thead>
+							<tbody id="cart-content-body">
+							</tbody>
+							<tfoot id="cart-content-foot">
+								<tr>
+									<td colspan="2">Total</td>
+									<td>0</td>
+									<td>SGD 0</td>
+								</tr>
+							</tfoot>
+						</table>
+					</div>
+					<div id="checkout-msg-container">
+						<span id="checkout-msg"></span>
+						<div id="checkout-msg-bg"></div>
+					</div>
+					<button id="checkout-btn">
+						CHECKOUT
+					</button>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		/**
+		 * mobile cart button
+		 */
+		var lrContainer = document.getElementById("lr-container")
+		var cartContainer = document.getElementById("cart-container")
+		var cartExitBtn = document.getElementById("cart-exit-btn")
+		document.getElementById("mobile-cart-btn").addEventListener("click", e => {
+			lrContainer.classList.toggle("active")
+		})
+		cartExitBtn.addEventListener("click", e => {
+			lrContainer.classList.toggle("active")
+		})
+	</script>
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=10.0, minimum-scale=.25, user-scalable=yes"/>
+		<meta name="description" content="View the available series."/>
+
+		<link rel="stylesheet" href="/css/includes/reset.css">
+		<link rel="stylesheet" href="/css/includes/qriller/default.css">
+		<link rel="stylesheet" href="/css/includes/qriller/topbar.css">
+		<link rel="stylesheet" href="/css/views/qriller/qriller_seriespage.css">
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap" rel="stylesheet">
+
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+		<title>Qriller | Series</title>
+	</head>
+	<body>
+		<div id="topbar-container">
+			<a id="topbar-logo" href="/qriller">Qriller</a>
+			<div id="topbar-action-container">
+				<button id="contactus-btn" class="topbar-action-btn">
+					Support
+				</button>
+				<button id="contactus-btn" class="topbar-action-btn">
+					Contact Us
+				</button>
+				<a id="buy-btn" class="topbar-action-btn" href="/qriller/buy">
+					BUY
+				</a>
+			</div>
+		</div>
+		<div id="topbar-bottom-container">
+			<p>Conceptual learning | worksheets grandmaster</p>
+			<div id="topbar-bottom-action-container">
+				<div><a href="/qriller">Home</a></div>
+				<div><a href="/qriller/series">Series</a></div>
+				<div><a href="/qriller/topic-list">Topic List</a></div>
+			</div>
+		</div>
+
+		<div id="series-selector-container">
+			<div id="series-selector-btn-container">
+				<button id="series-mono-selector-btn" class="series-selector-btn active">
+					MONO
+				</button>
+				<button id="series-standard-selector-btn" class="series-selector-btn">
+					STANDARD
+				</button>
+			</div>
+			<h1>SERIES</h1>
+		</div>
+
+		<div id="product-showcase-container">
+			<div id="mono-product-showcase-container" class="active">
+				<div id="mono-series-first" class="product-showcase-section">
+					<div class="product-showcase-section-description">
+						<h3>Elusive series to drill solo sub-topics</h3>
+						<h2>For core fundamentals before sophiscated math concepts</h2>
+						<p>Get back to basics with fundamental questions drilling on core concepts before extending to application of such concepts.</p>
+						<p>Contains questions solely based on the targetted sub-topic (i.e. similar question types)</p>
+						<p>Save the generated worksheet (received via unique link) as a PDF for the infinite zoom and also to do it on the go. OR feel free to print it out.</p>
+						<p>Each worksheet (200 questions) is priced at <span class="sgd-reference">SGD5</span>.</p>
+					</div>
+					<div class="product-showcase-section-thumbnail">
+					</div>
+				</div>
+				<div id="mono-series-second" class="product-showcase-section">
+					<div class="product-showcase-section-description">
+						<h2>200 questions to DRILL</h2>
+						<p>Non-stop drilling of 200 procedurally generated questions & answers by the Qriller Engine with extended Algebra Engine to power its computational awareness.</p>
+					</div>
+				</div>
+				<div id="mono-series-third" class="product-showcase-section">
+					<div class="product-showcase-section-description">
+						<h3>Complements.</h3>
+						<h2>Paired with an answer sheet</h2>
+						<p>Answer sheet generated from the same exact unique worksheet upon purchase. This allows you to self grade your own work to spot mistakes early on.</p>
+					</div>
+					<div class="product-showcase-section-thumbnail">
+					</div>
+				</div>
+			</div>
+			<div id="standard-product-showcase-container">
+				<div id="mono-series-first" class="product-showcase-section">
+					<div class="product-showcase-section-description">
+						<h3>Standard series for a comprehensive study</h3>
+						<h2>For a comprehensive and general worksheet that covers the entire topic</h2>
+						<p>Perfect for students who are unsure which concepts they are unfamiliar with, this is a great start to working on your weaknesses while improving your strengths.</p>
+						<p>All question types for the particular big topic is covered.</p>
+						<p>Save the generated worksheet (received via unique link) as a PDF for the infinite zoom and also to do it on the go. OR feel free to print it out.</p>
+						<p>Each worksheet (200+ questions) is priced at <span class="sgd-reference">SGD5</span>.</p>
+					</div>
+					<div class="product-showcase-section-thumbnail">
+					</div>
+				</div>
+				<div id="standard-series-second" class="product-showcase-section">
+					<div class="product-showcase-section-description">
+						<h2>40 questions for each question type</h2>
+						<p>Every worksheet is populated by 40 questions for every sub-topic within that topic. This ensures there is enough questions to drill the entire topic comprensively.</p>
+						<p>All the sub-topics are squeezed into a single worksheet, Up to 200+ questions per worksheet.</p>
+						<p>Upon purchase, a new worksheet will be populated with 200 highly-procedural, randomly generated questions; guaranteeing absolute minimal reuse of questions.</p>
+					</div>
+					<div class="product-showcase-section-thumbnail">
+					</div>
+				</div>
+				<div id="mono-series-third" class="product-showcase-section">
+					<div class="product-showcase-section-description">
+						<h3>Complements.</h3>
+						<h2>Paired with an answer sheet</h2>
+						<p>Answer sheet generated from the same exact unique worksheet upon purchase. This allows you to self grade your own work to spot mistakes early on.</p>
+					</div>
+					<div class="product-showcase-section-thumbnail">
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="showcase-footer-container">
+			<a id="footer-purchase-btn" href="/qriller/buy">
+				PURCHASE
+			</a>
+			<p>For a low price of <span class="sgd-reference">SGD5</span></p>
+		</div>
+	</body>
+	<script>
+		const $selectors = {
+			"series-mono-selector-btn": $("#series-mono-selector-btn"),
+			"series-standard-selector-btn": $("#series-standard-selector-btn"),
+
+			"mono-product-showcase-container": $("#mono-product-showcase-container"),
+			"standard-product-showcase-container": $("#standard-product-showcase-container"),
+		}
+
+		var currentPage = 1
+		const switchPage = pageId => {
+			if (pageId === currentPage) {
+				return; // already on the same page
+			} else {
+				// set page
+				currentPage = pageId
+
+				// set scroll to 0
+				window.scrollTo(0, 0);
+			}
+
+			if (pageId === 1) {
+				$selectors["series-mono-selector-btn"].addClass("active")
+				$selectors["series-standard-selector-btn"].removeClass("active")
+
+				// show page
+				$selectors["mono-product-showcase-container"].addClass("active")
+				$selectors["standard-product-showcase-container"].removeClass("active")
+			} else {
+				$selectors["series-standard-selector-btn"].addClass("active")
+				$selectors["series-mono-selector-btn"].removeClass("active")
+
+				// show page
+				$selectors["standard-product-showcase-container"].addClass("active")
+				$selectors["mono-product-showcase-container"].removeClass("active")
+			}
+		}
+
+		$(".series-selector-btn").on("click", e => {
+			e.stopPropagation(); // stop propagation
+			if (e.target.id === "series-mono-selector-btn") {
+				// switch out
+				switchPage(1)
+			} else {
+				switchPage(2)
+			}
+		})
+
+		// load up params
+		const params = new URLSearchParams(window.location.search)
+		if (params.has("switchTo")) {
+			var page = params.get("switchTo")
+
+			// default page is 1 (mono)
+			if (page === "standard") {
+				switchPage(2)
+			}
+		}
+	</script>
+</html>

@@ -63,12 +63,21 @@ class SessionStore {
 
 class Client {
 	constructor() {
-		this.id = randomBytes(16)
+		this.id = randomBytes(16) // unique to every session
+		this.userId = 0 // to be set once .isAuthenticated is true, unique to every user account; used to uniquely identify authenticated users with their user data
+		this.username = null // to be set once .isAuthenticated is true
 		this.isAuthenticated = false;
-		this.isAdmin = false;
-		this.perms = {
-			"upload": false,
-			"delete": false
+		this._returnTo = null // contains the path (req.originalUrl) after successful login, to be set back to null once used up
+
+		// storage containers
+		this.cartItems = [] // contains the cart information whose elements are arrays with length 2 (see /server/routers/api/qrillerAPI.js for implementation)
+		this.cartItemsRepresentative = [] // similar to .cartItems but instead of the uniquecode, it is represented by the topic's title in the format, '1.0 | Indices Part I'
+
+		this.currentOrder = {
+			isValid: false, // boolean, determines if there is a current order in action
+			items: [], // str[2][], schema is identical to .cartItems of the client's property
+			total: 0, // number, numerical representation of order's total
+			currency: "sgd", // "sgd"|"usd"
 		}
 
 		// metadaata

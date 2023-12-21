@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=10.0, minimum-scale=1, user-scalable=yes"/>
+		<meta name="description" content=":)"/>
+
+		<link rel="icon" type="image/x-icon" href="">
+		<link rel="stylesheet" href="/css/includes/reset.css">
+		<link rel="stylesheet" href="/css/views/hotel_topbar.css">
+		<link rel="stylesheet" href="/css/views/hotel_reservations.css">
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+		<title>Dusk | Promotions</title>
+	</head>
+	<body>
+		<div id="topbar-container">
+			<img id="comp-logo" src="/hotel_assets/icon.svg">
+			<div id="topbar-right-container">
+				<button id="topbar-member-login-btn">
+					<img src="/hotel_assets/account_icon.svg">
+					Member sign in
+				</button>
+				<button id="topbar-booknow-btn">
+					BOOK NOW
+				</button>
+			</div>
+		</div>
+		<div id="window-image-container">
+		</div>
+		<div id="navmenu-attachment">
+			<div id="restaurant-selector">
+				<p>restaurant:</p>
+				<h2>DAWN</h2>
+			</div>
+			<div id="progress-container">
+				<button class="progress-tab-container unlocked active" id="details-tab-container">
+					<p>Details</p>
+					<div class="progress-tab-next-arrow">
+					</div>
+				</button>
+				<button class="progress-tab-container" id="guests-tab-container">
+					<p>Guests</p>
+					<div class="progress-tab-next-arrow">
+					</div>
+				</button>
+				<button class="progress-tab-container" id="payment-tab-container">
+					<p>Payment</p>
+					<div class="progress-tab-next-arrow">
+					</div>
+				</button>
+				<button class="progress-tab-container" id="confirmation-tab-container">
+					<p>Confirmation</p>
+				</button>
+			</div>
+		</div>
+		<div id="page-window">
+			<div id="details-page-container" class="page-container active">
+				<div class="page-header-container">
+					<h1>Details</h1>
+					<button class="page-header-next-navigbtn">Next</button>
+				</div>
+				<hr>
+				<div id="details-pform-container">
+					<div id="details-pform-timing-display">
+						<p id="details-pform-timing-display-text">Timings will be shown here</p>
+					</div>
+					<div id="details-pform-header">
+						<button id="details-pform-date-input-selector" class="active">Date</button><button id="details-pform-time-input-selector">Time</button>
+					</div>
+					<div id="details-pform-selectors-page-container">
+						<div id="details-pform-date" class="">
+							<div id="details-pform-date-header">
+								<button id="pform-date-prev-month" class="pform-date-calendar-btn">
+								</button>
+								<h2 id="pform-date-calendar-header">May 2023</h2>
+								<button id="pform-date-next-month" class="pform-date-calendar-btn active">
+								</button>
+							</div>
+							<table>
+								<thead>
+									<tr>
+										<th>Sun</th>
+										<th>Mon</th>
+										<th>Tue</th>
+										<th>Wed</th>
+										<th>Thu</th>
+										<th>Fri</th>
+										<th>Sat</th>
+									</tr>
+								</thead>
+								<tbody id="pform-date-selection-container">
+									<tr>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+									</tr>
+									<tr>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+									</tr>
+									<tr>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+									</tr>
+									<tr>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+									</tr>
+									<tr>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+									</tr>
+									<tr>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+										<th></th>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div id="details-pform-time" class="hidden">
+							<div id="details-pform-time-block">
+								<img src="https://svgsilh.com/svg/1801287.svg">
+								<p>Please select a date first</p>
+							</div>
+							<div id="details-pform-time-booking-container" class="hidden">
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div id="guests-page-container" class="page-container">
+				<div class="page-header-container">
+					<h1>Guests</h1>
+					<button class="page-header-next-navigbtn">Next</button>
+				</div>
+				<hr>
+				<div id="guests-pform-container">
+					<form class="guest-particulars-form" name="guest-1-particulars">
+						<div class="guest-particulars-form-header">
+							<h1>GUEST 1</h1>
+							<h4>&nbsp;</h4>
+						</div>
+						<div class="guest-particulars-name-container">
+							<div>
+								<label for="guest-1-firstname">First name</label>
+								<input name="guest-1-firstname" placeholder="First name" type="text" pattern="[a-zA-Z\s\/]{3, 255}" maxlength="255">
+							</div>
+							<div>
+								<label for="guest-1-lastname">Last name</label>
+								<input name="guest-1-lastname" placeholder="Last name" type="text" pattern="[a-zA-Z\s\/]{3, 255}" maxlength="255">
+							</div>
+						</div>
+
+						<label for="guest-1-special">Special remarks</label>
+						<input name="guest-1-special" placeholder="Dietary requirements, high chair, etc.." type="text" maxlength="255">
+
+						<div class="guest-ismainguest-container">
+							<label for="guest-1-ismainguest">Is main guest</label>
+							<input name="guest-1-ismainguest" type="checkbox">
+						</div>
+					</form>
+					<hr>
+					<button id="guest-pform-addguest">+ Add guests +</button>
+				</div>
+			</div>
+			<div id="payment-page-container" class="page-container">
+				<div class="page-header-container">
+					<h1>Payment</h1>
+					<button class="page-header-next-navigbtn">Next</button>
+				</div>
+				<hr>
+				<div id="payment-details-container">
+					<h2>Reservation details</h2>
+					<div id="reservation-details-container">
+						<p>Date: 26/05/23</p>
+						<p>Time: 18:00</p>
+						<p>Service: Dinner</p>
+						<p>Location: DAWN restaurant</p>
+						<p>Guests: 2pax</p>
+					</div>
+					<p>A credit hold of $50 is required for reservations.<br>Upon completing your reservation, the credit hold will be released back into your bank immediately.<br>For more details, read our <a class="faq-hyperlink" href="/faq#credit-hold">FAQ ↪</a>.</p>
+				</div>
+				<hr>
+				<form id="payment-pform-container" name="payment-card-details">
+					<label id="payment-card-name-label" for="payment-card-name">Name on card</label>
+					<input id="payment-card-name-input" name="payment-card-name" placeholder="Name" type="text" pattern="[a-zA-Z\s\/]{3, 255}" autocomplete="cc-name" minlength="3" maxlength="255">
+					<label id="payment-card-no-label" for="payment-card-no">Card number</label>
+					<input id="payment-card-no-input" name="payment-card-no" placeholder="0000 0000 0000 0000" type="tel" inputmode="numeric" pattern="[0-9\s]{13,19}" autocomplete="cc-number" maxlength="19">
+
+					<div id="payment-pform-card-details-row-container">
+						<div class="payment-pform-card-details-input-group">
+							<label id="payment-card-expmnth-label" for="payment-card-expmnth">Expiry</label>
+							<div id="payment-pform-cardexp-input-group">
+								<input id="payment-card-expmnth-input" name="payment-card-expmnth" placeholder="MM" inputmode="numeric" pattern="[0-9]{2}" type="text" autocomplete="cc-exp-month" minlength="2" maxlength="2">
+								<p>/</p>
+								<input id="payment-card-expyr-input" name="payment-card-expyr" placeholder="YY" inputmode="numeric" pattern="[0-9]{2}" type="text" autocomplete="cc-exp-year" minlength="2" maxlength="2">
+							</div>
+						</div>
+						<div class="payment-pform-card-details-input-group">
+							<label id="payment-card-cvv-label" for="payment-card-cvv">CVV</label>
+							<input id="payment-card-cvv-input" name="payment-card-cvv" placeholder="•••" inputmode="numeric" pattern="[0-9]{3}" type="text" minlength="3" maxlength="3" min="0" autocomplete="cc-cvv">
+						</div>
+					</div>
+					<hr>
+					<button id="payment-pform-processpayment" disabled>Process payment</button>
+				</form>
+			</div>
+			<div id="confirmation-page-container" class="page-container">
+				<div class="page-header-container">
+					<h1>Confirmation</h1>
+				</div>
+				<hr>
+				<div id="confirmation-invoice-slip">
+					<div id="confirmation-invoice-slip-header">
+						<h2>Reservation @ DAWN [success]</h2>
+						<div id="confirmation-invoice-slip-details">
+							<p>Invoice ID: #14e89ad</p>
+							<p>Date: 18/05/2023</p>
+							<p>Time: 16:43</p>
+						</div>
+					</div>
+					<hr>
+					<div id="confirmation-invoice-reservation-details">
+						<h2>Reservation details</h2>
+						<p>Date: 26/05/23</p>
+						<p>Time: 18:00</p>
+						<p>Service: Dinner</p>
+						<p>Guests: 2pax</p>
+					</div>
+					<hr>
+					<div id="confirmation-invoice-contact-details">
+						<h2>Contact details</h2>
+						<p>Name: John Doe</p>
+						<p>Email: 230643M@mymail.nyp.edu.sg</p>
+						<p>Phone number: +6592224896</p>
+					</div>
+					<hr>
+					<div id="confirmation-invoice-guestlist">
+						<div class="confirmation-invoice-guestcontainer">
+							<h2>Jane Doe</h2>
+							<p class="confirmation-invoice-guestspecialremarks">Special remarks:<br>None</p>
+						</div>
+					</div>
+					<hr>
+					<div id="confirmation-invoice-payment-details">
+						<h2>Payment details</h2>
+						<p>Credit hold: $50 [paid]</p>
+					</div>
+					<hr>
+					<div id="confirmation-invoice-footer">
+						<p>An email copy has already been sent to your email!</p>
+						<p>Please do not hesitate to contact us at <a href="/">customerservice@dusk.com</a> or at <a href="/">+65 0000 1800</a>.</p>
+						<p id="confirmation-invoice-thankyou">
+							We are proud to serve your occassion.
+						</p>
+						<p id="confirmation-invoice-signoff">
+							Regards,<br>The Dusk Hotel Group
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		// util object
+		const utils = {}
+
+		utils.generateTableDates = (year, month) => {
+			var tableDates = []
+			var availableDateRange = [-1, -1] // index (referenced from absValue defined in the loop)
+			console.log(year, month)
+
+			var currentMonthFirstDay = new Date(year, month).getDay()
+			var currentMonthTotalDays = new Date(year, month +1, 0).getDate()
+			var previousMonthTotalDays = new Date(year, month, 0).getDate()
+
+			for (let i = 0; i < 6; i++) {
+				var row = []
+				for (let j = 0; j < 7; j++) {
+					var absValue = j +i *7 // value representing the current amount of days passed
+					if (absValue -currentMonthFirstDay >= currentMonthTotalDays) {
+						// current month exceeded, use days in next month
+						row.push(absValue -currentMonthFirstDay -currentMonthTotalDays +1)
+
+						// update date range
+						if (availableDateRange[1] === -1) {
+							availableDateRange[1] = absValue -1
+						}
+					} else if (absValue >= currentMonthFirstDay) {
+						// still in current month
+						row.push(absValue -currentMonthFirstDay +1)
+
+						// update date range
+						if (availableDateRange[0] === -1) {
+							availableDateRange[0] = absValue
+						}
+					} else {
+						// use previous months date
+						row.push(previousMonthTotalDays -currentMonthFirstDay +absValue +1)
+					}
+				}
+				tableDates.push(row)
+			}
+
+			return [tableDates, availableDateRange]
+		}
+
+		// pages object
+		const pages = {
+			dir: ["details", "guests", "payment", "confirmation"],
+			pageElements: {
+				"details": {
+					tabContainer: document.getElementById("details-tab-container"),
+					pageContainer: document.getElementById("details-page-container"),
+
+					tabNextArrow: document.getElementById("details-tab-container").getElementsByClassName("progress-tab-next-arrow")[0]
+				},
+				"guests": {
+					tabContainer: document.getElementById("guests-tab-container"),
+					pageContainer: document.getElementById("guests-page-container"),
+
+					tabNextArrow: document.getElementById("guests-tab-container").getElementsByClassName("progress-tab-next-arrow")[0]
+				},
+				"payment": {
+					tabContainer: document.getElementById("payment-tab-container"),
+					pageContainer: document.getElementById("payment-page-container"),
+
+					tabNextArrow: document.getElementById("payment-tab-container").getElementsByClassName("progress-tab-next-arrow")[0]
+				},
+				"confirmation": {
+					tabContainer: document.getElementById("confirmation-tab-container"),
+					pageContainer: document.getElementById("confirmation-page-container")
+				}
+			},
+
+			currentPage: 0,
+			highestPage: 10
+		}
+
+		// receiptionist object
+		const receiptionist = {
+			availableTimeslots: [["Breakfast", "08:00", "09:00", "10:00", "11:00"], ["Dinner", "16:00", "17:00", "18:00", "19:00", "20:00"]],
+			timingDisplayEle: document.getElementById("details-pform-timing-display-text"),
+			date: "",
+			time: "",
+			service: "",
+
+			generatedCalender: null, // to be generated (by .register())
+			generatedCalenderRange: null, // to be generated
+			calendarYear: null, // to be generated
+			calendarMonth: null, // to be generated
+		}
+
+		receiptionist.updateDateTimeDetails = function() {
+			// updates contents of this.timingDisplayEle with this.date and this.time
+			var o = this.date
+			if (this.time.length > 0) {
+				o += `, ${this.time}`
+			}
+
+			this.timingDisplayEle.innerHTML = o
+		}
+
+		receiptionist.chooseDate = function(dateObj) {
+			// date: string, in ISO format (YYYYMMDD)
+			var year = dateObj.getFullYear()
+			var month = dateObj.toLocaleString("default", {month: "short"})
+			var dateNum = dateObj.getDate()
+
+			this.date = `${dateNum} ${month} ${year}`
+			this.updateDateTimeDetails()
+		}
+
+		receiptionist.chooseTime = function(idx) {
+			// idx: number, time slot choosen (can infer type of service)
+			// returns true if found timeslot & service successfully, else false
+
+			// only selects when date has been chosen
+			if (this.date.length === 0) {
+				// date not yet chosen, return false
+				return false
+			}
+
+			// find service
+			console.log("TIME CHOOSEN", idx)
+			var i = 0;
+			var service, timeslot;
+			for (let serviceIdx = 0; serviceIdx < this.availableTimeslots.length; serviceIdx++) {
+				if (i > idx) {
+					// finder pointer already exceeded target index no match
+					return false
+				} else if ((idx -i) >= (this.availableTimeslots[serviceIdx].length -1)) {
+					// can skip this service
+					i += this.availableTimeslots[serviceIdx].length -1
+					continue
+				} else {
+					service = this.availableTimeslots[serviceIdx][0]
+					timeslot = this.availableTimeslots[serviceIdx][idx -i +1]
+					break
+				}
+			}
+
+			if (service == null) {
+				// not found
+				return false
+			}
+
+			this.service = service
+			this.time = timeslot
+			this.updateDateTimeDetails()
+
+			return true
+		}
+
+		receiptionist.redrawCalendarDateBooking = function(yearIdx, mnthIdx) {
+			// generate dates in current month with respect to the day (mon - sun)
+			var todayDate = new Date()
+			var [tableDates, availableDateRange] = utils.generateTableDates(yearIdx, mnthIdx)
+			var pastDateRange = (yearIdx === todayDate.getFullYear() && mnthIdx === todayDate.getMonth()) ? availableDateRange[0] +todayDate.getDate() : 0 // index that indicates the current date (used to determine whether if dates in tableDates has been past)
+
+			// store generated calendar
+			this.generatedCalender = tableDates
+			this.generatedCalenderRange = availableDateRange
+
+			// store calendar params
+			this.calendarMonth = mnthIdx
+			this.calendarYear = yearIdx
+
+			// modify dateselection container (and their classes)
+			var dateSelectionContainer = document.getElementById("pform-date-selection-container")
+			for (let i = 0; i < dateSelectionContainer.children.length; i++) {
+				var tr = dateSelectionContainer.children[i]
+				for (let j = 0; j < tr.children.length; j++) {
+					var th = tr.children[j]
+
+					// write date value
+					th.innerHTML = tableDates[i][j]
+
+					// set date property (depending whether its in month) [nim, pcd, ava]
+					th.className = "" // reset classes
+					if (j +i *7 >= availableDateRange[0] && j +i *7 < pastDateRange) {
+						// pcd (past current date)
+						th.classList.add("pcd")
+
+						// remove role & aria-label & tab-index attribute
+						th.removeAttribute("role")
+						th.removeAttribute("aria-label")
+						th.removeAttribute("tabindex")
+					} else if (j +i *7 >= availableDateRange[0] && j +i *7 <= availableDateRange[1]) {
+						// ava
+						th.classList.add("ava")
+
+						// set role & aria-label & tab-index attribute
+						th.setAttribute("role", "button")
+						th.setAttribute("aria-label", `select date ${new Date(yearIdx, mnthIdx, tableDates[i][j]).toLocaleDateString("en-US", {weekday: "long", year: "numeric", month: "long", day: "numeric"})}`)
+						th.setAttribute("tabindex", "0")
+					} else {
+						// nim (not in this month)
+						th.classList.add("nim")
+
+						// remove role & aria-label & tab-index attribute
+						th.removeAttribute("role")
+						th.removeAttribute("aria-label")
+						th.removeAttribute("tabindex")
+					}
+				}
+			}
+
+			var mnthString = new Date(yearIdx, mnthIdx).toLocaleString("default", {month: "short"})
+			mnthString = mnthString.charAt(0).toUpperCase() +mnthString.slice(1) // capitalise first character
+			document.getElementById("pform-date-calendar-header").innerHTML = `${mnthString} ${yearIdx}`
+		}
+
+		receiptionist.register = function() {
+			// initialisation call
+			var activeTab = 0; // 0 for date selector, 1 for time selector
+			var dateSelectorTab = document.getElementById("details-pform-date-input-selector");
+			var timeSelectorTab = document.getElementById("details-pform-time-input-selector");
+
+			var dateSelectorPage = document.getElementById("details-pform-date")
+			var timeSelectorPage = document.getElementById("details-pform-time")
+
+			var timeBlockMsg = document.getElementById("details-pform-time-block")
+			var timeBookingContainer = document.getElementById("details-pform-time-booking-container")
+
+			var calendarPrevBtn = document.getElementById("pform-date-prev-month")
+			var calendarNextBtn = document.getElementById("pform-date-next-month")
+
+			var todayDate = new Date()
+
+			dateSelectorTab.addEventListener("click", e => {
+				if (activeTab === 0) {
+					// already at date selector, ignore
+					return
+				}
+
+				// set activeTab
+				activeTab = 0;
+
+				// remove active class from timeSelector, and add it to date selector
+				timeSelectorTab.classList.remove("active")
+				dateSelectorTab.classList.add("active")
+
+				// show dateSelector page (and make active the calendar navig buttons)
+				dateSelectorPage.classList.remove("hidden")
+				if (!(todayDate.getFullYear() === this.calendarYear && todayDate.getMonth() === this.calendarMonth)) {
+					calendarPrevBtn.classList.add("active")
+				}
+				calendarNextBtn.classList.add("active")
+
+				// hide timeSelector page
+				timeSelectorPage.classList.add("hidden")
+			})
+
+			timeSelectorTab.addEventListener("click", e => {
+				if (activeTab === 1) {
+					// already at date selector, ignore
+					return
+				}
+
+				// set activeTab
+				activeTab = 1;
+
+				// determine if date was already selected (if so, hide block message)
+				if (this.date.length === 0) {
+					// not selected yet, show block message, high time booking container
+					timeBlockMsg.classList.remove("hidden")
+					timeBookingContainer.classList.add("hidden")
+				} else {
+					timeBlockMsg.classList.add("hidden")
+					timeBookingContainer.classList.remove("hidden")
+				}
+
+				// remove active class from date selector, and add it to timeSelector
+				dateSelectorTab.classList.remove("active")
+				timeSelectorTab.classList.add("active")
+
+				// show timeSelector page
+				timeSelectorPage.classList.remove("hidden")
+
+				// hide dateeSelector page (and the calendar buttons)
+				dateSelectorPage.classList.add("hidden")
+				calendarPrevBtn.classList.remove("active")
+				calendarNextBtn.classList.remove("active")
+			})
+
+			// generate dates in current month with respect to the day (mon - sun)
+			var [tableDates, availableDateRange] = utils.generateTableDates(todayDate.getFullYear(), todayDate.getMonth())
+			var pastDateRange = availableDateRange[0] +todayDate.getDate() // index that indicates the current date (used to determine whether if dates in tableDates has been past)
+
+			// store generated calendar
+			this.generatedCalender = tableDates
+			this.generatedCalenderRange = availableDateRange
+
+			// store calendar params
+			this.calendarMonth = todayDate.getMonth()
+			this.calendarYear = todayDate.getFullYear()
+
+			// modify dateselection container (register click events)
+			// initialisation call (use this.redrawCalendarDateBooking on subsequent calls)
+			var dateSelectionContainer = document.getElementById("pform-date-selection-container")
+			for (let i = 0; i < dateSelectionContainer.children.length; i++) {
+				var tr = dateSelectionContainer.children[i]
+				for (let j = 0; j < tr.children.length; j++) {
+					let absValue = j +i *7
+					var th = tr.children[j]
+
+					// write date value
+					th.innerHTML = tableDates[i][j]
+
+					// set date property (depending whether its in month) [nim, pcd, ava]
+					if (absValue >= availableDateRange[0] && absValue < pastDateRange) {
+						// pcd (past current date)
+						th.classList.add("pcd")
+					} else if (absValue >= availableDateRange[0] && absValue <= availableDateRange[1]) {
+						// ava
+						th.classList.add("ava")
+
+						// set role & aria-label & tab-index attribute
+						th.setAttribute("role", "button")
+						th.setAttribute("aria-label", `select booking date ${new Date(todayDate.getFullYear(), todayDate.getMonth(), tableDates[i][j]).toLocaleDateString("en-US", {weekday: "long", year: "numeric", month: "long", day: "numeric"})}`)
+						th.setAttribute("tabindex", "0")
+					} else {
+						// nim (not in this month)
+						th.classList.add("nim")
+					}
+
+					let thClickFn = e => {
+						// determine if this selection is a valid one since month may have changed (yet click works on the same registeration)
+						// get date
+						var date = this.generatedCalender[i][j]
+
+						// see if date is within range
+						if (absValue < availableDateRange[0] || absValue > availableDateRange[1]) {
+							// out of range, return (invalid click)
+							return
+						} else {
+							// see if the date is already past (pcd)
+							if (todayDate.getFullYear() === this.calendarYear && todayDate.getMonth() >= this.calendarMonth && todayDate.getDate() > date) {
+								// at current month and year AND today date has past selected date
+								// out of range, return (invalid date)
+								return
+							}
+						}
+
+						// valid date
+						this.chooseDate(new Date(this.calendarYear, this.calendarMonth, date))
+					}
+
+					// set click events
+					th.addEventListener("click", thClickFn)
+					th.addEventListener("keydown", e => {
+						if (e.keyCode === 32 || e.keyCode == 13) {
+							// space and enter key (for compatibility)
+							thClickFn()
+						}
+					})
+				}
+			}
+
+			// update text display
+			var mnthString = todayDate.toLocaleString("default", {month: "short"})
+			mnthString = mnthString.charAt(0).toUpperCase() +mnthString.slice(1) // capitalise first character
+			document.getElementById("pform-date-calendar-header").innerHTML = `${mnthString} ${todayDate.getFullYear()}`
+
+			// register calendar prev/next buttons
+			calendarPrevBtn.addEventListener("click", e => {
+				// go back previous month (unless calendarMonth is already this month -- cant go back any more)
+				if (todayDate.getFullYear() === this.calendarYear && todayDate.getMonth() === this.calendarMonth) {
+					// already at the current month, hide this button
+					calendarPrevBtn.classList.remove("active")
+
+					// do nothing
+					return
+				}
+
+				// calculate month index
+				var year, month
+				if (this.calendarMonth <= 0) {
+					year = this.calendarYear -1
+					month = 11
+				} else {
+					year = this.calendarYear
+					month = this.calendarMonth -1
+				}
+
+				// redraw calendar
+				this.redrawCalendarDateBooking(year, month)
+
+				// determine if need to hide prevbtn
+				if (todayDate.getFullYear() === this.calendarYear && todayDate.getMonth() === this.calendarMonth) {
+					// cannot go back any more
+					calendarPrevBtn.classList.remove("active")
+				}
+			})
+
+			calendarNextBtn.addEventListener("click", e => {
+				// go next month
+				// calculate month index
+				var year, month
+				if (this.calendarMonth >= 11) {
+					// jump to next year
+					year = this.calendarYear +1
+					month = 0
+				} else {
+					year = this.calendarYear
+					month = this.calendarMonth +1
+				}
+
+				// redraw calendar
+				this.redrawCalendarDateBooking(year, month)
+
+				// show prevbtn
+				calendarPrevBtn.classList.add("active")
+			})
+
+
+			// write timeslots
+			let iterIdx = 0;
+			for (let i = 0; i < this.availableTimeslots.length; i++) {
+				var timeslotData = this.availableTimeslots[i]
+
+				// create header
+				const header = document.createElement("h3")
+				header.innerHTML = timeslotData[0]
+				timeBookingContainer.appendChild(header)
+
+				// create container
+				var container = document.createElement("div")
+				container.className = "details-pform-timeslots-container"
+				timeBookingContainer.appendChild(container)
+
+				// time slot cards (start from index 1 since index 0 is the service header name)
+				for (j = 1; j < this.availableTimeslots[i].length; j++) {
+					// compute global index
+					let timeslotGlobalIdx = iterIdx++
+
+					// create card (p tag)
+					const timeslotCard = document.createElement("p")
+					timeslotCard.innerHTML = this.availableTimeslots[i][j]
+					container.appendChild(timeslotCard)
+
+					// register click events
+					timeslotCard.addEventListener("click", e => {
+						this.chooseTime(timeslotGlobalIdx)
+					})
+				}
+			}
+		}
+
+		console.log(pages.pageElements.details.tabNextArrow)
+
+		pages.navbarArrowsHighlight = function() {
+			// highlights arrow up till this.currentPage
+			for (let i = 0; i < this.currentPage; i++) {
+				this.pageElements[this.dir[i]].tabNextArrow.classList.add("active")
+			}
+
+			// un-highlight remaining arrows
+			// last tab-container has no arrows
+			for (let i = this.currentPage; i < this.dir.length -1; i++) {
+				this.pageElements[this.dir[i]].tabNextArrow.classList.remove("active")
+			}
+		}
+
+		pages.switchPage = function(pageId, forced) {
+			// returns boolean (whether operation was successful or not)
+			// function should only be used to traverse through completed pages
+			// to progress page, use nextPage method
+
+			// already on the page
+			if (pageId == this.currentPage && !forced) {
+				return false
+			}
+
+			// determine if page we want to switch to has been 'completed' (unlocked)
+			if (pageId > this.highestPage) {
+				return false
+			}
+
+			// hide current page
+			this.pageElements[this.dir[this.currentPage]].tabContainer.classList.remove("active")
+			this.pageElements[this.dir[this.currentPage]].pageContainer.classList.remove("active")
+
+			// set current page
+			this.currentPage = pageId
+			this.pageElements[this.dir[pageId]].tabContainer.classList.add("active")
+			this.pageElements[this.dir[pageId]].pageContainer.classList.add("active")
+
+			// highlight navigation bar arrows
+			this.navbarArrowsHighlight()
+
+			// return value
+			return true
+		}
+
+		pages.register = function() {
+			// initialisation function
+
+			// attach click events for all the tabs trigger
+			for (const [pageName, links] of Object.entries(this.pageElements)) {
+				let pageId = this.dir.indexOf(pageName)
+				if (pageId === -1) {
+					// not found
+					console.warn("[WARN]: .register() unable to register page", pageName, "due to mismatch pageName with directory")
+					continue
+				}
+
+				links.tabContainer.addEventListener("click", e => {
+					this.switchPage(pageId)
+				})
+			}
+		}
+
+		pages.nextPage = function() {
+			// unlocks the next page upon verification
+			// returns true if unlock was successful, else false
+			if (this.currentPage === this.dir.length -1) {
+				// already at the end
+				return false
+			}
+
+			// add styles
+			this.pageElements[this.dir[this.currentPage +1]].tabContainer.classList.add("unlocked")
+
+			// set highest page
+			this.highestPage = this.currentPage +1
+
+			// switch page
+			var success = this.switchPage(this.currentPage +1, true)
+		}
+
+
+		// caller
+		receiptionist.register()
+		pages.register()
+		pages.nextPage()
+		pages.nextPage()
+	</script>
+</html>

@@ -1,0 +1,175 @@
+#topbar-container {
+	position: sticky;
+	top: 0;
+
+	display: flex;
+	flex-direction: row;
+	align-items: flex-end;
+
+	padding: 20px 45px;
+	padding-bottom: 33px;
+
+	background-color: var(--primary-color);
+
+	z-index: 3;
+}
+
+#topbar-container.scrolled {
+	border-bottom-style: solid;
+	border-bottom-width: 1px;
+	border-bottom-color: var(--border-light);
+	box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+}
+
+#logo-redirect {
+	margin-right: 20%;
+}
+
+#logo-redirect > img {
+	width: auto;
+	height: 26px;
+
+	object-fit: cover;
+}
+
+#topbar-desktop-navig-container {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+
+	flex-grow: 1;
+}
+
+#topbar-container a {
+	color: black;
+	text-decoration: none;
+
+	transition-property: color;
+	transition-duration: 100ms;
+	transition-timing-function: linear;
+}
+
+#topbar-container a:hover,
+#topbar-container a:focus {
+	color: var(--accent-compl-color);
+}
+
+#topbar-container a.active {
+	color: var(--accent-color);
+}
+
+#topbar-mobile-component {
+	display: none;
+}
+
+#topbar-mobile-sidepanel-container {
+	position: absolute;
+	top: -6px;
+	right: -20px;
+
+	display: none;
+
+	width: 100vw;
+	height: 100vh;
+
+	backdrop-filter: blur(5px);
+}
+
+#topbar-mobile-sidepanel-container.active {
+	display: block;
+}
+
+#topbar-mobile-sidepanel-content {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+
+	position: absolute;
+	top: 0;
+	right: 0;
+
+	width: 230px;
+	max-width: 230px;
+	height: 100svh;
+
+	padding: 10px 5px;
+
+	box-sizing: border-box;
+
+	border-left-style: solid;
+	border-left-width: 1px;
+	border-left-color: var(--border-light);
+	background-color: var(--primary-color);
+}
+
+#topbar-mobile-close-btn {
+}
+
+#topbar-mobile-close-btn > img {
+	width: 26px;
+	height: 26px;
+
+	padding: 5px;
+}
+
+#topbar-mobile-navig-container {
+	display: flex;
+	flex-direction: column;
+
+	margin-top: 15px;
+	padding-left: 5px;
+}
+
+#topbar-mobile-navig-container > a {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+
+	padding: 10px 0;
+}
+
+#topbar-mobile-navig-container > a > img {
+	width: 24px;
+	height: 24px;
+
+	padding-right: 5px;
+}
+
+@media (max-width: 640px) {
+	#topbar-container {
+		justify-content: space-between;
+		align-items: center;
+
+		width: auto;
+		min-width: 0;
+		padding: 6px 20px;
+	}
+
+	#logo-redirect {
+		margin-bottom: 10px;
+		margin-right: 0;
+	}
+
+	#topbar-desktop-navig-container {
+		display: none;
+	}
+
+	#topbar-mobile-component {
+		position: relative;
+
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+
+		margin-left: auto;
+	}
+
+	#topbar-mobile-hamburg-btn > img {
+		width: 28px;
+		height: 28px;
+
+		padding: 5px;
+
+		object-fit: cover;
+	}
+}

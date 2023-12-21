@@ -52,7 +52,7 @@ router.get("/query/:uid", (req, res) => {
 })
 
 // modify image details (single image with uid)
-router.post("/modify/:uid", auth_router.admin_authenticated, (req, res) => {
+router.post("/modify/:uid", auth_router.authenticated, (req, res) => {
 	var uid = req.params.uid.toString()
 	console.log(req.body)
 	var body = req.body
@@ -66,7 +66,7 @@ router.post("/modify/:uid", auth_router.admin_authenticated, (req, res) => {
 })
 
 // use server resources to retrieve image details (date, location, camera make, size in bytes, dimensions)
-router.post("/image-fetch-details", auth_router.admin_authenticated, upload.array("files"), (req, res) => {
+router.post("/image-fetch-details", auth_router.authenticated, upload.array("files"), (req, res) => {
 	req.files.forEach(fileObj => {
 		var imageObj = new backend_handler.Image(fileObj.path, fileObj.filename, fileObj.size, "", {'timezonePref': "Asia/Singapore"})
 
@@ -95,7 +95,7 @@ router.post("/image-fetch-details", auth_router.admin_authenticated, upload.arra
 })
 
 // uploads images
-router.post("/upload", auth_router.admin_authenticated, upload.array("files"), (req, res) => {
+router.post("/upload", auth_router.authenticated, upload.array("files"), (req, res) => {
 	// determine if formData was sent correctly
 	// format body.metadata first
 	if (typeof req.body.metadata == "string" && req.body.metadata.length === 0) {
@@ -155,7 +155,7 @@ router.post("/upload", auth_router.admin_authenticated, upload.array("files"), (
 })
 
 // add reactions
-router.post("/reactions/add", auth_router.admin_authenticated, (req, res) => {
+router.post("/reactions/add", auth_router.authenticated, (req, res) => {
 	// add reactions in the form of unicode string
 	var unicodeHexString = parseInt(req.body.unicodeHexString)
 	var imgUid = req.body.uid
@@ -172,7 +172,7 @@ router.post("/reactions/add", auth_router.admin_authenticated, (req, res) => {
 })
 
 // remove reactions
-router.post("/reactions/remove", auth_router.admin_authenticated, (req, res) => {
+router.post("/reactions/remove", auth_router.authenticated, (req, res) => {
 	// add reactions in the form of unicode string
 	var imgUid = req.body.uid
 	if (!imgUid) {

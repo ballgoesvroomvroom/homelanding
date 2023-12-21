@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=10.0, minimum-scale=.25, user-scalable=yes"/>
+		<meta name="description" content="Worksheets grandmaster"/>
+
+		<link rel="stylesheet" href="/css/includes/reset.css">
+		<link rel="stylesheet" href="/css/includes/qriller/default.css">
+		<link rel="stylesheet" href="/css/includes/qriller/topbar.css">
+		<link rel="stylesheet" href="/css/includes/qriller/modal.css">
+		<link rel="stylesheet" href="/css/views/qriller/signup.css">
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap" rel="stylesheet">
+
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+		<script src="/js/views/qriller/signup.js"></script>
+
+		<title>Qriller | Login</title>
+	</head>
+	<body>
+		<div id="modal-window">
+			<div id="modal-dialogue-container">
+				<h2 id="modal-dialogue-header">
+				</h2>
+				<p id="modal-dialogue-details">
+				</p>
+				<div id="modal-dialogue-action-container">
+					<button id="modal-dialogue-confirm-btn" title="reset cart">YES</button>
+					<button id="modal-dialogue-cancel-btn" title="keep cart">CANCEL</button>
+				</div>
+			</div>
+		</div>
+		<div id="topbar-container">
+			<a id="topbar-logo" href="/qriller">Qriller</a>
+			<div id="topbar-action-container">
+				<button id="contactus-btn" class="topbar-action-btn">
+					Support
+				</button>
+				<button id="contactus-btn" class="topbar-action-btn">
+					Contact Us
+				</button>
+				<a id="buy-btn" class="topbar-action-btn" href="/qriller/buy">
+					BUY
+				</a>
+			</div>
+		</div>
+		<div id="topbar-bottom-container">
+			<p>Conceptual learning | worksheets grandmaster</p>
+			<div id="topbar-bottom-action-container">
+				<div><a href="/qriller">Home</a></div>
+				<div><a href="/qriller/series">Series</a></div>
+				<div><a href="/qriller/topic-list">Topic List</a></div>
+			</div>
+		</div>
+		<div id="container">
+			<h1>Sign up</h1>
+			<form id="login">
+				<label for="username">Username</label>
+				<input id="username-inp" name="username" type="text" minlength="3" maxlength="23" required>
+				<label for="emailaddr">Email address</label>
+				<input id="emailaddr-inp" name="emailaddr" type="email" required>
+				<label for="password">Password</label>
+				<input id="password-inp" name="password" type="password" minlength="3" maxlength="23">
+				<label for="cfm-password">Confirm password</label>
+				<input id="cfm-password-inp" name="cfm-password" type="password" minlength="3" maxlength="23">
+
+				<p id="formErrorMsg">&nbsp;</p>
+				<button id="formSubmitBtn" type="submit">SUBMIT</button>
+			</form>
+			<div id="links-container">
+				<p><a href="/qriller/signup">SIGN UP WITH GOOGLE</a></p>
+				<p><a href="/qriller/signup">TERMINATE ACCOUNT</a></p>
+			</div>
+		</div>
+		<div id="right-expand-container" tabindex="0">
+		</div>
+	</body>
+</html>

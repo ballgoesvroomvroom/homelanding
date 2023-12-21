@@ -1,6 +1,6 @@
 const fs = require("fs")
 const path = require("path")
-const dotenv = require("dotenv").config();
+const dotenv = require("dotenv").config({path: path.join(__dirname, "../../.env")});
 const CryptoJS = require("crypto-js")
 
 const status = {
@@ -9,41 +9,15 @@ const status = {
 }
 
 class Mask {
-	constructor(passphrase) {
-		this.passphrase = passphrase
-	}
-
-	encryptAES(text) {
-		const ciphertext = CryptoJS.AES.encrypt(text, this.passphrase, {mode: CryptoJS.mode.ECB});
-		const ivHex = ciphertext.iv.toString();
-	}
-
-	decryptAES(ciphertext) {
-		return ciphertext;
-		// const bytes = CryptoJS.AES.decrypt(ciphertext, this.passphrase, {mode: CryptoJS.mode.ECB});
-		// const originalText = bytes.toString(CryptoJS.enc.Utf8);
-		// return originalText;
+	constructor(salt) {
+		/**
+		 * salt: string, salt applied to string
+		 */
+		this.salt = salt
 	}
 
 	hash(text) {
-		return CryptoJS.SHA512(text).toString()
-	}
-
-	encryptFields(data, path) {
-		// path: string; e.g. '/name'
-		// modifies 'data' variable
-
-		// placeholder for now
-		for (let [key, val] of Object.entries(data)) {
-			val.username = this.encryptAES(val.username)
-		}
-	}
-
-	decryptFields(data, path) {
-		// placeholder for now
-		for (let [key, val] of Object.entries(data)) {
-			val.username = this.decryptAES(val.username)
-		}
+		return CryptoJS.SHA512(text +this.salt).toString()
 	}
 }
 
@@ -54,8 +28,12 @@ class Database {
 		this.name = name
 		this.filename = path.join(__dirname, `./${name}.json`);
 		this.status = status.ERROR;
-		this.properties = properties;
+		this.properties = Object.assign({
+			"salt": ""
+		}, properties);
 		this.data = {}; // store contents here
+
+		this.mask = new Mask(this.properties.salt)
 
 		try {
 			fs.accessSync(this.filename, fs.constants.R_OK | fs.constants.W_OK);
@@ -68,30 +46,7 @@ class Database {
 		console.log("[DEBUG]: properties:", properties)
 
 		this.loadIntoMemory().then(data => {
-			// read properties and carry out the necessary operations (decrypting)
-			// if (properties.keysEncrypted) {
-			// 	this.mask = new Mask(properties.passphrase)
-			// 	const data = {}
-			// 	for (const [key, val] of Object.entries(this.data)) {
-			// 		var decrypted = this.mask.decryptAES(key)
-
-			// 		data[decrypted] = val;
-			// 	}
-			// 	// set new data
-			// 	this.data = data
-			// }
-
-			// parse the properties.fieldsEncrypted value to determine which values need to be decrypted
-			this.mask = new Mask(properties.passphrase)
-			if ("fieldsEncrypted" in properties) {
-				if (this.mask == null) {
-					this.mask = new Mask(properties.passphrase)
-				}
-
-				for (let i = 0; i < properties.fieldsEncrypted.length; i++) {
-					this.mask.decryptFields(this.data, properties.fieldsEncrypted[i])
-				}
-			}
+			// data loaded in successfully
 
 			console.log("[DEBUG]: data:", this.data)
 		});
@@ -138,7 +93,7 @@ class Database {
 			if (res !== null) {console.log(res); res()} // resolve anyways; no clue what to add at this point in time
 			return;
 		}
-		const data = JSON.stringify(this.encryptDatabase(), null, "\t");
+		const data = JSON.stringify(this.data, null, "\t");
 		await fs.writeFile(this.filename, data, "utf-8", err => {
 			if (err) {
 				console.warn("[DEBUG]: error while trying to push contents with fs.writeFile", err);
@@ -149,32 +104,6 @@ class Database {
 			console.log("[DEBUG]: push operation successful for", this.filename);
 			if (res !== null) {res()}
 		});
-	}
-
-	encryptDatabase() {
-		// encrypts .data field (modifies .data field)
-		// returns final encrypted data
-		// encrypts using .properties field
-		// if (this.properties.keysEncrypted) {
-		// 	// this.mask should exist
-		// 	const data = {}
-		// 	for (const [key, val] of Object.entries(this.data)) {
-		// 		var encrypted = this.mask.encryptAES(key)
-
-		// 		data[encrypted] = val;
-		// 	}
-		// 	// set new data
-		// 	this.data = data
-		// }
-
-		// parse the properties.fieldsEncrypted value to determine which values need to be decrypted
-		if ("fieldsEncrypted" in this.properties) {
-			for (let i = 0; i < this.properties.fieldsEncrypted.length; i++) {
-				this.mask.encryptFields(this.data, this.properties.fieldsEncrypted[i])
-			}
-		}
-
-		return this.data
 	}
 
 	offLoad() {
@@ -189,12 +118,11 @@ class Database {
 
 module.exports = {
 	auth_keys: new Database("auth_keys", {
-		keysEncrypted: true,
-		salt: "pepperandcorn",
-		// fieldsEncrypted: ["/username"],
-		passphrase: process.env.ENCRYPT_PASSPHRASE
+		salt: process.env.BLACK_SALT
+	}),
+	qriller_users: new Database("qriller", {
+		salt: process.env.HIMALAYAN_SALT
 	}),
 	images_db: new Database("hearts", {
-		keysEncrypted: false
 	})
 }
